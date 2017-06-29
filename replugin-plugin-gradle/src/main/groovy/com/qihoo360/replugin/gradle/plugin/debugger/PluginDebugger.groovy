@@ -33,9 +33,6 @@ class PluginDebugger {
     public PluginDebugger(Project project) {
         this.project = project
         config = project.extensions.getByName(AppConstant.USER_CONFIG)
-
-
-
     }
 
     /**
@@ -45,7 +42,7 @@ class PluginDebugger {
     public boolean install() {
 
         if (isConfigNull(config)) {
-            return
+            return false
         }
 
         String buildDir = project.buildDir.absolutePath.toString()
@@ -91,7 +88,7 @@ class PluginDebugger {
     public boolean run() {
 
         if (isConfigNull(config)) {
-            return
+            return false
         }
 
         if (null == config.pluginName) {
@@ -115,8 +112,9 @@ class PluginDebugger {
     private boolean isConfigNull(def config) {
         if (null == config) {
             System.err.println "${AppConstant.TAG} the config object can not be null!!!"
-            return false
+            return true
         }
+        return false
     }
 
 
