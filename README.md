@@ -115,13 +115,12 @@ A：
 
 以下是RePlugin接入的应用情况（包括之前的卫士插件化框架）：
 
-* 360 手机卫士
-![](https://github.com/CreateChance/RePlugin/wiki/img/appstore.png)
-* 360 手机助手
-* 360 清理大师
-* 360 影视大全
-* 360 浏览器
-* 花椒相机
+[360手机卫士] | [360手机助手] | [360安全浏览器] | [花椒相机] | [清理大师] |
+-------------------------------------------------------------------|----------|---------------|--------|--------------|
+[![](https://github.com/CreateChance/RePlugin/wiki/img/mobilesafe.png)](https://play.google.com/store/apps/details?id=org.voxe.android) | [![](https://github.com/CreateChance/RePlugin/wiki/img/appstore.png)](https://market.android.com/details?id=com.vuzzz.android) | [![](https://github.com/CreateChance/RePlugin/wiki/img/browser.png)](https://play.google.com/store/apps/details?id=com.ebiz.opencyclo.android) | [![](https://github.com/CreateChance/RePlugin/wiki/img/camera.png)](https://play.google.com/store/apps/details?id=com.ebiz.openparis.android) | [![Capico Logo](https://github.com/CreateChance/RePlugin/wiki/img/clean.png)](https://market.android.com/details?id=com.excilys.condor.android.application)| 
+[360影视大全] | [借钱吧] | [借了吗] | [海淘一号] | [华润通] |
+[![](https://github.com/CreateChance/RePlugin/wiki/img/movie.png)](https://play.google.com/store/apps/details?id=org.voxe.android) | [![](https://github.com/CreateChance/RePlugin/wiki/img/jieqianba.png)](https://market.android.com/details?id=com.vuzzz.android) | [![](https://github.com/CreateChance/RePlugin/wiki/img/jielema.png)](https://play.google.com/store/apps/details?id=com.ebiz.opencyclo.android) | [![](https://github.com/CreateChance/RePlugin/wiki/img/haitao1hao.png)](https://play.google.com/store/apps/details?id=com.ebiz.openparis.android) | [![Capico Logo](https://github.com/CreateChance/RePlugin/wiki/img/huaruntong.png)](https://market.android.com/details?id=com.excilys.condor.android.application)| 
+
 * 360OS 应用
 * 还有几个”孵化项目”
 
