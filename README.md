@@ -116,6 +116,7 @@ A：
 以下是RePlugin接入的应用情况（包括之前的卫士插件化框架）：
 
 * 360 手机卫士
+![](https://github.com/CreateChance/RePlugin/wiki/img/appstore.png)
 * 360 手机助手
 * 360 清理大师
 * 360 影视大全
