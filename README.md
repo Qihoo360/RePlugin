@@ -1,23 +1,21 @@
 <p align="center">
   <a href="https://github.com/Qihoo360/RePlugin/wiki">
-    <img alt="RePlugin Logo" src="https://github.com/Qihoo360/RePlugin/wiki/img/RePlugin.png" width="400"/>
+    <img alt="RePlugin Logo" src="https://github.com/Qihoo360/RePlugin/wiki/img/RePlugin.png" width="400"/>
   </a>
 </p>
 
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
 [![Release Version](https://img.shields.io/badge/release-2.1.0-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/wiki/%E5%8F%91%E8%A1%8C%E6%B3%A8%E8%AE%B0)
 
-**RePlugin开源进入倒计时，今日开源！**
+# 号外！RePlugin 开·源·啦！
 
-首先非常感谢您们关注RePlugin，**在前几天还没有彻底开源的前提下，能达到如此多的Star，300多个Watching，以及很多业内人士的关注**，这些都出乎我们所料。在此非常感谢您们的支持！
+2017年6月30日23:51分，**RePlugin已完成全部测试**，并在保证一切通过的情况下，**正式公开源代码！**
 
-为此，我们郑重宣布：**就在今天！RePlugin在6月30日，将彻底开源！**
-
-而且我们还要补充一点：**我们“绝不搞内测”，而是直接开源上线（版本是2.1.0，而非Pre版）。您们拿到的，就是这些亿级别App在用的，经过了多年验证的**。
-
-再次感谢，希望大家能一如既往的支持RePlugin，无论是加Star，还是提Issue，还是未来提PR，我们都非常的欢迎。
+感谢您们一直以来对关注RePlugin的关注和支持。希望大家能一如既往的支持我们，无论是加Star，还是提Issue，还是未来提PR，我们都非常的欢迎。
 
 **让“全面插件化”（无论大小项目均可使用，稳定与灵活兼得）时代，因RePlugin和您的出现，而更加精彩！**
+
+PS：RePlugin Team的全体成员，大家辛苦了！
 
 - - -
 
@@ -31,41 +29,39 @@ RePlugin是一套完整的、稳定的、适合全面使用的，占坑类插件
 * **管理成熟**：拥有成熟稳定的“插件管理方案”，支持插件安装、升级、卸载、版本管理，甚至包括进程通讯、协议版本、安全校验等
 * **数亿支撑**：有360手机卫士庞大的**数亿**用户做支撑，**三年多的残酷验证**，确保App用到的方案是最稳定、最适合使用的
 
-# 支持的特性
+### 除此之外，我们还支持
 
 | 特性 | 描述 |
 |:-------------:|:-------------:|
-| 支持的组件 | Activity, Service, Receiver, Provider, Application |
-| 新组件无需修改主程序Manifest | 支持 |
-| 支持Android特性 | 近乎所有特性 |
-| **插件类型** | **自带插件（自动识别）、外置插件** |
-| **TaskAffinity** | **完美支持（独创坑位方案）** |
-| **多进程任意分配** | **支持（静态和动态均可）** |
-| 插件间耦合 | 支持Binder、ClassLoader、资源等 |
-| **自定义Theme** | **支持** |
-| AppComat | 支持 |
-| DataBinding | 支持 |
-| SO库随心用 | 支持 |
-| 高级进程间通信 | 支持 |
-| 跨插件资源 | 支持 |
-| 安全校验 | 支持（毕竟是安全公司嘛） |
-| PendingIntent | 支持 |
+| **组件** | **四大组件 + Application** |
+| **升级无需改主程序Manifest** | **完美支持** |
+| **Android特性** | **支持近乎所有** |
+| **插件类型** | **支持自带插件（*自识别*）、外置插件** |
+| **TaskAffinity** | **支持（*坑位方案*）** |
+| **多进程任意分配** | **支持** |
+| **插件间耦合** | **支持Binder、Class Loader、资源等** |
+| **进程间通讯** | **支持同步、异步、Binder、广播等** |
+| **自定义Theme & AppComat** | **支持** |
+| **DataBinding** | **支持** |
+| **SO库随心用** | **支持** |
+| **跨插件资源** | **支持** |
+| **安全校验** | **支持** |
+| **PendingIntent** | **支持** |
 | **首页也能变插件** | **支持** |
-| **Hook点** | **仅一个** |
-| 兼容性 | 几乎所有的设备 |
-| 支持的android版本 | API Level 9+ （2.3及以上） |
+| **兼容性** | **几乎所有的设备** |
+| **Android版本** | **API Level 9+ （2.3及以上）** |
 
 截止2017年6月底，RePlugin的：
 
 | 特性 | 描述 |
 |:-------------:|:-------------:|
-| 插件数 | **103个** |
-| 核心插件 | 57个 |
-| 插件占应用比 | **高达83%** |
-| 年发版次数 | **高达596次** |
-| 平均每日发版次数 | 2~3次 |
-| 崩溃率 | 万分之一（0.01%） |
-| 时间 | 2014年，3年验证 |
+| **插件数** | **103个** |
+| **核心插件** | **57个** |
+| **插件占应用比** | **高达83%** |
+| **年发版次数** | **高达596次** |
+| **平均每工作日发版** | **2~3次** |
+| **崩溃率** | **万分之一（0.01%）** |
+| **时间** | **2014年，3年验证** |
 
 目前360公司几乎**所有的亿级用户量的APP**，以及多款主流第三方APP，都采用了RePlugin方案。
 
@@ -123,13 +119,13 @@ A：
 
 除了360集团旗下的亿级别应用，还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方应用，也接入了RePlugin（目前为SDK）：
 
-[360手机卫士] | [360手机助手] | [360安全浏览器] | [花椒相机] | [清理大师] |
+**360 手机卫士** | **360 手机助手** | **360 手机浏览器** | **花椒相机** | **360 清理大师** |
 -------------------------------------------------------------------|----------|---------------|--------|--------------|
-[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/mobilesafe.png" width="100" height="100">](https://shouji.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/appstore.png" width="100" height="100">](http://sj.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/browser.png" width="100" height="100">](http://mse.360.cn/m/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/camera.png" width="100" height="100">](http://xj.huajiao.com/xji/home/pc) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/clean.png" width="100" height="100">](https://shouji.360.cn/360cleandroid/index.html)| 
-**[360影视大全]** | **[借钱吧]** | **[借了吗]** | **[海淘一号]** | **[华润通]** |
-[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/movie.png" width="100" height="100">](http://www.360kan.com/appdownload) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jieqianba.png" width="100" height="100">](http://www.jielem.com/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jielema.png" width="100" height="100"> | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/haitao1hao.png" width="100" height="100">](http://www.1haitao.com/) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/huaruntong.png" width="100" height="100">](http://www.huaruntong.com/)| 
-**[360OS app]** | **[360借条]** | **[你的app]** | **[你的app]** | **[你的app]** |
-[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360os.jpg" width="100" height="100">](http://www.qiku.com/product/360os2/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360jietiao.jpg" width="100" height="100">](https://www.360jie.com.cn/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="100" height="100"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="100" height="100"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="100" height="100">| 
+[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/mobilesafe.png" width="80" height="80">](https://shouji.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/appstore.png" width="80" height="80">](http://sj.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/browser.png" width="80" height="80">](http://mse.360.cn/m/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/camera.png" width="80" height="80">](http://xj.huajiao.com/xji/home/pc) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/clean.png" width="80" height="80">](https://shouji.360.cn/360cleandroid/index.html)| 
+**360 影视大全** | **借钱吧** | **借了吗** | **海淘一号** | **华润通** |
+[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/movie.png" width="80" height="80">](http://www.360kan.com/appdownload) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jieqianba.png" width="80" height="80">](http://www.jielem.com/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jielema.png" width="80" height="80"> | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/haitao1hao.png" width="80" height="80">](http://www.1haitao.com/) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/huaruntong.png" width="80" height="80">](http://www.huaruntong.com/)| 
+**360OS 应用** | **360借条** | **你的App** | **你的App** | **你的App** |
+[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360os.jpg" width="80" height="80">](http://www.qiku.com/product/360os2/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360jietiao.jpg" width="80" height="80">](https://www.360jie.com.cn/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80">| 
 
 其中，**360手机助手App——即DroidPlugin的创始团队的应用——，现已“全面切换到RePlugin”上**。
 
