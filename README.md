@@ -1,4 +1,11 @@
-# RePlugin
+<p align="center">
+  <a href="https://github.com/Qihoo360/RePlugin/wiki">
+    <img alt="RePlugin Logo" src="https://github.com/Qihoo360/RePlugin/wiki/img/RePlugin.png" width="400"/>
+  </a>
+</p>
+
+[![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
+[![Release Version](https://img.shields.io/badge/release-2.1.0-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/wiki/%E5%8F%91%E8%A1%8C%E6%B3%A8%E8%AE%B0)
 
 **RePlugin开源进入倒计时，今日开源！**
 
@@ -10,7 +17,7 @@
 
 再次感谢，希望大家能一如既往的支持RePlugin，无论是加Star，还是提Issue，还是未来提PR，我们都非常的欢迎。
 
-让**“全面插件化”（无论大小项目均可使用，稳定与灵活兼得）时代**来得更猛烈一些吧！
+**让“全面插件化”（无论大小项目均可使用，稳定与灵活兼得）时代，因RePlugin和您的出现，而更加精彩！**
 
 - - -
 
@@ -31,6 +38,7 @@ RePlugin是一套完整的、稳定的、适合全面使用的，占坑类插件
 | 支持的组件 | Activity, Service, Receiver, Provider, Application |
 | 新组件无需修改主程序Manifest | 支持 |
 | 支持Android特性 | 近乎所有特性 |
+| **插件类型** | **自带插件（自动识别）、外置插件** |
 | **TaskAffinity** | **完美支持（独创坑位方案）** |
 | **多进程任意分配** | **支持（静态和动态均可）** |
 | 插件间耦合 | 支持Binder、ClassLoader、资源等 |
