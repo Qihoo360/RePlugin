@@ -7,7 +7,7 @@
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
 [![Release Version](https://img.shields.io/badge/release-2.1.0-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/wiki/%E5%8F%91%E8%A1%8C%E6%B3%A8%E8%AE%B0)
 
-# 号外！RePlugin 开·源·啦！
+# RePlugin 彻·底·开·源·啦！
 
 2017年6月30日23:51分，**RePlugin已完成全部测试**，并在保证一切通过的情况下，**正式公开源代码！**
 
@@ -21,54 +21,60 @@ PS：RePlugin Team的全体成员，大家辛苦了！
 
 RePlugin是一套完整的、稳定的、适合全面使用的，占坑类插件化方案。其主要优势有：
 * **极其灵活**：主程序无需升级（无需在Manifest中预埋组件），即可支持新增的四大组件，甚至全新的插件
-* **非常稳定**：Hook点仅有一处（ClassLoader）。其崩溃率仅为“万分之一”，并完美兼容市面上近乎所有的Android ROM
-* **特性丰富**：支持近乎所有在“单品”开发时的特性。包括静态Receiver、Task-Affinity坑位、自定义Theme、进程坑位、AppCompat、DataBinding等
-* **易于集成**：无论插件还是主程序，只需“数行”就能完成接入
-* **进程任意**：可让各组件跑在UI、常驻，甚至是“**任意坑位进程**”
-* **自由隔离**：想隔离就隔离（如不稳定或占资源的插件，易于释放），不想隔离的模块就混用（如各种基础、UI插件，都跑在UI进程内，性能优异）
+* **非常稳定**：Hook点仅有一处（ClassLoader）。其崩溃率仅为“万分之一”，**并完美兼容市面上近乎所有的Android ROM**
+* **特性丰富**：支持近乎所有在“单品”开发时的特性。**包括静态Receiver、Task-Affinity坑位、自定义Theme、进程坑位、AppCompat、DataBinding等**
+* **易于集成**：无论插件还是主程序，**只需“数行”就能完成接入**
 * **管理成熟**：拥有成熟稳定的“插件管理方案”，支持插件安装、升级、卸载、版本管理，甚至包括进程通讯、协议版本、安全校验等
 * **数亿支撑**：有360手机卫士庞大的**数亿**用户做支撑，**三年多的残酷验证**，确保App用到的方案是最稳定、最适合使用的
-
-### 除此之外，我们还支持
-
-| 特性 | 描述 |
-|:-------------:|:-------------:|
-| **组件** | **四大组件 + Application** |
-| **升级无需改主程序Manifest** | **完美支持** |
-| **Android特性** | **支持近乎所有** |
-| **插件类型** | **支持自带插件（*自识别*）、外置插件** |
-| **TaskAffinity** | **支持（*坑位方案*）** |
-| **多进程任意分配** | **支持** |
-| **插件间耦合** | **支持Binder、Class Loader、资源等** |
-| **进程间通讯** | **支持同步、异步、Binder、广播等** |
-| **自定义Theme & AppComat** | **支持** |
-| **DataBinding** | **支持** |
-| **SO库随心用** | **支持** |
-| **跨插件资源** | **支持** |
-| **安全校验** | **支持** |
-| **PendingIntent** | **支持** |
-| **首页也能变插件** | **支持** |
-| **兼容性** | **几乎所有的设备** |
-| **Android版本** | **API Level 9+ （2.3及以上）** |
 
 截止2017年6月底，RePlugin的：
 
 | 特性 | 描述 |
 |:-------------:|:-------------:|
-| **插件数** | **103个** |
-| **核心插件** | **57个** |
+| **插件数** | **103（核心57个）** |
 | **插件占应用比** | **高达83%** |
-| **年发版次数** | **高达596次** |
-| **平均每工作日发版** | **2~3次** |
-| **崩溃率** | **万分之一（0.01%）** |
-| **时间** | **2014年，3年验证** |
+| **年发版次数** | **高达596次（工作日均2次）** |
+| **崩溃率** | **万分之一（0.01%），极低** |
+| **时间** | **2014年应用，3年验证** |
 
 目前360公司几乎**所有的亿级用户量的APP**，以及多款主流第三方APP，都采用了RePlugin方案。
 
 有关RePlugin的详细介绍，请[点击这里阅读《RePlugin 官方 WiKi》](https://github.com/Qihoo360/RePlugin/wiki)。
 
+#### 我们还支持以下特性
+
+| 特性 | 描述 |
+|:-------------:|:-------------:|
+| 组件 | **四大组件（含静态Receiver）** |
+| 升级无需改主程序Manifest | **完美支持** |
+| Android特性 | **支持近乎所有（包括SO库等）** |
+| 插件类型 | **支持自带插件（*自识别*）、外置插件** |
+| TaskAffinity & 多进程 | **支持（*坑位方案*）** |
+| 插件间耦合 | **支持Binder、Class Loader、资源等** |
+| 进程间通讯 | **支持同步、异步、Binder、广播等** |
+| 自定义Theme & AppComat | **支持** |
+| DataBinding | **支持** |
+| 安全校验 | **支持** |
+| 资源方案 | **独立资源 + Context传递（相对稳定）** |
+| Android 版本 | **API Level 9+ （2.3及以上）** |
+
 ## 愿景
+
 让插件化能**飞入寻常应用家**，做到稳定、灵活、自由，大小项目兼用。
+
+## RePlugin 架构图
+
+<p align="center">
+  <a href="https://github.com/Qihoo360/RePlugin/wiki">
+    <img alt="RePlugin Framework" src="https://github.com/Qihoo360/RePlugin/wiki/img/RePluginFramePic.jpeg" height="600" />
+  </a>
+</p>
+
+以360手机卫士为例：
+
+* **系统层——Android**：为Android Framework层。**只有ClassLoader是Hook的**，而AMS、Resources等都没有做Hook，确保了其稳定性。
+* **框架层——RePlugin框架**：RePlugin框架层，**只有RePlugin是对“上层完全公开”的**，其余均为Internal，或“动态编译方案”生效后的调用，对开发者而言是“无需关心”的。
+* **插件层——各插件**：“标蓝部分”是各插件，包括大部分的业务插件（如体检、清理、桌面插件等）。而其中“标黄部分”是支撑一个应用的各种基础插件，如WebView、Download、Share，甚至Protobuf都能成为基础插件。
 
 ## 使用方法
 
@@ -117,7 +123,7 @@ A：
 
 我们诚挚期待您成为咱们RePlugin应用大家庭中的一员！
 
-除了360集团旗下的亿级别应用，还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方应用，也接入了RePlugin（目前为SDK）：
+除了**360集团旗下的亿级别应用**之外，还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方合作应用，也接入了RePlugin（目前为SDK）：
 
 **360 手机卫士** | **360 手机助手** | **360 手机浏览器** | **花椒相机** | **360 清理大师** |
 -------------------------------------------------------------------|----------|---------------|--------|--------------|
@@ -130,8 +136,6 @@ A：
 其中，**360手机助手App——即DroidPlugin的创始团队的应用——，现已“全面切换到RePlugin”上**。
 
 这里**衷心感谢** “360手机助手”，以及其它各App团队成员，帮助我们发现了很多需要改进的地方，并给予了非常积极的反馈。您们的鼓励与支持，让咱们的RePlugin能走的更远、更好！
-
-// TODO 说好的图和链接呢？稍安勿躁
 
 ## 已接入RePlugin的插件
 
@@ -153,15 +157,3 @@ A：
 ## License
 
 RePlugin is [Apache v2.0 licensed](./LICENSE).
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
