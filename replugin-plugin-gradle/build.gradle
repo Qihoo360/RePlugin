@@ -22,9 +22,6 @@ apply plugin: 'maven-publish'
 apply from: 'config.gradle'
 
 repositories {
-    maven {
-        url ''
-    }
     jcenter()
 }
 

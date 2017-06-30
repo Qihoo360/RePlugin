@@ -24,6 +24,7 @@ import com.qihoo360.replugin.gradle.host.creator.impl.json.PluginBuiltinJsonCrea
 import com.qihoo360.replugin.gradle.host.handlemanifest.ComponentsGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.logging.LogLevel
 
 /**
@@ -74,9 +75,9 @@ public class Replugin implements Plugin<Project> {
         }
     }
 
-    // 添加 showPlugins 任务
+    // 添加 【查看所有插件信息】 任务
     def addShowPluginTask() {
-        project.task('showPlugins').doLast {
+        Task showPlugins = project.task(AppConstant.TASK_SHOW_PLUGIN).doLast {
             IFileCreator creator = new PluginBuiltinJsonCreator(project, config)
             def dir = creator.getFileDir()
             // 如果 src 路径不存在，创建之
@@ -85,6 +86,8 @@ public class Replugin implements Plugin<Project> {
             }
             new File(dir, creator.getFileName()).write(creator.getFileContent(), 'UTF-8')
         }
+        showPlugins.group = AppConstant.TASKS_GROUP
+
     }
 
     /**

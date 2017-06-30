@@ -73,7 +73,13 @@ public class PluginBuiltinJsonCreator implements IFileCreator {
             }
         }
 
-        // 构建插件们的json信息
-        new JsonOutput().toJson(pluginInfos)
+
+        //构建插件们的json信息
+        def jsonOutput = new JsonOutput()
+        String pluginInfosJson = jsonOutput.toJson(pluginInfos)
+        //格式化打印插件们的json信息
+        println "${AppConstant.TAG} pluginsInfo=${jsonOutput.prettyPrint(pluginInfosJson)}"
+
+        return pluginInfosJson
     }
 }

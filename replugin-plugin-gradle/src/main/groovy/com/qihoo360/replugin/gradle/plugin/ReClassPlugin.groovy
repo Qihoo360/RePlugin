@@ -55,13 +55,26 @@ public class ReClassPlugin implements Plugin<Project> {
 
             PluginDebugger pluginDebugger = new PluginDebugger(project)
 
+            //安装任务（依赖编译任务）
             Task installTask = project.task(AppConstant.TASK_INSTALL_PLUGIN).doLast {
                 pluginDebugger.install()
             }.dependsOn(apkBuildTask)
+            installTask.group = AppConstant.TASKS_GROUP
 
-            project.task(AppConstant.TASK_RUN_PLUGIN).doLast {
+            //运行任务
+            Task runPlugin = project.task(AppConstant.TASK_RUN_PLUGIN).doLast {
+                pluginDebugger.run()
+            }
+            runPlugin.group = AppConstant.TASKS_GROUP
+
+            //安装并运行任务(依赖安装任务)
+            Task installAndRunPlugin = project.task(AppConstant.TASK_INSTALL_AND_RUN_PLUGIN).doLast {
                 pluginDebugger.run()
             }.dependsOn(installTask)
+            installAndRunPlugin.group = AppConstant.TASKS_GROUP
+
+
+
 
             def android = project.extensions.getByType(AppExtension)
             sSDKDir = android.sdkDirectory.getAbsolutePath()

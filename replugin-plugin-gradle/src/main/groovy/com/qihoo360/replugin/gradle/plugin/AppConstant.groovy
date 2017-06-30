@@ -28,11 +28,20 @@ class AppConstant {
     /** 外部用户配置信息 */
     def static final USER_CONFIG = "repluginPluginConfig"
 
+    /** 用户Task组 */
+    def static final TASKS_GROUP = "replugin-plugin"
+
+    /** Task前缀 */
+    def static final TASKS_PREFIX = "rp"
+
     /** 用户Task:安装插件 */
-    def static final TASK_INSTALL_PLUGIN = "installPlugin"
+    def static final TASK_INSTALL_PLUGIN = TASKS_PREFIX + "InstallPlugin"
 
     /** 用户Task:运行插件 */
-    def static final TASK_RUN_PLUGIN = "runPlugin"
+    def static final TASK_RUN_PLUGIN = TASKS_PREFIX + "RunPlugin"
+
+    /** 用户Task:安装并运行插件 */
+    def static final TASK_INSTALL_AND_RUN_PLUGIN = TASKS_PREFIX + "InstallAndRunPlugin"
 
     private AppConstant() {}
 }
