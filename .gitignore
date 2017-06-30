@@ -91,36 +91,6 @@ gradle-app.setting
 
 
 # --------
-# Java
-# https://raw.githubusercontent.com/github/gitignore/master/Java.gitignore
-# Date: 14 Feb 2017
-# --------
-
-# Compiled class file
-*.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
-
-# --------
 # Eclipse
 # https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore
 # Date: 28 Mar 2017
