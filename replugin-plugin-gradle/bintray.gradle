@@ -1,0 +1,86 @@
+/*
+ * Copyright (C) 2005-2017 Qihoo 360 Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed To in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+// 应用插件
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+
+
+def baseUrl = 'https://github.com/Qihoo360/RePlugin'
+def siteUrl = baseUrl
+def gitUrl = "${baseUrl}/RePlugin"
+def issueUrl = "${gitUrl}/issues"
+
+
+
+install {
+    repositories {
+        mavenInstaller {
+            // This generates POM.xml with proper paramters
+            pom.project {
+
+                //添加项目描述
+                name 'Gradle Plugin for Android'
+                url siteUrl
+
+                //设置开源证书信息
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                //添加开发者信息
+                developers {
+                    developer {
+                        name 'replugin'
+                        email 'replugin@gmail.com'
+                    }
+                }
+
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+
+    }
+}
+
+
+//配置上传Bintray相关信息
+bintray {
+    user = ""
+    key = ""
+
+    configurations = ['archives']
+    pkg {
+        repo = '' // 上传到中央仓库的名称
+        name = '' // 上传到jcenter 的项目名称
+        userOrg = ''
+        desc = 'RePlugin - A flexible, stable, easy-to-use Android Plug-in Framework' // 项目描述
+        websiteUrl = siteUrl
+        issueTrackerUrl = issueUrl
+        vcsUrl = gitUrl
+        labels = ['gradle', 'plugin']
+        licenses = ['Apache-2.0']
+        publish = true
+    }
+}
+

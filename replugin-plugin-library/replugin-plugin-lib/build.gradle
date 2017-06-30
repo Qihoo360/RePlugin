@@ -14,9 +14,6 @@
  * the License.
  */
 
-/**
- * @author RePlugin Team
- */
 apply plugin: 'com.android.library'
 
 android {
@@ -24,19 +21,16 @@ android {
     buildToolsVersion '25.0.2'
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 25
-
-        testVariants.all {
-            it.mergedFlavor.manifestPlaceholders = [persistentName: ":GuardService"]
-        }
-
-        consumerProguardFiles 'replugin-rules.pro'
+        minSdkVersion 1
+        versionCode 1
+        versionName "1.0"
+        consumerProguardFiles 'replugin-library-rules.pro'
     }
+
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'replugin-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -46,11 +40,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-
-    // 以“占位符”（Provided）的方式来引用support-v4，不会编入AAR
-    // 但宿主需要支持Support-v4（至少应支持LocalBroadcastManager）
-    provided 'com.android.support:support-v4:25.2.0'
-    compile 'commons-io:commons-io:2.5'
-    compile 'org.apache.commons:commons-lang3:3.5'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    provided 'com.android.support:appcompat-v7:23.4.0'
 }
+apply from: 'bintray.gradle'

@@ -1,0 +1,82 @@
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+def siteUrl = ''
+def gitUrl = ''
+
+version = "2.1.0"
+group = 'com.qihoo360.replugin'  // 组名
+
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            artifactId = ""
+
+            project {
+
+                packaging 'aar'
+                // Add your description here
+                name 'RePlugin - A flexible, stable, easy-to-use Android Plug-in Framework' //项目描述
+                url siteUrl
+                // Set your license
+                licenses {
+                    license {
+                        name 'Apache License 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'qihoo360'    //填写的一些基本信息
+                        name 'qihoo360'
+                        email 'replugin@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    //archives javadocJar
+    archives sourcesJar
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = ""
+    key = ""
+    configurations = ['archives']
+    pkg {
+
+        repo = '' // 上传到中央仓库的名称
+        name = '' // 上传到jcenter 的项目名称
+        userOrg = ''
+        desc = 'RePlugin - A flexible, stable, easy-to-use Android Plug-in Framework' // 项目描述
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+
+}
