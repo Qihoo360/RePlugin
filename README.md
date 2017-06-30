@@ -113,24 +113,15 @@ A：
 
 我们诚挚期待您成为咱们RePlugin应用大家庭中的一员！
 
-以下是RePlugin接入的应用情况（包括之前的卫士插件化框架）：
+除了360集团旗下的亿级别应用，还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方应用，也接入了RePlugin（目前为SDK）：
 
-* 360 手机卫士
-* 360 手机助手
-* 360 清理大师
-* 360 影视大全
-* 360 浏览器
-* 花椒相机
-* 360OS 应用
-* 还有几个”孵化项目”
-
-怎么都是360集团旗下的亿级别应用？当然不仅如此，我们还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方应用，也接入了RePlugin（目前为SDK）：
-
-* 360 借条
-* 借钱吧
-* 海淘一号
-* 华润通
-* 借了吗
+[360手机卫士] | [360手机助手] | [360安全浏览器] | [花椒相机] | [清理大师] |
+-------------------------------------------------------------------|----------|---------------|--------|--------------|
+[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/mobilesafe.png" width="100" height="100">](https://shouji.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/appstore.png" width="100" height="100">](http://sj.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/browser.png" width="100" height="100">](http://mse.360.cn/m/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/camera.png" width="100" height="100">](http://xj.huajiao.com/xji/home/pc) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/clean.png" width="100" height="100">](https://shouji.360.cn/360cleandroid/index.html)| 
+**[360影视大全]** | **[借钱吧]** | **[借了吗]** | **[海淘一号]** | **[华润通]** |
+[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/movie.png" width="100" height="100">](http://www.360kan.com/appdownload) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jieqianba.png" width="100" height="100">](http://www.jielem.com/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jielema.png" width="100" height="100"> | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/haitao1hao.png" width="100" height="100">](http://www.1haitao.com/) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/huaruntong.png" width="100" height="100">](http://www.huaruntong.com/)| 
+**[360OS app]** | **[360借条]** | **[你的app]** | **[你的app]** | **[你的app]** |
+[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360os.jpg" width="100" height="100">](http://www.qiku.com/product/360os2/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360jietiao.jpg" width="100" height="100">](https://www.360jie.com.cn/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="100" height="100"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="100" height="100"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="100" height="100">| 
 
 其中，**360手机助手App——即DroidPlugin的创始团队的应用——，现已“全面切换到RePlugin”上**。
 
