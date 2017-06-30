@@ -113,7 +113,7 @@ A：
 
 我们诚挚期待您成为咱们RePlugin应用大家庭中的一员！
 
-以下是RePlugin接入的应用情况（包括之前的卫士插件化框架）：
+除了360集团旗下的亿级别应用，还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方应用，也接入了RePlugin（目前为SDK）：
 
 [360手机卫士] | [360手机助手] | [360安全浏览器] | [花椒相机] | [清理大师] |
 -------------------------------------------------------------------|----------|---------------|--------|--------------|
@@ -122,17 +122,6 @@ A：
 [<img src="https://github.com/CreateChance/RePlugin/wiki/img/movie.png" width="100" height="100">](http://www.360kan.com/appdownload) | [<img src="https://github.com/CreateChance/RePlugin/wiki/img/jieqianba.png" width="100" height="100">](http://www.jielem.com/) | <img src="https://github.com/CreateChance/RePlugin/wiki/img/jielema.png" width="100" height="100"> | [<img src="https://github.com/CreateChance/RePlugin/wiki/img/haitao1hao.png" width="100" height="100">](http://www.1haitao.com/) | [<img src="https://github.com/CreateChance/RePlugin/wiki/img/huaruntong.png" width="100" height="100">](http://www.huaruntong.com/)| 
 [360OS app] | [360借条] | [你的app] | [你的app] | [你的app] |
 [<img src="https://github.com/CreateChance/RePlugin/wiki/img/360os.jpg" width="100" height="100">](http://www.qiku.com/product/360os2/index.html) | [<img src="https://github.com/CreateChance/RePlugin/wiki/img/360jietiao.jpg" width="100" height="100">](https://www.360jie.com.cn/) | <img src="https://github.com/CreateChance/RePlugin/wiki/img/yourapps.png" width="100" height="100"> | <img src="https://github.com/CreateChance/RePlugin/wiki/img/yourapps.png" width="100" height="100"> | <img src="https://github.com/CreateChance/RePlugin/wiki/img/yourapps.png" width="100" height="100">| 
-
-* 360OS 应用
-* 还有几个”孵化项目”
-
-怎么都是360集团旗下的亿级别应用？当然不仅如此，我们还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方应用，也接入了RePlugin（目前为SDK）：
-
-* 360 借条
-* 借钱吧
-* 海淘一号
-* 华润通
-* 借了吗
 
 其中，**360手机助手App——即DroidPlugin的创始团队的应用——，现已“全面切换到RePlugin”上**。
 
