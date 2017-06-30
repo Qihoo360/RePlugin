@@ -1,0 +1,240 @@
+<!--
+  ~ Copyright (C) 2005-2017 Qihoo 360 Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed To in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.qihoo360.mobilesafe.core">
+
+    <application>
+
+        <!-- 注意：此文件不要写入与'坑位'配置相关的组件（Activity、Provider），它们由 gradle 插件自动生成） -->
+        <!-- 注意：此文件不要写入与'坑位'配置相关的组件（Activity、Provider），它们由 gradle 插件自动生成） -->
+        <!-- 注意：此文件不要写入与'坑位'配置相关的组件（Activity、Provider），它们由 gradle 插件自动生成） -->
+
+        <!-- ======================================================================== -->
+        <!-- 开始：插件stub -->
+        <!-- Activity坑中的screenSize属性 7.3.0以上才支持 -->
+
+        <provider
+            android:name="com.qihoo360.replugin.component.process.ProcessPitProviderPersist"
+            android:authorities="${applicationId}.loader.p.main"
+            android:exported="false"
+            android:process=":GuardService" />
+
+        <provider
+            android:name="com.qihoo360.replugin.component.process.ProcessPitProviderUI"
+            android:authorities="${applicationId}.loader.p.mainN1"
+            android:exported="false" />
+        <provider
+            android:name="${applicationId}.loader.p.ProviderN1"
+            android:authorities="${applicationId}.loader.p.prN1"
+            android:exported="false" />
+
+        <service
+            android:name="${applicationId}.loader.s.ServiceN1"
+            android:exported="false" />
+
+        <provider
+            android:name="com.qihoo360.replugin.component.process.ProcessPitProviderLoader0"
+            android:authorities="${applicationId}.loader.p.main0"
+            android:exported="false"
+            android:process=":loader0" />
+        <provider
+            android:name="${applicationId}.loader.p.Provider0"
+            android:authorities="${applicationId}.loader.p.pr0"
+            android:exported="false"
+            android:process=":loader0" />
+
+        <service
+            android:name="${applicationId}.loader.s.Service0"
+            android:exported="false"
+            android:process=":loader0" />
+
+        <activity
+            android:name="${applicationId}.loader.a.Activity0_singleTask1"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:process=":loader0"
+            android:screenOrientation="portrait"
+            android:taskAffinity=":loader0"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity0_singleInstance1"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:process=":loader0"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity0_task"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader0"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity0_fullscreen"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader0"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity0_translucent"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader0"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity0_translucent_fullscreen"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader0"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity0_dialog"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader0"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity0"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader0"
+            android:screenOrientation="portrait"
+            android:taskAffinity=":loader0"
+            android:theme="@android:style/Theme.NoTitleBar" />
+
+        <provider
+            android:name="com.qihoo360.replugin.component.process.ProcessPitProviderLoader1"
+            android:authorities="${applicationId}.loader.p.main1"
+            android:exported="false"
+            android:process=":loader1" />
+        <provider
+            android:name="${applicationId}.loader.p.Provider1"
+            android:authorities="${applicationId}.loader.p.pr1"
+            android:exported="false"
+            android:process=":loader1" />
+
+        <service
+            android:name="${applicationId}.loader.s.Service1"
+            android:exported="false"
+            android:process=":loader1" />
+
+        <activity
+            android:name="${applicationId}.loader.a.Activity1_singleTask1"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:process=":loader1"
+            android:screenOrientation="portrait"
+            android:taskAffinity=":loader1"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity1_singleInstance1"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:process=":loader1"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity1_task"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader1"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity1_fullscreen"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader1"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity1_translucent"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader1"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity1_translucent_fullscreen"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader1"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity1_dialog"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader1"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name="${applicationId}.loader.a.Activity1"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:process=":loader1"
+            android:screenOrientation="portrait"
+            android:taskAffinity=":loader1"
+            android:theme="@android:style/Theme.NoTitleBar" />
+
+        <provider
+            android:name="com.qihoo360.replugin.component.provider.PluginPitProviderUI"
+            android:authorities="${applicationId}.Plugin.NP.UIP"
+            android:exported="false" />
+        <provider
+            android:name="com.qihoo360.replugin.component.provider.PluginPitProviderPersist"
+            android:authorities="${applicationId}.Plugin.NP.PSP"
+            android:exported="false"
+            android:process=":GuardService" />
+
+        <service
+            android:name="com.qihoo360.replugin.component.service.server.PluginPitServiceGuard"
+            android:process=":GuardService" />
+
+        <service
+            android:name="com.qihoo360.replugin.component.service.server.PluginPitServiceUI" />
+
+        <!-- 结束：插件stub -->
+        <!-- ======================================================================== -->
+
+        <!-- 服务框架 begin -->
+        <provider
+            android:name="com.qihoo360.mobilesafe.svcmanager.ServiceProvider"
+            android:authorities="${applicationId}.svcmanager"
+            android:exported="false"
+            android:multiprocess="false"
+            android:process=":GuardService" />
+        <!-- 服务框架 end -->
+
+        <!-- 在UI进程中安装插件。请参见类的说明 -->
+        <provider
+            android:name="com.qihoo360.replugin.packages.PluginFastInstallProvider"
+            android:authorities="${applicationId}.loader.p.pip"
+            android:exported="false" >
+        </provider>
+
+    </application>
+</manifest>
