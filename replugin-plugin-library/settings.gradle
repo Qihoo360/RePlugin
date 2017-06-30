@@ -13,4 +13,4 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-include ':replugin-library'
+include ':replugin-plugin-lib'
