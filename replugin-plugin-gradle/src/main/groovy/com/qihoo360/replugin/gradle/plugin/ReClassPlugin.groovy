@@ -73,9 +73,6 @@ public class ReClassPlugin implements Plugin<Project> {
             }.dependsOn(installTask)
             installAndRunPlugin.group = AppConstant.TASKS_GROUP
 
-
-
-
             def android = project.extensions.getByType(AppExtension)
             sSDKDir = android.sdkDirectory.getAbsolutePath()
 
