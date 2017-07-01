@@ -7,21 +7,14 @@
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
 [![Release Version](https://img.shields.io/badge/release-2.1.0-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/wiki/%E5%8F%91%E8%A1%8C%E6%B3%A8%E8%AE%B0)
 
-# RePlugin 彻·底·开·源·啦！
 
-2017年6月30日23:51分，**RePlugin已完成全部测试**，并在保证一切通过的情况下，**正式公开源代码！**
+## RePlugin —— 历经三年多考验，数亿设备使用的，稳定占坑类插件化方案
 
-感谢您们一直以来对关注RePlugin的关注和支持。希望大家能一如既往的支持我们，无论是加Star，还是提Issue，还是未来提PR，我们都非常的欢迎。
+RePlugin是一套完整的、稳定的、适合全面使用的，占坑类插件化方案，由360手机卫士的RePlugin Team研发，也是业内首个提出”全面插件化“（全面特性、全面兼容、全面使用）的方案。
 
-**让“全面插件化”（无论大小项目均可使用，稳定与灵活兼得）时代，因RePlugin和您的出现，而更加精彩！**
-
-PS：RePlugin Team的全体成员，大家辛苦了！
-
-- - -
-
-RePlugin是一套完整的、稳定的、适合全面使用的，占坑类插件化方案。其主要优势有：
+其主要优势有：
 * **极其灵活**：主程序无需升级（无需在Manifest中预埋组件），即可支持新增的四大组件，甚至全新的插件
-* **非常稳定**：Hook点仅有一处（ClassLoader）。其崩溃率仅为“万分之一”，**并完美兼容市面上近乎所有的Android ROM**
+* **非常稳定**：Hook点仅有一处（ClassLoader）。其**崩溃率仅为“万分之一”，并完美兼容市面上近乎所有的Android ROM**
 * **特性丰富**：支持近乎所有在“单品”开发时的特性。**包括静态Receiver、Task-Affinity坑位、自定义Theme、进程坑位、AppCompat、DataBinding等**
 * **易于集成**：无论插件还是主程序，**只需“数行”就能完成接入**
 * **管理成熟**：拥有成熟稳定的“插件管理方案”，支持插件安装、升级、卸载、版本管理，甚至包括进程通讯、协议版本、安全校验等
@@ -41,7 +34,7 @@ RePlugin是一套完整的、稳定的、适合全面使用的，占坑类插件
 
 有关RePlugin的详细介绍，请[点击这里阅读《RePlugin 官方 WiKi》](https://github.com/Qihoo360/RePlugin/wiki)。
 
-#### 我们还支持以下特性
+### 我们还支持以下特性
 
 | 特性 | 描述 |
 |:-------------:|:-------------:|
@@ -90,50 +83,61 @@ RePlugin的使用方法非常简单，大部分情况下和“单品”开发无
 
 以下针对在Issue中提到的“最常见问题”做出回答，希望能对您有帮助。
 
+* Q：您们和360之前发的DroidPlugin的主要区别是什么？
+* Q：插件与插件、主程序间可以共用资源吗？
+* Q：您们是否支持DataBinding？
+
 #### Q：您们和360之前发的DroidPlugin的主要区别是什么？
-A：
-其实最主要的技术区别就一个：**Hook点的多少**。
+A：这个问题问得很好。很多人都有这个疑惑——“*为什么你们360要开发两套不同的插件化框架呢*”？
 
-DroidPlugin要Hook的点非常多，好处是可以让APK“直接运行在主程序中”，但代价是失去了一定的稳定性（这点非常关键）。
+其实归根结底，最根本的区别是——**目标的不同**：
 
-相反，RePlugin只Hook了ClassLoader，所以极为稳定，且同样支持绝大多数单品的特性。而APK只需要通过我们的Gradle编译，无需开发者修改Java Code，即可运行在主程序中。但出于稳定性考虑，我们不支持（也不打算支持）“直接将APK，不经修改就放到主程序中”。
+* DroidPlugin主要解决的是各个独立功能拼装在一起，能够快速发布，其间不需要有任何的交互。**目前市面上的一些双开应用，和DroidPlugin的思路有共同之处**。当然了，要做到完整的双开，则仍需要大量的修改，如Native Hook等。
 
-当然，还有一点，就是使用场景的不同：
+* RePlugin解决的是各个功能模块能独立升级，又能需要和宿主、插件之间有一定交互和耦合。
 
-DroidPlugin解决的是各个独立功能拼装在一起，能够快速发布，不需要有任何的交互。目前市面上的一些双开应用，和DroidPlugin的思路有共同之处。当然了，要做到完整的双开，则仍需要大量的修改，如Native Hook等。
+此外，从技术层面上，其最核心的区别就一个：**Hook点的多少**。
 
-RePlugin解决的是各个功能模块能独立升级，又能需要和宿主之间有一定交互。其宗旨是“允许插件少量修改，来换得最佳稳定和灵活”。
+* DroidPlugin可以做到**让APK“直接运行在主程序”中**，无需任何额外修改。但需要Hook大量的API（包括AMS、PackageManager等），在适配上需要做大量的工作。
 
-另外在项目启动时间上，RePlugin最早是2014年中旬用于360手机卫士（完整占坑类方案），DroidPlugin是2015年下旬用于360手机助手。
+* RePlugin只Hook了ClassLoader，所以**极为稳定**，且同样**支持绝大多数单品的特性**，但需要插件做“少许修改”。好在作为插件开发者而言无需过于关心，因为通过“动态编译方案”，开发者可做到“无需开发者修改Java Code，即可运行在主程序中”的效果。
+
+可以肯定的是，**DroidPlugin也是一款业界公认的，优秀的免安装插件方案**。我相信，随着时间的推移，RePlugin和DroidPlugin会分别在各自领域（全面插件化 & 应用免安装）打造出属于自己的一番天地。
+
+#### Q：插件与插件、主程序间可以共用资源吗？
+
+A：可以的，RePlugin会同时把Host和Plugin的Context传递给插件，供开发者选择。
+
+补充：目前业内用得较多的，我们称之为“共享资源”方案——也即需要修改Aapt、做addAssetPath，以达到“宿主和插件用同一套资源”的效果。其好处是插件和主程序可以“直接使用”各自的资源，交互容易。**但代价是需要做“资源分区”，以及针对不同机型（如ZTEResources、MiuiResources）等做适配，稳定性上值得考量**。
+
+> 细心的朋友，可以看一下360手机卫士在2013年的APK，会发现一个小惊喜：其实，我们当年就是这个方案（彼时业内还没有相应公开方案）
+
+而对于RePlugin而言，**稳定永远是第一要义**，因此我们采用的**是“独立资源”方案，插件与应用间是完全独立的**，每个插件都是一个Resources。
+
+但是，“独立”不代表“不能共用”。想象一下，我们卫士有很多插件（如WebView等）都是需要将自己的资源（如Layout-XML等）共享给宿主和其它插件。这时候我们的做法是有两种：
+* 可以直接通过调用RePlugin.fetchResources接口，直接拿到资源
+* 通过反射获取View来间接拿到资源。
+
+例如360手机助手所用的“换肤CommonView”就是采用第二种方式来做的，目前来看，没有问题。
 
 #### Q：您们是否支持DataBinding？
 
-A：
-支持。我们有几个插件在用。除此之外，我们的Sample工程，其Demo2就是用DataBinding做的，而Demo1是ButterKnife。您们可以体验一下。
-
-#### Q：插件可以复用主程序的资源吗？
-
-A：
-可以的，RePlugin会同时把Host和Plugin的Context传递给插件，供开发者选择。
-
-这块儿后续我们还会有文章来专门介绍，敬请期待。
+A：支持。我们有几个插件在用。除此之外，我们的Sample工程，其Demo2就是用DataBinding做的，而Demo1是ButterKnife。您们可以体验一下。
 
 
 ## 已接入RePlugin的应用
 
 我们诚挚期待您成为咱们RePlugin应用大家庭中的一员！
 
-除了**360集团旗下的亿级别应用**之外，还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方合作应用，也接入了RePlugin（目前为SDK）：
+除了**360集团旗下的亿级别应用**以外，还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方合作应用也接入了RePlugin（含SDK）：
 
 **360 手机卫士** | **360 手机助手** | **360 手机浏览器** | **花椒相机** | **360 清理大师** |
 -------------------------------------------------------------------|----------|---------------|--------|--------------|
 [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/mobilesafe.png" width="80" height="80">](https://shouji.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/appstore.png" width="80" height="80">](http://sj.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/browser.png" width="80" height="80">](http://mse.360.cn/m/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/camera.png" width="80" height="80">](http://xj.huajiao.com/xji/home/pc) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/clean.png" width="80" height="80">](https://shouji.360.cn/360cleandroid/index.html)| 
 **360 影视大全** | **借钱吧** | **借了吗** | **海淘一号** | **华润通** |
 [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/movie.png" width="80" height="80">](http://www.360kan.com/appdownload) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jieqianba.png" width="80" height="80">](http://www.jielem.com/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jielema.png" width="80" height="80"> | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/haitao1hao.png" width="80" height="80">](http://www.1haitao.com/) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/huaruntong.png" width="80" height="80">](http://www.huaruntong.com/)| 
-**360OS 应用** | **360借条** | **你的App** | **你的App** | **你的App** |
+**360OS 应用** | **360借条** | **（即将公开）** | **（即将公开）** | **你的App** |
 [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360os.jpg" width="80" height="80">](http://www.qiku.com/product/360os2/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360jietiao.jpg" width="80" height="80">](https://www.360jie.com.cn/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80">| 
-
-其中，**360手机助手App——即DroidPlugin的创始团队的应用——，现已“全面切换到RePlugin”上**。
 
 这里**衷心感谢** “360手机助手”，以及其它各App团队成员，帮助我们发现了很多需要改进的地方，并给予了非常积极的反馈。您们的鼓励与支持，让咱们的RePlugin能走的更远、更好！
 
