@@ -60,40 +60,25 @@ public class ReClassTransform extends Transform {
         CommonData.appModule = config.appModule
         CommonData.ignoredActivities = config.ignoredActivities
 
-        // 未声明要使用的注入器
-        if (!isInjectorDeclared(config)) {
-            // 跳过 reclass
-            copyResult(inputs, outputProvider)
+        def injectors = includedInjectors(config)
+        if (injectors.isEmpty()) {
+            copyResult(inputs, outputProvider) // 跳过 reclass
         } else {
-            // 执行 reclass
-            doTransform(inputs, outputProvider, config)
+            doTransform(inputs, outputProvider, config, injectors) // 执行 reclass
         }
     }
 
     /**
-     * 用户是否声明了注入器
+     * 返回用户未忽略的注入器的集合
      */
-    private boolean isInjectorDeclared(def cfg) {
-        CommonData.includedInjectors = cfg.includedInjectors
-
-        // 查找系统的注入器
-        def found = Injectors.values().find() {
-            it.nickName in CommonData.includedInjectors
-        } != null
-
-        // 查找自定义注入器
-        if (!found) {
-            def customInjectors = cfg.customInjectors
-            found = customInjectors.size() > 0
+    def includedInjectors(def cfg) {
+        def injectors = []
+        Injectors.values().each {
+            if (!(it.nickName in cfg.ignoredInjectors)) {
+                injectors << it.nickName
+            }
         }
-
-        if (!found) {
-            Util.newSection()
-            println 'No Injectors，return.'
-            Util.newSection()
-            return false
-        }
-        return true
+        injectors
     }
 
     /**
@@ -101,7 +86,8 @@ public class ReClassTransform extends Transform {
      */
     def doTransform(Collection<TransformInput> inputs,
                     TransformOutputProvider outputProvider,
-                    Object config) {
+                    Object config,
+                    def injectors) {
 
         /* 初始化 ClassPool */
         Object pool = initClassPool(inputs)
@@ -109,7 +95,7 @@ public class ReClassTransform extends Transform {
         /* 进行注入操作 */
         Util.newSection()
         Injectors.values().each {
-            if (it.nickName in config.includedInjectors) {
+            if (it.nickName in injectors) {
                 println ">>> Do: ${it.nickName}"
                 // 将 NickName 的第 0 个字符转换成小写，用作对应配置的名称
                 def configPre = Util.lowerCaseAtIndex(it.nickName, 0)
@@ -266,17 +252,10 @@ repluginPluginConfig {
     // Name of 'App Module'，use '' if root dir is 'App Module'. ':app' as default.
     appModule = ':app'
 
-    // Injectors：if null or empty, skip reclass.
+    // Injectors ignored
     // LoaderActivityInjector: Replace Activity to LoaderActivity
     // ProviderInjector: Inject provider method call.
-    includedInjectors = ['LoaderActivityInjector']
-
-    customInjectors = [new BaseInjector() {
-        @Override
-        def injectClass(javassist.ClassPool pool, String dir) {
-            // ...
-        }
-    }]
+    ignoredInjectors = ['LoaderActivityInjector']
 }""")
         println('\n')
     }
