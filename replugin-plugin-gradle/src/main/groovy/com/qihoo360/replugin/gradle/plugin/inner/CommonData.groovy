@@ -35,9 +35,6 @@ public class CommonData {
     /** 执行 LoaderActivity 替换时，不需要替换的 Activity */
     def static ignoredActivities = []
 
-    /** 用户声明要使用的注入器 */
-    def static includedInjectors = []
-
     def static putClassAndPath(def className, def classFilePath) {
         classAndPath.put(className, classFilePath)
     }

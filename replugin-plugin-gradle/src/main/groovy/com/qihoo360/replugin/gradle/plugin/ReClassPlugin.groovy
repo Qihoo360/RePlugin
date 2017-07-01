@@ -98,8 +98,8 @@ class ReClassConfig {
     /** 编译的 App Module 的名称 */
     def appModule = ':app'
 
-    /** 用户声明的 注入器的名称，如果未声明，则不进行注入操作 */
-    def includedInjectors = []
+    /** 用户声明要忽略的注入器 */
+    def ignoredInjectors = []
 
     /** 执行 LoaderActivity 替换时，用户声明不需要替换的 Activity */
     def ignoredActivities = []
@@ -124,6 +124,4 @@ class ReClassConfig {
 
     /** 宿主包名,默认"com.qihoo360.repluginapp" */
     def hostApplicationId = "com.qihoo360.repluginapp"
-
-
 }
