@@ -80,11 +80,19 @@ public class Replugin implements Plugin<Project> {
         Task showPlugins = project.task(AppConstant.TASK_SHOW_PLUGIN).doLast {
             IFileCreator creator = new PluginBuiltinJsonCreator(project, config)
             def dir = creator.getFileDir()
-            // 如果 src 路径不存在，创建之
+
             if (!dir.exists()) {
-                println "$TAG mkdirs ${dir.getAbsolutePath()} : ${dir.mkdirs()}"
+                println "${AppConstant.TAG} The ${dir.absolutePath} does not exist "
+                println "${AppConstant.TAG} pluginsInfo=null"
+                return
             }
-            new File(dir, creator.getFileName()).write(creator.getFileContent(), 'UTF-8')
+
+            String fileContent = creator.getFileContent()
+            if (null == fileContent) {
+                return
+            }
+
+            new File(dir, creator.getFileName()).write(fileContent, 'UTF-8')
         }
         showPlugins.group = AppConstant.TASKS_GROUP
 
