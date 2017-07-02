@@ -19,7 +19,6 @@ package com.qihoo360.replugin.gradle.plugin.debugger
 
 import com.qihoo360.replugin.gradle.plugin.AppConstant
 import com.qihoo360.replugin.gradle.plugin.util.CmdUtil
-import groovy.io.FileType
 import org.gradle.api.Project
 
 /**
@@ -27,12 +26,34 @@ import org.gradle.api.Project
  */
 class PluginDebugger {
 
-    def Project project
+    def project
     def config
+    def variant
+    File apkFile
+    File adbFile
 
-    public PluginDebugger(Project project) {
+    public PluginDebugger(Project project, def config, def variant) {
         this.project = project
-        config = project.extensions.getByName(AppConstant.USER_CONFIG)
+        this.config = config
+        this.variant = variant
+
+        def variantData = this.variant.variantData
+        def scope = variantData.scope
+        def globalScope = scope.globalScope
+        def variantConfiguration = variantData.variantConfiguration
+        String archivesBaseName = globalScope.getArchivesBaseName();
+        String apkBaseName = archivesBaseName + "-" + variantConfiguration.getBaseName()
+
+        File apkDir = new File(globalScope.getBuildDir(), "outputs/apk")
+
+        String unsigned = (variantConfiguration.getSigningConfig() == null
+                ? "-unsigned.apk"
+                : ".apk");
+        String apkName = apkBaseName + unsigned
+
+        apkFile = new File(apkDir, apkName)
+
+        adbFile = globalScope.androidBuilder.sdkInfo.adb;
     }
 
     /**
@@ -45,35 +66,26 @@ class PluginDebugger {
             return false
         }
 
-        String buildDir = project.buildDir.absolutePath.toString()
-
-        String apkDir = buildDir + File.separator + "outputs" + File.separator + "apk"
-
-        File apkDirFile = new File(apkDir)
-
         //检查adb环境
-        if (null == config.adbFilePath){
-            System.err.println "${AppConstant.TAG} please config the adbFilePath !!!"
+        if (null == adbFile || !adbFile.exists()) {
+            System.err.println "${AppConstant.TAG} Could not find the adb file !!!"
         }
 
-        //找到要安装的xxx.apk
-        String debugApk = null
-        apkDirFile.eachFileMatch(FileType.FILES, ~/.*\${config.apkPostfix}/) {
-            debugApk = it.absolutePath.toString()
-        }
-        if (null == debugApk) {
-            System.err.println "${AppConstant.TAG} Could not find the available debug apk !!!"
+        //检查apk文件是否存在
+        if (null == apkFile || !apkFile.exists()) {
+            System.err.println "${AppConstant.TAG} Could not find the available apk !!!"
             return false
         }
 
-        //推送xxx.apk到手机
-        String pushCmd = "${config.adbFilePath} push ${debugApk} ${config.phoneStorageDir}"
+        //推送apk文件到手机
+        String pushCmd = "${adbFile.absolutePath} push ${apkFile.absolutePath} ${config.phoneStorageDir}"
         if (0 != CmdUtil.syncExecute(pushCmd)) {
             return false
         }
 
+        File destStorageFile = new File(config.phoneStorageDir, apkFile.name)
         //发送安装广播
-        String installBrCmd = "${config.adbFilePath} shell am broadcast -a ${config.hostApplicationId}.replugin.install -e path ${config.phoneStorageDir}app-debug.apk -e immediately true "
+        String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.install -e path ${destStorageFile.absolutePath} -e immediately true "
         if (0 != CmdUtil.syncExecute(installBrCmd)) {
             return false
         }
@@ -98,7 +110,7 @@ class PluginDebugger {
 
         //发送运行广播
         // adb shell am broadcast -a com.qihoo360.repluginapp.replugin.start_activity -e plugin [Name] -e activity [Class]
-        String installBrCmd = "${config.adbFilePath} shell am broadcast -a ${config.hostApplicationId}.replugin.start_activity -e plugin ${config.pluginName}"
+        String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.start_activity -e plugin ${config.pluginName}"
         if (0 != CmdUtil.syncExecute(installBrCmd)) {
             return false
         }

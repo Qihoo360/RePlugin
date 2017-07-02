@@ -19,13 +19,11 @@ package com.qihoo360.replugin.gradle.plugin
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
-import com.qihoo360.replugin.gradle.plugin.inner.ReClassTransform
 import com.qihoo360.replugin.gradle.plugin.debugger.PluginDebugger
 import com.qihoo360.replugin.gradle.plugin.inner.CommonData
+import com.qihoo360.replugin.gradle.plugin.inner.ReClassTransform
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
-
 /**
  * @author RePlugin Team
  */
@@ -51,32 +49,43 @@ public class ReClassPlugin implements Plugin<Project> {
 
             def config = project.extensions.getByName(AppConstant.USER_CONFIG)
 
-            def apkBuildTask = project.tasks.findByName(config.apkBuildTask)
-
-            PluginDebugger pluginDebugger = new PluginDebugger(project)
-
-            //安装任务（依赖编译任务）
-            Task installTask = project.task(AppConstant.TASK_INSTALL_PLUGIN).doLast {
-                pluginDebugger.install()
-            }.dependsOn(apkBuildTask)
-            installTask.group = AppConstant.TASKS_GROUP
-
-            //运行任务
-            Task runPlugin = project.task(AppConstant.TASK_RUN_PLUGIN).doLast {
-                pluginDebugger.run()
-            }
-            runPlugin.group = AppConstant.TASKS_GROUP
-
-            //安装并运行任务(依赖安装任务)
-            Task installAndRunPlugin = project.task(AppConstant.TASK_INSTALL_AND_RUN_PLUGIN).doLast {
-                pluginDebugger.run()
-            }.dependsOn(installTask)
-            installAndRunPlugin.group = AppConstant.TASKS_GROUP
-
-
-
-
             def android = project.extensions.getByType(AppExtension)
+            android.applicationVariants.all { variant ->
+                PluginDebugger pluginDebugger = new PluginDebugger(project, config, variant)
+
+                def variantData = variant.variantData
+                def scope = variantData.scope
+
+                def assembleTask = variant.getAssemble()
+
+                def installPluginTaskName = scope.getTaskName(AppConstant.TASK_INSTALL_PLUGIN, "")
+                def installPluginTask = project.task(installPluginTaskName)
+
+                installPluginTask.doLast {
+                    //generate json
+                    pluginDebugger.install()
+                }
+                installPluginTask.group = AppConstant.TASKS_GROUP
+                if (assembleTask) {
+                    installPluginTask.dependsOn assembleTask
+                }
+
+                def runPluginTaskName = scope.getTaskName(AppConstant.TASK_RUN_PLUGIN, "")
+                def runPluginTask = project.task(runPluginTaskName)
+                runPluginTask.doLast {
+                    pluginDebugger.run()
+                }
+                runPluginTask.group = AppConstant.TASKS_GROUP
+
+                def installAndRunPluginTaskName = scope.getTaskName(AppConstant.TASK_INSTALL_AND_RUN_PLUGIN, "")
+                def installAndRunPluginTask = project.task(installAndRunPluginTaskName)
+                installAndRunPluginTask.doLast {
+                    pluginDebugger.run()
+                }
+                installAndRunPluginTask.group = AppConstant.TASKS_GROUP
+                installAndRunPluginTask.dependsOn installPluginTask
+            }
+
             sSDKDir = android.sdkDirectory.getAbsolutePath()
 
             CommonData.appPackage = android.defaultConfig.applicationId
@@ -107,17 +116,8 @@ class ReClassConfig {
     /** 自定义的注入器 */
     def customInjectors = []
 
-    /** 配置你的adb文件绝对路径 */
-    def adbFilePath = null
-
     /** 插件名字,默认null */
     def pluginName = null
-
-    /** 插件生成任务,默认"assembleDebug" */
-    def apkBuildTask = "assembleDebug"
-
-    /** 被安装插件apk的后缀,默认"-debug.apk" */
-    def apkPostfix = "-debug.apk"
 
     /** 手机存储目录,默认"/sdcard/" */
     def phoneStorageDir = "/sdcard/"
