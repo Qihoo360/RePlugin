@@ -15,6 +15,7 @@
  */
 buildscript {
     repositories {
+        mavenLocal()
         jcenter()
         maven {
             url  "https://dl.bintray.com/qihoo360/replugin"
@@ -28,6 +29,7 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
         jcenter()
         maven {
             url  "https://dl.bintray.com/qihoo360/replugin"

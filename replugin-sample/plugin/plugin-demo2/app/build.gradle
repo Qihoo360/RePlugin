@@ -21,19 +21,6 @@
  */
 apply plugin: 'com.android.application'
 
-
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            url "https://dl.bintray.com/qihoo360/replugin"
-        }
-    }
-    dependencies {
-        classpath 'com.qihoo360.replugin:replugin-plugin-gradle:2.1.0'
-    }
-}
-
 android {
     compileSdkVersion 21
     buildToolsVersion '23.0.1'
