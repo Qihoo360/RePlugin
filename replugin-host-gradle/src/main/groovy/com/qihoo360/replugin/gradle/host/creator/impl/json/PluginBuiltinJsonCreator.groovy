@@ -54,7 +54,14 @@ public class PluginBuiltinJsonCreator implements IFileCreator {
 
     @Override
     String getFileContent() {
-        // 查找插件文件并抽取信息
+        //查找插件文件并抽取信息,如果没有就直接返回null
+        File pluginDirFile = new File(fileDir.getAbsolutePath() + File.separator + config.pluginDir)
+        if (!pluginDirFile.exists()) {
+            println "${AppConstant.TAG} The ${pluginDirFile.absolutePath} does not exist "
+            println "${AppConstant.TAG} pluginsInfo=null"
+            return null
+        }
+
         new File(fileDir.getAbsolutePath() + File.separator + config.pluginDir)
                 .traverse(type: FileType.FILES, nameFilter: ~/.*\${config.pluginFilePostfix}/) {
 
@@ -73,13 +80,21 @@ public class PluginBuiltinJsonCreator implements IFileCreator {
             }
         }
 
+        //插件为0个
+        if (pluginInfos.isEmpty()) {
+            println "${AppConstant.TAG} pluginsSize=0"
+            println "${AppConstant.TAG} pluginsInfo=null"
+            return null
+        }
 
         //构建插件们的json信息
         def jsonOutput = new JsonOutput()
         String pluginInfosJson = jsonOutput.toJson(pluginInfos)
         //格式化打印插件们的json信息
+        println "${AppConstant.TAG} pluginsSize=${pluginInfos.size()}"
         println "${AppConstant.TAG} pluginsInfo=${jsonOutput.prettyPrint(pluginInfosJson)}"
 
         return pluginInfosJson
     }
+
 }
