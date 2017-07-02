@@ -20,7 +20,8 @@ package com.qihoo360.replugin.gradle.plugin.inner
 import com.android.build.api.transform.DirectoryInput
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInput
-import com.qihoo360.replugin.gradle.plugin.ReClassPlugin
+import com.android.build.gradle.internal.scope.GlobalScope
+import com.android.sdklib.IAndroidTarget
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 
@@ -33,14 +34,15 @@ import java.nio.file.Paths
 public class Util {
 
     /** 生成 ClassPool 使用的 ClassPath 集合，同时将要处理的 jar 写入 includeJars */
-    def static getClassPaths(Collection<TransformInput> inputs, Set<String> includeJars) {
+    def
+    static getClassPaths(Project project, GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars) {
         def classpathList = []
 
         // android.jar
-        classpathList.add(getAndroidJarPath())
+        classpathList.add(getAndroidJarPath(globalScope))
 
         // 原始项目中引用的 classpathList
-        getProjectClassPath(ReClassPlugin.sSDKDir, inputs, includeJars).each {
+        getProjectClassPath(project, inputs, includeJars).each {
             classpathList.add(it)
         }
 
@@ -50,12 +52,12 @@ public class Util {
     }
 
     /** 获取原始项目中的 ClassPath */
-    def private static getProjectClassPath(String sdkDir,
+    def private static getProjectClassPath(Project project,
                                            Collection<TransformInput> inputs,
                                            Set<String> includeJars) {
         def classPath = []
         def visitor = new ClassFileVisitor()
-        def projectDir = ReClassPlugin.sProject.getRootDir().absolutePath
+        def projectDir = project.getRootDir().absolutePath
 
         println ">>> Unzip Jar ..."
 
@@ -102,9 +104,8 @@ public class Util {
     /**
      * 编译环境中 android.jar 的路径
      */
-    def static getAndroidJarPath() {
-        def compileVer = CommonData.compileSdkVersion
-        return String.join(File.separator, ReClassPlugin.sSDKDir, 'platforms', compileVer, 'android.jar')
+    def static getAndroidJarPath(GlobalScope globalScope) {
+        return globalScope.getAndroidBuilder().getTarget().getPath(IAndroidTarget.ANDROID_JAR)
     }
 
     /**
