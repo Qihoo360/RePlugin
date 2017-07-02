@@ -124,6 +124,14 @@ A：可以的，RePlugin会同时把Host和Plugin的Context传递给插件，供
 
 A：支持。我们有几个插件在用。除此之外，我们的Sample工程，其Demo2就是用DataBinding做的，而Demo1是ButterKnife。您们可以体验一下。
 
+#### Q: java.lang.ClassNotFoundException: Didn't find class "xxx.loader.p.ProviderN1"
+
+A：通常遇到这个问题是因为没有在主程序的AndroidManifest.xml中声明Application，或在Application中没有调用RePlugin.App.attachBaseContext等方法导致。
+
+请严格按照“[主程序接入指南](https://github.com/Qihoo360/RePlugin/wiki/%E4%B8%BB%E7%A8%8B%E5%BA%8F%E6%8E%A5%E5%85%A5%E6%8C%87%E5%8D%97)”所述来完成接入，一共只有三个步骤，非常简单。
+
+当然，如果在严格按照接入文档后，仍出现这个问题（这种情况非常罕见），请向我们提交Issue。Issue中应包括：完整的Logcat信息（含崩溃前后上下文）、手机型号、ROM版本、Android版本等。感谢您的理解。
+
 
 ## 已接入RePlugin的应用
 
