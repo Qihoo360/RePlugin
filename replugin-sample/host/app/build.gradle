@@ -24,7 +24,7 @@ android {
     defaultConfig {
         applicationId "com.qihoo360.replugin.sample.host"
         minSdkVersion 9
-        targetSdkVersion 25
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
