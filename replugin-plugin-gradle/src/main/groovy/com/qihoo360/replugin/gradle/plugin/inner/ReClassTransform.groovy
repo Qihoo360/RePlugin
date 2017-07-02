@@ -74,6 +74,7 @@ public class ReClassTransform extends Transform {
     def includedInjectors(def cfg) {
         def injectors = []
         Injectors.values().each {
+            it.injector.setProject(project)
             if (!(it.nickName in cfg.ignoredInjectors)) {
                 injectors << it.nickName
             }
