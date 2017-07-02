@@ -151,7 +151,7 @@ public class Replugin implements Plugin<Project> {
     def doCheckConfig(def name, def count) {
         if (!(count instanceof Integer) || count < 0) {
             this.project.logger.log(LogLevel.ERROR, "\n--------------------------------------------------------")
-            this.project.logger.log(LogLevel.ERROR, " ERROR: ${name} must be an positive integer. ")
+            this.project.logger.log(LogLevel.ERROR, " ${TAG} ERROR: ${name} must be an positive integer. ")
             this.project.logger.log(LogLevel.ERROR, "--------------------------------------------------------\n")
             System.exit(0)
         }
