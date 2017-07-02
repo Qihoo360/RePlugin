@@ -20,6 +20,7 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.api.AndroidSourceSet
 import com.qihoo360.replugin.gradle.host.creator.IFileCreator
 import org.gradle.api.NamedDomainObjectContainer
+
 /**
  * @author RePlugin Team
  */
@@ -30,11 +31,13 @@ public class RePluginHostConfigCreator implements IFileCreator {
 
     def config
     def project
+    def variant
     def fileDir
     def fileName
 
-    def RePluginHostConfigCreator(def project, def cfg) {
+    def RePluginHostConfigCreator(def project, def variant, def cfg) {
         this.project = project
+        this.variant = variant;
         this.config = cfg
         NamedDomainObjectContainer<AndroidSourceSet> sourceSets = project.extensions.getByType(AppExtension).getSourceSets()
         File sourceDir = sourceSets.findByName('main')['javaDirectories'][0]

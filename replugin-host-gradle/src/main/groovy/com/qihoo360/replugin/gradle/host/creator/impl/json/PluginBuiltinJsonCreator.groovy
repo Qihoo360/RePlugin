@@ -29,14 +29,15 @@ import org.gradle.api.NamedDomainObjectContainer
  */
 public class PluginBuiltinJsonCreator implements IFileCreator {
 
+    def variant
     def config
     File fileDir
     def fileName
     def pluginInfos = []
 
-    def PluginBuiltinJsonCreator(def project, def cfg) {
-        config = cfg
-
+    def PluginBuiltinJsonCreator(def project, def variant, def cfg) {
+        this.config = cfg
+        this.variant = variant
         NamedDomainObjectContainer<AndroidSourceSet> sourceSets = project.extensions.getByType(AppExtension).getSourceSets()
         fileDir = sourceSets.findByName('main')['assetsDirectories'][0]
         fileName = config.builtInJsonFileName

@@ -62,7 +62,7 @@ public class Replugin implements Plugin<Project> {
                     }
 
                     output.processResources.doFirst {
-                        new FileCreators().init(project, config).create()
+                        new FileCreators().init(project, variant, config).create()
                     }
 
                     output.processManifest.doLast {
