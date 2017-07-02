@@ -17,8 +17,8 @@
 
 package com.qihoo360.replugin.gradle.plugin.manifest
 
-import com.qihoo360.replugin.gradle.plugin.ReClassPlugin
 import com.qihoo360.replugin.gradle.plugin.inner.Util
+import org.gradle.api.Project
 
 /**
  * @author RePlugin Team
@@ -27,9 +27,9 @@ public class ManifestAPI {
 
     def private static IManifest sManifestAPIImpl
 
-    def static getActivities() {
+    def static getActivities(Project project) {
         if (sManifestAPIImpl == null) {
-            sManifestAPIImpl = new ManifestReader(manifestPath())
+            sManifestAPIImpl = new ManifestReader(manifestPath(project))
         }
         sManifestAPIImpl.activities
     }
@@ -38,8 +38,8 @@ public class ManifestAPI {
      * 获取 AndroidManifest.xml 路径
      * @return
      */
-    def static private manifestPath() {
-        String buildDir = Util.appProject(ReClassPlugin.sProject).buildDir.absolutePath
+    def static private manifestPath(Project project) {
+        String buildDir = Util.appProject(project).buildDir.absolutePath
         String xmlPath = String.join(File.separator, buildDir,
                 'intermediates', 'manifests', 'full', 'release', 'AndroidManifest.xml')
 
