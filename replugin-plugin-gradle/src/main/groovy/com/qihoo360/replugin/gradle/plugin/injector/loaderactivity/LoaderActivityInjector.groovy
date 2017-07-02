@@ -17,7 +17,6 @@
 
 package com.qihoo360.replugin.gradle.plugin.injector.loaderactivity
 
-import com.qihoo360.replugin.gradle.plugin.ReClassPlugin
 import com.qihoo360.replugin.gradle.plugin.injector.BaseInjector
 import com.qihoo360.replugin.gradle.plugin.inner.CommonData
 import com.qihoo360.replugin.gradle.plugin.manifest.ManifestAPI
@@ -26,7 +25,6 @@ import javassist.ClassPool
 import javassist.CtClass
 import javassist.expr.ExprEditor
 import javassist.expr.MethodCall
-import org.gradle.api.Project
 
 /**
  * LOADER_ACTIVITY_CHECK_INJECTOR
@@ -56,7 +54,7 @@ public class LoaderActivityInjector extends BaseInjector {
         init()
 
         /* 遍历程序中声明的所有 Activity */
-        ManifestAPI.activities.each {
+        ManifestAPI.getActivities(project).each {
             // 处理没有被忽略的 Activity
             if (!(it in CommonData.ignoredActivities)) {
                 handleActivity(pool, it, dir)
@@ -155,8 +153,7 @@ public class LoaderActivityInjector extends BaseInjector {
         /* 延迟初始化 loaderActivityRules */
         // todo 从配置中读取，而不是写死在代码中
         if (loaderActivityRules == null) {
-            Project p = ReClassPlugin.sProject
-            def buildSrcPath = p.project(':buildsrc').projectDir.absolutePath
+            def buildSrcPath = project.project(':buildsrc').projectDir.absolutePath
             def loaderConfigPath = String.join(File.separator, buildSrcPath, 'res', LOADER_PROP_FILE)
 
             loaderActivityRules = new Properties()
