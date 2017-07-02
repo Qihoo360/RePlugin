@@ -17,13 +17,21 @@
 
 package com.qihoo360.replugin.gradle.plugin.injector
 
+import org.gradle.api.Project
+
 /**
  * @author RePlugin Team
  */
 public abstract class BaseInjector implements IClassInjector {
 
+    protected Project project
+
     @Override
     public Object name() {
         return getClass().getSimpleName()
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }
