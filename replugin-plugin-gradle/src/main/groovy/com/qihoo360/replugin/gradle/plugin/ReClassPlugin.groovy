@@ -24,22 +24,16 @@ import com.qihoo360.replugin.gradle.plugin.inner.CommonData
 import com.qihoo360.replugin.gradle.plugin.inner.ReClassTransform
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+
 /**
  * @author RePlugin Team
  */
 public class ReClassPlugin implements Plugin<Project> {
 
-    static Project sProject
-
-    // SDK 目录
-    static String sSDKDir
-
     @Override
     public void apply(Project project) {
 
         println "${AppConstant.TAG} Welcome to replugin world ! "
-
-        sProject = project
 
         /* Extensions */
         project.extensions.create(AppConstant.USER_CONFIG, ReClassConfig)
@@ -86,14 +80,9 @@ public class ReClassPlugin implements Plugin<Project> {
                 installAndRunPluginTask.dependsOn installPluginTask
             }
 
-            sSDKDir = android.sdkDirectory.getAbsolutePath()
-
             CommonData.appPackage = android.defaultConfig.applicationId
-            CommonData.compileSdkVersion = android.compileSdkVersion
-            CommonData.buildToolsVersion = android.buildToolsVersion
 
             println ">>> APP_PACKAGE " + CommonData.appPackage
-            println ">>> SDK_DIR " + android.sdkDirectory
 
             def transform = new ReClassTransform(project)
             // 将 transform 注册到 android
