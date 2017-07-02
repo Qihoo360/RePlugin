@@ -18,7 +18,10 @@
 package com.qihoo360.replugin.gradle.plugin.inner
 
 import com.android.build.api.transform.*
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.internal.TaskManager
 import com.android.build.gradle.internal.pipeline.TransformManager
+import com.android.build.gradle.internal.scope.GlobalScope
 import com.qihoo360.replugin.gradle.plugin.injector.IClassInjector
 import com.qihoo360.replugin.gradle.plugin.injector.Injectors
 import javassist.ClassPool
@@ -32,12 +35,16 @@ import org.gradle.api.Project
 public class ReClassTransform extends Transform {
 
     private Project project
+    private GlobalScope globalScope
 
     /* 需要处理的 jar 包 */
     def includeJars = [] as Set
 
     public ReClassTransform(Project p) {
         this.project = p
+        AppPlugin appPlugin = project.plugins.getPlugin(AppPlugin)
+        TaskManager taskManager = appPlugin.taskManager
+        this.globalScope = taskManager.globalScope;
     }
 
     @Override
@@ -180,7 +187,7 @@ public class ReClassTransform extends Transform {
         Util.newSection()
         def pool = new ClassPool(true)
         // 添加编译时需要引用的到类到 ClassPool, 同时记录要修改的 jar 到 includeJars
-        Util.getClassPaths(inputs, includeJars).each {
+        Util.getClassPaths(project, globalScope, inputs, includeJars).each {
             println "    $it"
             pool.insertClassPath(it)
         }
