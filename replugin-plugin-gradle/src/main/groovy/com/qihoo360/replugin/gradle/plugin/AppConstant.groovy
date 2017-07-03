@@ -23,7 +23,7 @@ package com.qihoo360.replugin.gradle.plugin
 class AppConstant {
 
     /** 打印信息时候的前缀 */
-    def static final TAG = "< replugin-plugin >"
+    def static final TAG = "< replugin-plugin-v2.1.1 >"
 
     /** 外部用户配置信息 */
     def static final USER_CONFIG = "repluginPluginConfig"

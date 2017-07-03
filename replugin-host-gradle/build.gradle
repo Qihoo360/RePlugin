@@ -39,7 +39,7 @@ buildscript {
 }
 
 group = 'com.qihoo360.replugin'  // 组名
-version = '2.1.0' // 版本
+version = '2.1.1' // 版本
 
 dependencies {
     compile 'com.android.tools.build:gradle:2.1.3'
