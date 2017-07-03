@@ -28,12 +28,12 @@ public class FileCreators {
 
     def creators
 
-    def init(Project project, def config) {
+    def init(Project project, def variant, def config) {
         creators = []
-        creators << new RePluginHostConfigCreator(project, config)
+        creators << new RePluginHostConfigCreator(project, variant, config)
 
         if (config.autoManageBuiltInJsonFile) {
-            creators << new PluginBuiltinJsonCreator(project, config)
+            creators << new PluginBuiltinJsonCreator(project, variant, config)
         }
         return this
     }

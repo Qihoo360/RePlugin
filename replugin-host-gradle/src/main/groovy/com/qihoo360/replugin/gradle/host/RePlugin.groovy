@@ -24,7 +24,6 @@ import com.qihoo360.replugin.gradle.host.creator.impl.json.PluginBuiltinJsonCrea
 import com.qihoo360.replugin.gradle.host.handlemanifest.ComponentsGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.logging.LogLevel
 
 /**
@@ -48,10 +47,11 @@ public class Replugin implements Plugin<Project> {
 
         if (project.plugins.hasPlugin(AppPlugin)) {
 
-            addShowPluginTask()
-
             def android = project.extensions.getByType(AppExtension)
             android.applicationVariants.all { variant ->
+
+                addShowPluginTask(variant)
+
                 variant.outputs.each { output ->
 
                     if (config == null) {
@@ -62,7 +62,7 @@ public class Replugin implements Plugin<Project> {
                     }
 
                     output.processResources.doFirst {
-                        new FileCreators().init(project, config).create()
+                        new FileCreators().init(project, variant, config).create()
                     }
 
                     output.processManifest.doLast {
@@ -76,9 +76,14 @@ public class Replugin implements Plugin<Project> {
     }
 
     // 添加 【查看所有插件信息】 任务
-    def addShowPluginTask() {
-        Task showPlugins = project.task(AppConstant.TASK_SHOW_PLUGIN).doLast {
-            IFileCreator creator = new PluginBuiltinJsonCreator(project, config)
+    def addShowPluginTask(def variant) {
+        def variantData = variant.variantData
+        def scope = variantData.scope
+        def showPluginsTaskName = scope.getTaskName(AppConstant.TASK_SHOW_PLUGIN, "")
+        def showPluginsTask = project.task(showPluginsTaskName)
+
+        showPluginsTask.doLast {
+            IFileCreator creator = new PluginBuiltinJsonCreator(project, variant, config)
             def dir = creator.getFileDir()
 
             if (!dir.exists()) {
@@ -94,7 +99,17 @@ public class Replugin implements Plugin<Project> {
 
             new File(dir, creator.getFileName()).write(fileContent, 'UTF-8')
         }
-        showPlugins.group = AppConstant.TASKS_GROUP
+        showPluginsTask.group = AppConstant.TASKS_GROUP
+
+        //get mergeAssetsTask name
+        String mergeAssetsTaskName = variant.getVariantData().getScope().getMergeAssetsTask().name
+        //get real gradle task
+        def mergeAssetsTask = project.tasks.getByName(mergeAssetsTaskName)
+
+        //depend on mergeAssetsTask so that assets have been merged
+        if (mergeAssetsTask) {
+            showPluginsTask.dependsOn mergeAssetsTask
+        }
 
     }
 

@@ -16,10 +16,8 @@
 
 package com.qihoo360.replugin.gradle.host.creator.impl.java
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.api.AndroidSourceSet
 import com.qihoo360.replugin.gradle.host.creator.IFileCreator
-import org.gradle.api.NamedDomainObjectContainer
+
 /**
  * @author RePlugin Team
  */
@@ -30,16 +28,18 @@ public class RePluginHostConfigCreator implements IFileCreator {
 
     def config
     def project
+    def variant
     def fileDir
     def fileName
 
-    def RePluginHostConfigCreator(def project, def cfg) {
+    def RePluginHostConfigCreator(def project, def variant, def cfg) {
         this.project = project
+        this.variant = variant;
         this.config = cfg
-        NamedDomainObjectContainer<AndroidSourceSet> sourceSets = project.extensions.getByType(AppExtension).getSourceSets()
-        File sourceDir = sourceSets.findByName('main')['javaDirectories'][0]
-        fileDir = new File(sourceDir.getAbsolutePath(), HOST_CONFIG_PATH)
+        //make it generated in buildConfig output dir so that we don't need to hook anything
+        File buildConfigGeneratedDir = this.variant.getVariantData().getScope().getBuildConfigSourceOutputDir()
         fileName = HOST_CONFIG_NAME;
+        fileDir = new File(buildConfigGeneratedDir, HOST_CONFIG_PATH)
     }
 
     @Override

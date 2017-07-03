@@ -16,29 +16,30 @@
 
 package com.qihoo360.replugin.gradle.host.creator.impl.json
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.api.AndroidSourceSet
 import com.qihoo360.replugin.gradle.host.AppConstant
 import com.qihoo360.replugin.gradle.host.creator.IFileCreator
 import groovy.io.FileType
 import groovy.json.JsonOutput
-import org.gradle.api.NamedDomainObjectContainer
 
 /**
  * @author RePlugin Team
  */
 public class PluginBuiltinJsonCreator implements IFileCreator {
 
+    def variant
     def config
     File fileDir
     def fileName
     def pluginInfos = []
 
-    def PluginBuiltinJsonCreator(def project, def cfg) {
-        config = cfg
-
-        NamedDomainObjectContainer<AndroidSourceSet> sourceSets = project.extensions.getByType(AppExtension).getSourceSets()
-        fileDir = sourceSets.findByName('main')['assetsDirectories'][0]
+    def PluginBuiltinJsonCreator(def project, def variant, def cfg) {
+        this.config = cfg
+        this.variant = variant
+        //make sure processResources Task execute after mergeAssets Task
+        String mergeAssetsTaskName = variant.getVariantData().getScope().getMergeAssetsTask().name
+        //get real gradle task
+        def mergeAssetsTask = project.tasks.getByName(mergeAssetsTaskName)
+        fileDir = mergeAssetsTask.outputDir
         fileName = config.builtInJsonFileName
     }
 
