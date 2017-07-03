@@ -51,10 +51,6 @@ android {
 }
 
 apply plugin: 'replugin-plugin-gradle'
-repluginPluginConfig {
-    includedInjectors = ['LoaderActivityInjector', 'ProviderInjector']
-}
-
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
