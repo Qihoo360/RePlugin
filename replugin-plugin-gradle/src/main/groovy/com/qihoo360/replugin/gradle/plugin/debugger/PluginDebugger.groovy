@@ -36,7 +36,6 @@ class PluginDebugger {
         this.project = project
         this.config = config
         this.variant = variant
-
         def variantData = this.variant.variantData
         def scope = variantData.scope
         def globalScope = scope.globalScope
@@ -121,7 +120,7 @@ class PluginDebugger {
      * @param config
      * @return
      */
-    private boolean isConfigNull(def config) {
+    private static boolean isConfigNull(def config) {
         if (null == config) {
             System.err.println "${AppConstant.TAG} the config object can not be null!!!"
             return true
