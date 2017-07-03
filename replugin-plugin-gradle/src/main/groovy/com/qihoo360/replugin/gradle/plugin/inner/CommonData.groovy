@@ -29,8 +29,6 @@ public class CommonData {
     def static String appModule
 
     def static String appPackage
-    def static String compileSdkVersion
-    def static String buildToolsVersion
 
     /** 执行 LoaderActivity 替换时，不需要替换的 Activity */
     def static ignoredActivities = []

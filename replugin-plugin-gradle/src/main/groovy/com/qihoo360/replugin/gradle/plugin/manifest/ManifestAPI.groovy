@@ -17,8 +17,10 @@
 
 package com.qihoo360.replugin.gradle.plugin.manifest
 
-import com.qihoo360.replugin.gradle.plugin.ReClassPlugin
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.internal.TaskManager
 import com.qihoo360.replugin.gradle.plugin.inner.Util
+import org.gradle.api.Project
 
 /**
  * @author RePlugin Team
@@ -27,9 +29,9 @@ public class ManifestAPI {
 
     def private static IManifest sManifestAPIImpl
 
-    def static getActivities() {
+    def static getActivities(Project project, String variantDir) {
         if (sManifestAPIImpl == null) {
-            sManifestAPIImpl = new ManifestReader(manifestPath())
+            sManifestAPIImpl = new ManifestReader(manifestPath(project, variantDir))
         }
         sManifestAPIImpl.activities
     }
@@ -38,18 +40,21 @@ public class ManifestAPI {
      * 获取 AndroidManifest.xml 路径
      * @return
      */
-    def static private manifestPath() {
-        String buildDir = Util.appProject(ReClassPlugin.sProject).buildDir.absolutePath
-        String xmlPath = String.join(File.separator, buildDir,
-                'intermediates', 'manifests', 'full', 'release', 'AndroidManifest.xml')
+    def static private manifestPath(Project project, String variantDir) {
 
-        // build/.../release 目录下不存在 AndroidManifest.xml，检查 debug 目录
-        if (!new File(xmlPath).exists()) {
-            xmlPath = String.join(File.separator, buildDir,
-                    'intermediates', 'manifests', 'full', 'debug', 'AndroidManifest.xml')
+        AppPlugin appPlugin = project.plugins.getPlugin(AppPlugin)
+        TaskManager taskManager = appPlugin.taskManager
+        def globalScope = taskManager.globalScope;
+
+        File xmlPath = new File(globalScope.getIntermediatesDir(),
+                "/manifests/full/" + variantDir + "/AndroidManifest.xml")
+
+        // 检测文件是否存在
+        if (!xmlPath.exists()) {
+            println "AndroidManifest.xml not exist"
         }
         println "AndroidManifest.xml 路径：$xmlPath"
 
-        xmlPath
+        xmlPath.absolutePath
     }
 }

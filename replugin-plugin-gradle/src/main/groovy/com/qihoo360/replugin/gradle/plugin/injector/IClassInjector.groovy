@@ -18,12 +18,24 @@
 package com.qihoo360.replugin.gradle.plugin.injector
 
 import javassist.ClassPool
+import org.gradle.api.Project
 
 /**
  * @author RePlugin Team
  */
 interface IClassInjector {
 
+    /**
+     * 设置project对象
+     * @param project
+     */
+    void setProject(Project project)
+
+    /**
+     * 设置variant目录关键串
+     * @param variantDir
+     */
+    void setVariantDir(String variantDir)
     /**
      * 注入器名称
      */
