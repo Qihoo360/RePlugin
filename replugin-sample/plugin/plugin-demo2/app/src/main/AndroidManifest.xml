@@ -23,8 +23,6 @@
         android:icon="@mipmap/app_icon"
         android:label="@string/app_name">
 
-        <!-- **不要改动**。插件版本请直接在【plugin.gradle】中修改 -->
-        <!-- 插件各种版本，Gradle已为我们生成好 -->
         <meta-data
             android:name="com.qihoo360.plugin.name"
             android:value="demo2" />
@@ -32,7 +30,6 @@
             android:name="com.qihoo360.plugin.version.ver"
             android:value="100" />
 
-        <!-- 插件主Activity，可替换成您自己的，但一定要修改继承关系 -->
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
