@@ -27,9 +27,9 @@ public class ManifestAPI {
 
     def private static IManifest sManifestAPIImpl
 
-    def static getActivities(Project project) {
+    def static getActivities(Project project, String variantDir) {
         if (sManifestAPIImpl == null) {
-            sManifestAPIImpl = new ManifestReader(manifestPath(project))
+            sManifestAPIImpl = new ManifestReader(manifestPath(project, variantDir))
         }
         sManifestAPIImpl.activities
     }
@@ -38,15 +38,15 @@ public class ManifestAPI {
      * 获取 AndroidManifest.xml 路径
      * @return
      */
-    def static private manifestPath(Project project) {
+    def static private manifestPath(Project project, String variantDir) {
         String buildDir = Util.appProject(project).buildDir.absolutePath
         String xmlPath = String.join(File.separator, buildDir,
-                'intermediates', 'manifests', 'full', 'release', 'AndroidManifest.xml')
+                'intermediates', 'manifests', 'full', variantDir, 'AndroidManifest.xml')
 
         // build/.../release 目录下不存在 AndroidManifest.xml，检查 debug 目录
         if (!new File(xmlPath).exists()) {
             xmlPath = String.join(File.separator, buildDir,
-                    'intermediates', 'manifests', 'full', 'debug', 'AndroidManifest.xml')
+                    'intermediates', 'manifests', 'full', variantDir, 'AndroidManifest.xml')
         }
         println "AndroidManifest.xml 路径：$xmlPath"
 

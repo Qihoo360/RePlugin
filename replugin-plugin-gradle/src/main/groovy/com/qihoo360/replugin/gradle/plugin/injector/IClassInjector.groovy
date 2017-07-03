@@ -30,6 +30,12 @@ interface IClassInjector {
      * @param project
      */
     void setProject(Project project)
+
+    /**
+     * 设置variant目录关键串
+     * @param variantDir
+     */
+    void setVariantDir(String variantDir)
     /**
      * 注入器名称
      */

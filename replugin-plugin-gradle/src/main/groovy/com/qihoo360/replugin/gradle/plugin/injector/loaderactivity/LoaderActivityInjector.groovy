@@ -54,7 +54,7 @@ public class LoaderActivityInjector extends BaseInjector {
         init()
 
         /* 遍历程序中声明的所有 Activity */
-        ManifestAPI.getActivities(project).each {
+        ManifestAPI.getActivities(project, variantDir).each {
             // 处理没有被忽略的 Activity
             if (!(it in CommonData.ignoredActivities)) {
                 handleActivity(pool, it, dir)

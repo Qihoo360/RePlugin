@@ -64,10 +64,15 @@ public class ReClassTransform extends Transform {
         /* 读取用户配置 */
         def config = project.extensions.getByName('repluginPluginConfig')
 
+        File rootLocation = outputProvider.rootLocation
+        def variantDir = rootLocation.absolutePath.split(getName() + "/")[1]
+
+        println ">>> variantDir: ${variantDir}"
+
         CommonData.appModule = config.appModule
         CommonData.ignoredActivities = config.ignoredActivities
 
-        def injectors = includedInjectors(config)
+        def injectors = includedInjectors(config, variantDir)
         if (injectors.isEmpty()) {
             copyResult(inputs, outputProvider) // 跳过 reclass
         } else {
@@ -78,10 +83,13 @@ public class ReClassTransform extends Transform {
     /**
      * 返回用户未忽略的注入器的集合
      */
-    def includedInjectors(def cfg) {
+    def includedInjectors(def cfg, String variantDir) {
         def injectors = []
         Injectors.values().each {
+            //设置project
             it.injector.setProject(project)
+            //设置variant关键dir
+            it.injector.setVariantDir(variantDir)
             if (!(it.nickName in cfg.ignoredInjectors)) {
                 injectors << it.nickName
             }

@@ -26,6 +26,8 @@ public abstract class BaseInjector implements IClassInjector {
 
     protected Project project
 
+    protected String variantDir
+
     @Override
     public Object name() {
         return getClass().getSimpleName()
@@ -33,5 +35,9 @@ public abstract class BaseInjector implements IClassInjector {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public void setVariantDir(String variantDir) {
+        this.variantDir = variantDir;
     }
 }
