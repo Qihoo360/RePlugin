@@ -167,6 +167,16 @@ A：通常遇到这个问题是因为没有在主程序的AndroidManifest.xml中
 
 你可以贡献代码、提出问题、编写文档等。有关“贡献”相关的内容，请[点击这里阅读《贡献力量》](https://github.com/Qihoo360/RePlugin/wiki/%E8%B4%A1%E7%8C%AE%E5%8A%9B%E9%87%8F)
 
+## 与我们联系
+
+欢迎您加入到我们的RePlugin微信群、QQ群大家庭。
+
+微信群二维码：
+
+<img alt="Wechat Group" src="https://github.com/Qihoo360/RePlugin/wiki/img/WechatGroup.jpg" width="300"/>
+
+QQ群：**653205923**
+
 ## License
 
 RePlugin is [Apache v2.0 licensed](./LICENSE).
