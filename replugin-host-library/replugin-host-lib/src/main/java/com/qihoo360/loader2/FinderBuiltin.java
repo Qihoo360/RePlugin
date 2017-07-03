@@ -23,8 +23,8 @@ import com.qihoo360.loader2.Builder.PxAll;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.model.PluginInfo;
 
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
+import com.qihoo360.replugin.ext.io.Charsets;
+import com.qihoo360.replugin.ext.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

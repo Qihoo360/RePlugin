@@ -25,7 +25,7 @@ import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 
-import org.apache.commons.io.FileUtils;
+import com.qihoo360.replugin.ext.io.FileUtils;
 
 import java.io.DataInputStream;
 import java.io.File;

@@ -35,7 +35,7 @@ import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.helper.JSONHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 
-import org.apache.commons.io.FileUtils;
+import com.qihoo360.replugin.ext.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 

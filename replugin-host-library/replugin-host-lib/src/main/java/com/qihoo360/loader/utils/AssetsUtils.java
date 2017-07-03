@@ -24,8 +24,8 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
+import com.qihoo360.replugin.ext.io.Charsets;
+import com.qihoo360.replugin.ext.io.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

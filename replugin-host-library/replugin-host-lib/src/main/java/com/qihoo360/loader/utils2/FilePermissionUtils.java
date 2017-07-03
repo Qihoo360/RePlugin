@@ -16,8 +16,8 @@
 
 package com.qihoo360.loader.utils2;
 
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
+import com.qihoo360.replugin.ext.lang3.ClassUtils;
+import com.qihoo360.replugin.ext.lang3.reflect.MethodUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

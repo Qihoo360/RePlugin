@@ -27,8 +27,8 @@ import android.util.Log;
 import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.RePlugin;
 
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
+import com.qihoo360.replugin.ext.io.Charsets;
+import com.qihoo360.replugin.ext.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

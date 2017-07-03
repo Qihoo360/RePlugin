@@ -23,8 +23,8 @@ import com.qihoo360.loader.utils.CloseableUtils;
 import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.helper.LogDebug;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import com.qihoo360.replugin.ext.io.FileUtils;
+import com.qihoo360.replugin.ext.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;

@@ -37,8 +37,8 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
+import com.qihoo360.replugin.ext.lang3.ClassUtils;
+import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
