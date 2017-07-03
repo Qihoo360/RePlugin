@@ -51,7 +51,7 @@ public class HostConfigHelper {
     public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE = 2;
 
     // TaskAffinity 组数
-    public static int ACTIVITY_PIT_COUNT_TASK = 8;
+    public static int ACTIVITY_PIT_COUNT_TASK = 2;
 
     // 是否使用 AppCompat 库
     public static boolean ACTIVITY_PIT_USE_APPCOMPAT = false;
