@@ -36,7 +36,7 @@ import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.model.PluginInfoList;
 
-import org.apache.commons.io.FileUtils;
+import com.qihoo360.replugin.ext.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

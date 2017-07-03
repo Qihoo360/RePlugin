@@ -20,7 +20,7 @@ import android.text.TextUtils;
 
 import com.qihoo360.replugin.helper.LogRelease;
 
-import org.apache.commons.io.IOUtils;
+import com.qihoo360.replugin.ext.io.IOUtils;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
