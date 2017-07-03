@@ -422,9 +422,10 @@ class Loader {
             }
             mCreateMethod2 = c.getDeclaredMethod(Factory.PLUGIN_ENTRY_EXPORT_METHOD_NAME, Factory.PLUGIN_ENTRY_EXPORT_METHOD2_PARAMS);
         } catch (Throwable e) {
-            if (LOGR) {
-                LogRelease.e(PLUGIN_TAG, e.getMessage(), e);
-            }
+            // 老版本的插件才会用到这个方法，因后面还有新版本的load方式，这里不打log
+//            if (LOGR) {
+//                LogRelease.e(PLUGIN_TAG, e.getMessage(), e);
+//            }
         }
         return mCreateMethod2 != null;
     }
