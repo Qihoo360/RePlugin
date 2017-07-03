@@ -50,6 +50,7 @@ android {
     }
 }
 
+// 这个plugin需要放在android配置之后，因为需要读取android中的配置项
 apply plugin: 'replugin-plugin-gradle'
 
 dependencies {
