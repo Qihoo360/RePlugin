@@ -43,10 +43,9 @@ public class ManifestAPI {
         String xmlPath = String.join(File.separator, buildDir,
                 'intermediates', 'manifests', 'full', variantDir, 'AndroidManifest.xml')
 
-        // build/.../release 目录下不存在 AndroidManifest.xml，检查 debug 目录
+        // 检测文件是否存在
         if (!new File(xmlPath).exists()) {
-            xmlPath = String.join(File.separator, buildDir,
-                    'intermediates', 'manifests', 'full', variantDir, 'AndroidManifest.xml')
+            println "AndroidManifest.xml not exist"
         }
         println "AndroidManifest.xml 路径：$xmlPath"
 
