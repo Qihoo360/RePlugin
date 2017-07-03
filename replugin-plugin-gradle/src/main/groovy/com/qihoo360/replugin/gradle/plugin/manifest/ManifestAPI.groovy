@@ -17,6 +17,8 @@
 
 package com.qihoo360.replugin.gradle.plugin.manifest
 
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.internal.TaskManager
 import com.qihoo360.replugin.gradle.plugin.inner.Util
 import org.gradle.api.Project
 
@@ -39,16 +41,20 @@ public class ManifestAPI {
      * @return
      */
     def static private manifestPath(Project project, String variantDir) {
-        String buildDir = Util.appProject(project).buildDir.absolutePath
-        String xmlPath = String.join(File.separator, buildDir,
-                'intermediates', 'manifests', 'full', variantDir, 'AndroidManifest.xml')
+
+        AppPlugin appPlugin = project.plugins.getPlugin(AppPlugin)
+        TaskManager taskManager = appPlugin.taskManager
+        def globalScope = taskManager.globalScope;
+
+        File xmlPath = new File(globalScope.getIntermediatesDir(),
+                "/manifests/full/" + variantDir + "/AndroidManifest.xml")
 
         // 检测文件是否存在
-        if (!new File(xmlPath).exists()) {
+        if (!xmlPath.exists()) {
             println "AndroidManifest.xml not exist"
         }
         println "AndroidManifest.xml 路径：$xmlPath"
 
-        xmlPath
+        xmlPath.absolutePath
     }
 }
