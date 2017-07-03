@@ -34,13 +34,6 @@ public class SampleApplication extends Application {
         // ======= REPLUGIN =======
         RePlugin.App.attachBaseContext(this);
         // ========================
-
-        // For Tester
-        // 支持接收一些Debug相关的广播
-        // 注意：仅在Debug环境中使用，请不要用于【发布环境】，以免出现危险
-        if (BuildConfig.DEBUG) {
-            DebugReceivers.registerReceivers(this);
-        }
     }
 
     @Override
