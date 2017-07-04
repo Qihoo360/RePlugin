@@ -19,6 +19,7 @@ package com.qihoo360.replugin.gradle.plugin.inner
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.BasePlugin
 import com.android.build.gradle.internal.TaskManager
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.build.gradle.internal.scope.GlobalScope
@@ -43,7 +44,10 @@ public class ReClassTransform extends Transform {
     public ReClassTransform(Project p) {
         this.project = p
         AppPlugin appPlugin = project.plugins.getPlugin(AppPlugin)
-        TaskManager taskManager = appPlugin.taskManager
+
+        // taskManager 在 2.1.3 中为 protected 访问类型的，在之后的版本为 private 访问类型的，
+        // 使用反射访问
+        TaskManager taskManager = BasePlugin.metaClass.getProperty(appPlugin, "taskManager")
         this.globalScope = taskManager.globalScope;
     }
 
@@ -65,7 +69,10 @@ public class ReClassTransform extends Transform {
         def config = project.extensions.getByName('repluginPluginConfig')
 
         File rootLocation = outputProvider.rootLocation
-        def variantDir = rootLocation.absolutePath.split(getName() + "/")[1]
+        // Windows 系统路径分隔符为 \，split 函数参数为正则表达式，而 \ 在正则表达式中为转义字符，
+        // 所以不能直接使用 （getName()+File.separatorChar），为了方便直接使用 name 分割过滤掉
+        // 第一个路径分割字符
+        def variantDir = rootLocation.absolutePath.split(getName())[1].substring(1)
 
         println ">>> variantDir: ${variantDir}"
 
