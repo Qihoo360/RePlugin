@@ -34,7 +34,7 @@ By the end of June 2017, RePlugin has already made some achievements:
 
 At present, almost **all Apps with hundreds of millions users in 360, and many mainstream third-party Apps, are using RePlugin solution**. 
 
-### We are support:
+### We support:
 
 | Feature | Description |
 |:-------------:|:-------------:|
