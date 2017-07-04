@@ -15,7 +15,7 @@ RePlugin is a complete Android plug-in solution which is suitable for general us
 （[文档，还是中文的好](./README_CN.md)）
 
 It is major strengths are:
-* **Extreme flexibility**: App not need to be upgraded to support new components, **even brand new plugins**.
+* **Extreme flexibility**: Apps do not need to be upgraded to support new components, **even brand new plug-ins**.
 * **Extraordinary stability**: With only **ONE** hook (ClassLoader), **NO BINDER HOOK**. RePlugin’s Crash ratio is **as low as Ten thousandth (0.01%)**. In addition, RePlugin is compatible with almost **ALL Android ROMs** in the market.
 * **Rich features**: RePlugin supports **almost all features seamlessly as an installed application**, including static Receiver, Task-Affinity, user-defined Theme, AppCompat, DataBinding, etc.
 * **Easy integration**: It takes only couple lines to access, whether plug-ins or main programs. 
@@ -32,7 +32,7 @@ By the end of June 2017, RePlugin has already made some achievements:
 | **Crash** | **0.01%, Extraordinary stability** |
 | **First Release** | **2014** |
 
-At present, almost **all Apps with hundreds of millions users in 360, and many mainstream third-party Apps, are using RePlugin solution**. 
+At present, almost **all Apps with hundreds of millions users from 360, and many mainstream third-party Apps, are using RePlugin solution**. 
 
 ### We support:
 
@@ -52,7 +52,7 @@ At present, almost **all Apps with hundreds of millions users in 360, and many m
 | Android Version | **API Level 9 (Android 2.3 and above)** |
 
 ## Our Vision
-Make RePlugin be used in all kinds of ordinary Apps and provide stable, flexible, liberal plug-ins which adopt for both large and small projects.
+Make RePlugin be used in all kinds of ordinary Apps; and provide stable, flexible, liberal plug-ins which adopt for both large and small projects.
 
 ## RePlugin Architecture
 
@@ -84,15 +84,15 @@ If you want to view RePlugin’s sample project, and learn concrete usage of the
 
 ## Plug-ins Accessed in RePlugin
 
-For your reference, plug-in accessed can be classified into following categories: 
+For your reference, plug-ins accessed can be classified into following categories: 
 
-* **Expo plug-ins**: Guard Home Page, physical examination, information flow, etc. 
+* **Expo plug-ins**: Safe Home Page, physical examination, information flow, etc. 
 * **Business plug-ins**: cleaning, disturbance intercept, floating window, etc.
 * **Cooperation plug-ins**: App Lock, free Wi-Fi, security desktop, etc.
 * **Background plug-ins**: Push, service management, Protobuf, etc.
 * **Base plug-ins**: Security WebView, share, location service, etc.
 
-By the end of June 2017, we already have 102 plugins like these. We look forward to you becoming a part of RePlugin family!
+By the end of June 2017, we already have 102 plug-ins like these. We look forward to you becoming a part of RePlugin family!
 
 ## Contribute Your Share
 We sincerely welcome and appreciate your contribution of any kind. You can submit code, raise suggestions, write documentation, etc. For more information, please [click here to read Contribute Your Share(Chinese Version)](https://github.com/Qihoo360/RePlugin/wiki/%E8%B4%A1%E7%8C%AE%E5%8A%9B%E9%87%8F).
@@ -102,4 +102,4 @@ We sincerely welcome and appreciate your contribution of any kind. You can submi
 
 RePlugin is [Apache v2.0 licensed](./LICENSE).
 
-(Thanks xiezihan（谢子晗） for providing translations.)
+(Thanks Xiezihan（谢子晗） for providing the translations.)
