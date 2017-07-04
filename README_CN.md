@@ -171,9 +171,7 @@ A：通常遇到这个问题是因为没有在主程序的AndroidManifest.xml中
 
 欢迎您加入到我们的RePlugin微信群、QQ群大家庭。
 
-微信群二维码：
-
-<img alt="Wechat Group" src="https://github.com/Qihoo360/RePlugin/wiki/img/WechatGroup.jpg" width="300"/>
+微信群已超过上限，请进入我们的QQ群
 
 QQ群：**653205923**
 
