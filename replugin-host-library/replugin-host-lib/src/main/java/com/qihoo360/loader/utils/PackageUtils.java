@@ -24,10 +24,10 @@ import android.util.DisplayMetrics;
 
 import com.qihoo360.replugin.helper.LogDebug;
 
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.reflect.ConstructorUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
+import com.qihoo360.replugin.ext.lang3.ClassUtils;
+import com.qihoo360.replugin.ext.lang3.reflect.ConstructorUtils;
+import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
+import com.qihoo360.replugin.ext.lang3.reflect.MethodUtils;
 
 import java.io.File;
 

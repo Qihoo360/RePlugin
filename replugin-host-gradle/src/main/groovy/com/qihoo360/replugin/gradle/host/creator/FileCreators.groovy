@@ -29,13 +29,21 @@ public class FileCreators {
         if (creator == null) {
             return
         }
+      
+     
         def dir = creator.getFileDir()
         if (!dir.exists()) {
             println "${AppConstant.TAG} mkdirs ${dir.getAbsolutePath()} : ${dir.mkdirs()}"
         }
 
         def targetFile = new File(dir, creator.getFileName())
-        targetFile.write(creator.getFileContent(), 'UTF-8')
+      
+        String fileContent = creator.getFileContent()
+        if (null == fileContent){
+            return
+        }
+      
+        targetFile.write(fileContent, 'UTF-8')
         println "${AppConstant.TAG} rewrite ${targetFile.getAbsoluteFile()}"
     }
 
@@ -43,6 +51,7 @@ public class FileCreators {
         def creator = new RePluginHostConfigCreator(project, variant, config)
         create(creator)
     }
+
 
     static def createBuiltinJson(project, variant, config) {
         if (config.autoManageBuiltInJsonFile) {

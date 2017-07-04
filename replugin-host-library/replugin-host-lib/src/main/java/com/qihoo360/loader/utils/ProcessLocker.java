@@ -17,12 +17,11 @@
 package com.qihoo360.loader.utils;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 
-import org.apache.commons.io.FileUtils;
+import com.qihoo360.replugin.ext.io.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

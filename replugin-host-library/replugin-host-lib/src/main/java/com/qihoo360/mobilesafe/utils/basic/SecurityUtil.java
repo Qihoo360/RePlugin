@@ -16,8 +16,8 @@
 
 package com.qihoo360.mobilesafe.utils.basic;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import com.qihoo360.replugin.ext.io.FileUtils;
+import com.qihoo360.replugin.ext.io.IOUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;

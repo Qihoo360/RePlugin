@@ -20,8 +20,8 @@ import android.text.TextUtils;
 
 import com.qihoo360.mobilesafe.utils.basic.SecurityUtil;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import com.qihoo360.replugin.ext.io.FileUtils;
+import com.qihoo360.replugin.ext.io.IOUtils;
 
 import java.io.DataOutputStream;
 import java.io.File;

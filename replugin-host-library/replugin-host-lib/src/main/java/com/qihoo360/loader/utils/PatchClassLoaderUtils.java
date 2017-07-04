@@ -23,7 +23,7 @@ import android.util.Log;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.helper.LogRelease;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
+import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;

@@ -16,8 +16,8 @@
 
 package com.qihoo360.replugin.helper;
 
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
+import com.qihoo360.replugin.ext.lang3.ClassUtils;
+import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
 
 /**
  * 从宿主的 RePluginHostConfig 中获取一些字段值，
