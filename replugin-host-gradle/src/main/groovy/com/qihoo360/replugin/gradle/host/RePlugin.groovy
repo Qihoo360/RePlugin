@@ -52,19 +52,39 @@ public class Replugin implements Plugin<Project> {
 
                 addShowPluginTask(variant)
 
+                if (config == null) {
+                    config = project.extensions.getByName(AppConstant.USER_CONFIG)
+                    def appID = variant.generateBuildConfig.appPackageName
+                    checkUserConfig(config, appID)
+                    newManifest = ComponentsGenerator.generateComponent(appID, config)
+                }
+
+
+                def variantData = variant.variantData
+                def scope = variantData.scope
+
+                def generateJsonAndHostConfigTaskName = scope.getTaskName("rpGenerate", "JsonAndHostConfig")
+                def generateJsonAndHostConfigTask = project.task(generateJsonAndHostConfigTaskName)
+
+                generateJsonAndHostConfigTask.doLast {
+                    new FileCreators().init(project, variant, config).create()
+                }
+                generateJsonAndHostConfigTask.group = AppConstant.TASKS_GROUP
+
+                String generateBuildConfigTaskName = variant.getVariantData().getScope().getGenerateBuildConfigTask().name
+                def generateBuildConfigTask = project.tasks.getByName(generateBuildConfigTaskName)
+                if (generateBuildConfigTaskName) {
+                    generateJsonAndHostConfigTask.dependsOn generateBuildConfigTask
+                }
+
+                String mergeAssetsTaskName = variant.getVariantData().getScope().getMergeAssetsTask().name
+                def mergeAssetsTask = project.tasks.getByName(mergeAssetsTaskName)
+                if (mergeAssetsTask) {
+                    generateJsonAndHostConfigTask.dependsOn mergeAssetsTask
+                    mergeAssetsTask.finalizedBy generateJsonAndHostConfigTask
+                }
+
                 variant.outputs.each { output ->
-
-                    if (config == null) {
-                        config = project.extensions.getByName(AppConstant.USER_CONFIG)
-                        def appID = variant.generateBuildConfig.appPackageName
-                        checkUserConfig(config, appID)
-                        newManifest = ComponentsGenerator.generateComponent(appID, config)
-                    }
-
-                    output.processResources.doFirst {
-                        new FileCreators().init(project, variant, config).create()
-                    }
-
                     output.processManifest.doLast {
                         def manifestPath = output.processManifest.outputFile.absolutePath
                         def updatedContent = new File(manifestPath).getText("UTF-8").replaceAll("</application>", newManifest + "</application>")
