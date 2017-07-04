@@ -46,6 +46,12 @@ public class FileCreators {
             }
 
             def targetFile = new File(dir, creator.getFileName())
+
+            String fileContent = creator.getFileContent()
+            if (null == fileContent){
+                return
+            }
+
             targetFile.write(creator.getFileContent(), 'UTF-8')
             println "${AppConstant.TAG} rewrite ${targetFile.getAbsoluteFile()}"
         }
