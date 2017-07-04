@@ -65,14 +65,14 @@ Make RePlugin be used in all kinds of ordinary Apps and provide stable, flexible
 ## How to Use RePlugin
 Using RePlugin is very simple. Under most conditions, using it is no different than developing an App.
 
-If you are the first-time user, please click here to read [Quick Start Guide(Chinese Version)](https://github.com/Qihoo360/RePlugin/wiki/%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B). Following our guide, you will learn more about RePlugin.
+If you are the first-time user, please [click here to read Quick Start Guide(Chinese Version)](https://github.com/Qihoo360/RePlugin/wiki/%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B). Following our guide, you will learn more about RePlugin.
 
 If you wish to learn more gameplays about RePlugin, please [click here to read Step-by-step Tutorial(Chinese Version)](https://github.com/Qihoo360/RePlugin/wiki/%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B).
 
 If you want to view RePlugin’s sample project, and learn concrete usage of the frame, please [click here to check Sample SC](https://github.com/Qihoo360/RePlugin/blob/master/replugin-sample).
 
 
-## These apps using RePlugin
+## These apps are using RePlugin
 
 **360 MobileSafe** | **360 AppStore** | **360 MobileBrowser** | **HuaJiao Camera** | **360 CleanMaster** |
 -------------------------------------------------------------------|----------|---------------|--------|--------------|
