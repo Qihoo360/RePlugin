@@ -18,8 +18,8 @@
 package com.qihoo360.replugin.gradle.plugin.manifest
 
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.BasePlugin
 import com.android.build.gradle.internal.TaskManager
-import com.qihoo360.replugin.gradle.plugin.inner.Util
 import org.gradle.api.Project
 
 /**
@@ -43,15 +43,17 @@ public class ManifestAPI {
     def static private manifestPath(Project project, String variantDir) {
 
         AppPlugin appPlugin = project.plugins.getPlugin(AppPlugin)
-        TaskManager taskManager = appPlugin.taskManager
+        // taskManager 在 2.1.3 中为 protected 访问类型的，在之后的版本为 private 访问类型的，
+        // 使用反射访问
+        TaskManager taskManager = BasePlugin.metaClass.getProperty(appPlugin, 'taskManager')
         def globalScope = taskManager.globalScope;
 
         File xmlPath = new File(globalScope.getIntermediatesDir(),
-                "/manifests/full/" + variantDir + "/AndroidManifest.xml")
+                '/manifests/full/' + variantDir + '/AndroidManifest.xml')
 
         // 检测文件是否存在
         if (!xmlPath.exists()) {
-            println "AndroidManifest.xml not exist"
+            println 'AndroidManifest.xml not exist'
         }
         println "AndroidManifest.xml 路径：$xmlPath"
 
