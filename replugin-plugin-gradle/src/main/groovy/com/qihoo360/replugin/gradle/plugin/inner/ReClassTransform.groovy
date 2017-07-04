@@ -20,34 +20,30 @@ package com.qihoo360.replugin.gradle.plugin.inner
 import com.android.build.api.transform.*
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BasePlugin
-import com.android.build.gradle.internal.TaskManager
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.android.build.gradle.internal.scope.GlobalScope
 import com.qihoo360.replugin.gradle.plugin.injector.IClassInjector
 import com.qihoo360.replugin.gradle.plugin.injector.Injectors
 import javassist.ClassPool
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
-
 /**
  * @author RePlugin Team
  */
 public class ReClassTransform extends Transform {
 
     private Project project
-    private GlobalScope globalScope
+    private def globalScope
 
     /* 需要处理的 jar 包 */
     def includeJars = [] as Set
 
     public ReClassTransform(Project p) {
         this.project = p
-        AppPlugin appPlugin = project.plugins.getPlugin(AppPlugin)
-
+        def appPlugin = project.plugins.getPlugin(AppPlugin)
         // taskManager 在 2.1.3 中为 protected 访问类型的，在之后的版本为 private 访问类型的，
         // 使用反射访问
-        TaskManager taskManager = BasePlugin.metaClass.getProperty(appPlugin, "taskManager")
+        def taskManager = BasePlugin.metaClass.getProperty(appPlugin, "taskManager")
         this.globalScope = taskManager.globalScope;
     }
 
