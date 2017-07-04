@@ -52,19 +52,52 @@ public class Replugin implements Plugin<Project> {
 
                 addShowPluginTask(variant)
 
+                if (config == null) {
+                    config = project.extensions.getByName(AppConstant.USER_CONFIG)
+                    def appID = variant.generateBuildConfig.appPackageName
+                    checkUserConfig(config, appID)
+                    newManifest = ComponentsGenerator.generateComponent(appID, config)
+                }
+
+
+                def variantData = variant.variantData
+                def scope = variantData.scope
+
+                //host generate task
+                def generateHostConfigTaskName = scope.getTaskName("rpGenerate", "HostConfig")
+                def generateHostConfigTask = project.task(generateHostConfigTaskName)
+
+                generateHostConfigTask.doLast {
+                    FileCreators.createHostConfig(project, variant, config)
+                }
+                generateHostConfigTask.group = AppConstant.TASKS_GROUP
+
+                //depends on build config task
+                String generateBuildConfigTaskName = variant.getVariantData().getScope().getGenerateBuildConfigTask().name
+                def generateBuildConfigTask = project.tasks.getByName(generateBuildConfigTaskName)
+                if (generateBuildConfigTask) {
+                    generateHostConfigTask.dependsOn generateBuildConfigTask
+                    generateBuildConfigTask.finalizedBy generateHostConfigTask
+                }
+
+                //json generate task
+                def generateBuiltinJsonTaskName = scope.getTaskName("rpGenerate", "BuiltinJson")
+                def generateBuiltinJsonTask = project.task(generateBuiltinJsonTaskName)
+
+                generateBuiltinJsonTask.doLast {
+                    FileCreators.createBuiltinJson(project, variant, config)
+                }
+                generateBuiltinJsonTask.group = AppConstant.TASKS_GROUP
+
+                //depends on mergeAssets Task
+                String mergeAssetsTaskName = variant.getVariantData().getScope().getMergeAssetsTask().name
+                def mergeAssetsTask = project.tasks.getByName(mergeAssetsTaskName)
+                if (mergeAssetsTask) {
+                    generateBuiltinJsonTask.dependsOn mergeAssetsTask
+                    mergeAssetsTask.finalizedBy generateBuiltinJsonTask
+                }
+
                 variant.outputs.each { output ->
-
-                    if (config == null) {
-                        config = project.extensions.getByName(AppConstant.USER_CONFIG)
-                        def appID = variant.generateBuildConfig.appPackageName
-                        checkUserConfig(config, appID)
-                        newManifest = ComponentsGenerator.generateComponent(appID, config)
-                    }
-
-                    output.processResources.doFirst {
-                        new FileCreators().init(project, variant, config).create()
-                    }
-
                     output.processManifest.doLast {
                         def manifestPath = output.processManifest.outputFile.absolutePath
                         def updatedContent = new File(manifestPath).getText("UTF-8").replaceAll("</application>", newManifest + "</application>")
