@@ -19,35 +19,35 @@ package com.qihoo360.replugin.gradle.host.creator
 import com.qihoo360.replugin.gradle.host.AppConstant
 import com.qihoo360.replugin.gradle.host.creator.impl.java.RePluginHostConfigCreator
 import com.qihoo360.replugin.gradle.host.creator.impl.json.PluginBuiltinJsonCreator
-import org.gradle.api.Project
 
 /**
  * @author RePlugin Team
  */
 public class FileCreators {
 
-    def creators
-
-    def init(Project project, def variant, def config) {
-        creators = []
-        creators << new RePluginHostConfigCreator(project, variant, config)
-
-        if (config.autoManageBuiltInJsonFile) {
-            creators << new PluginBuiltinJsonCreator(project, variant, config)
+    static def create(IFileCreator creator) {
+        if (creator == null) {
+            return
         }
-        return this
+        def dir = creator.getFileDir()
+        if (!dir.exists()) {
+            println "${AppConstant.TAG} mkdirs ${dir.getAbsolutePath()} : ${dir.mkdirs()}"
+        }
+
+        def targetFile = new File(dir, creator.getFileName())
+        targetFile.write(creator.getFileContent(), 'UTF-8')
+        println "${AppConstant.TAG} rewrite ${targetFile.getAbsoluteFile()}"
     }
 
-    def create() {
-        creators.each { IFileCreator creator ->
-            def dir = creator.getFileDir()
-            if (!dir.exists()) {
-                println "${AppConstant.TAG} mkdirs ${dir.getAbsolutePath()} : ${dir.mkdirs()}"
-            }
+    static def createHostConfig(project, variant, config) {
+        def creator = new RePluginHostConfigCreator(project, variant, config)
+        create(creator)
+    }
 
-            def targetFile = new File(dir, creator.getFileName())
-            targetFile.write(creator.getFileContent(), 'UTF-8')
-            println "${AppConstant.TAG} rewrite ${targetFile.getAbsoluteFile()}"
+    static def createBuiltinJson(project, variant, config) {
+        if (config.autoManageBuiltInJsonFile) {
+            def creator = new PluginBuiltinJsonCreator(project, variant, config)
+            create(creator)
         }
     }
 }

@@ -63,25 +63,38 @@ public class Replugin implements Plugin<Project> {
                 def variantData = variant.variantData
                 def scope = variantData.scope
 
-                def generateJsonAndHostConfigTaskName = scope.getTaskName("rpGenerate", "JsonAndHostConfig")
-                def generateJsonAndHostConfigTask = project.task(generateJsonAndHostConfigTaskName)
+                //host generate task
+                def generateHostConfigTaskName = scope.getTaskName("rpGenerate", "HostConfig")
+                def generateHostConfigTask = project.task(generateHostConfigTaskName)
 
-                generateJsonAndHostConfigTask.doLast {
-                    new FileCreators().init(project, variant, config).create()
+                generateHostConfigTask.doLast {
+                    FileCreators.createHostConfig(project, variant, config)
                 }
-                generateJsonAndHostConfigTask.group = AppConstant.TASKS_GROUP
+                generateHostConfigTask.group = AppConstant.TASKS_GROUP
 
+                //depends on build config task
                 String generateBuildConfigTaskName = variant.getVariantData().getScope().getGenerateBuildConfigTask().name
                 def generateBuildConfigTask = project.tasks.getByName(generateBuildConfigTaskName)
-                if (generateBuildConfigTaskName) {
-                    generateJsonAndHostConfigTask.dependsOn generateBuildConfigTask
+                if (generateBuildConfigTask) {
+                    generateHostConfigTask.dependsOn generateBuildConfigTask
+                    generateBuildConfigTask.finalizedBy generateHostConfigTask
                 }
 
+                //json generate task
+                def generateBuiltinJsonTaskName = scope.getTaskName("rpGenerate", "BuiltinJson")
+                def generateBuiltinJsonTask = project.task(generateBuiltinJsonTaskName)
+
+                generateBuiltinJsonTask.doLast {
+                    FileCreators.createBuiltinJson(project, variant, config)
+                }
+                generateBuiltinJsonTask.group = AppConstant.TASKS_GROUP
+
+                //depends on mergeAssets Task
                 String mergeAssetsTaskName = variant.getVariantData().getScope().getMergeAssetsTask().name
                 def mergeAssetsTask = project.tasks.getByName(mergeAssetsTaskName)
                 if (mergeAssetsTask) {
-                    generateJsonAndHostConfigTask.dependsOn mergeAssetsTask
-                    mergeAssetsTask.finalizedBy generateJsonAndHostConfigTask
+                    generateBuiltinJsonTask.dependsOn mergeAssetsTask
+                    mergeAssetsTask.finalizedBy generateBuiltinJsonTask
                 }
 
                 variant.outputs.each { output ->
