@@ -20,9 +20,9 @@ It is major strengths are:
 * **Rich features**: RePlugin supports **almost all features seamlessly as an installed application**, including static Receiver, Task-Affinity, user-defined Theme, AppCompat, DataBinding, etc.
 * **Easy integration**: It takes only couple lines to access, whether plug-ins or main programs. 
 * **Mature management**:　RePlugin owns stable plug-in management solution which supports installation, upgrade, uninstallation and version management. Process communication, protocol versions and security check are also included. 
-* **Hundreds of millions support**: RePlugin possesses **Hundreds of millions users from 360 MobileSafe.** After more than three-year verification, we guarantee the solution that Apps use is the most stable and suitable.
+* **Hundreds of millions support**: RePlugin possesses **hundreds of millions users from 360 MobileSafe.** After more than three-year verification, we guarantee the solution that Apps use is the most stable and suitable.
 
-By the end of June 2017, RePlugin has already made some achievement:
+By the end of June 2017, RePlugin has already made some achievements:
 
 | Feature | Achievement |
 |:-------------:|:-------------:|
