@@ -16,59 +16,32 @@
 
 package com.qihoo360.replugin.sample.host;
 
-import android.app.Application;
 import android.content.Context;
-import android.content.res.Configuration;
 
 import com.qihoo360.replugin.RePlugin;
+import com.qihoo360.replugin.RePluginApplication;
+import com.qihoo360.replugin.RePluginConfig;
 
 /**
  * @author RePlugin Team
  */
-public class SampleApplication extends Application {
+public class SampleApplication extends RePluginApplication {
+
+    @Override
+    protected RePluginConfig createConfig() {
+        RePluginConfig c = new RePluginConfig();
+
+        // FIXME RePlugin默认会对安装的外置插件进行签名校验，这里先关掉，避免调试时出现签名错误
+        c.setVerifySign(!BuildConfig.DEBUG);
+
+        return c;
+    }
 
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
-        // ======= REPLUGIN =======
-        RePlugin.App.attachBaseContext(this);
-        // ========================
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        // ======= REPLUGIN =======
-        RePlugin.App.onCreate();
-        // ========================
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-
-        // ======= REPLUGIN =======
-        RePlugin.App.onLowMemory();
-        // ========================
-    }
-
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-
-        // ======= REPLUGIN =======
-        RePlugin.App.onTrimMemory(level);
-        // ========================
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        // ======= REPLUGIN =======
-        RePlugin.App.onConfigurationChanged(newConfig);
-        // ========================
+        // FIXME 允许接收rpRunPlugin等Gradle Task，发布时请务必关掉，以免出现问题
+        RePlugin.enableDebugger(base, BuildConfig.DEBUG);
     }
 }
