@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2005-2017 Qihoo 360 Inc.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -42,6 +41,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".PluginFragmentActivity" />
     </application>
 
 </manifest>

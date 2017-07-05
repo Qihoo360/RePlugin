@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2005-2017 Qihoo 360 Inc.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -19,6 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.qihoo360.replugin.sample.host.MainActivity">
 
     <Button
@@ -26,5 +26,14 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center"
-        android:text="@string/jump2demo1"/>
+        android:text="@string/jump2demo1" />
+
+
+    <Button
+        android:id="@+id/btn1"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:text="@string/jump_plugin_fragment" />
+
 </LinearLayout>
