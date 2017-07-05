@@ -1,7 +1,7 @@
 include ':replugin-host-gradle',
-        ':replugin-host-library',
+        ':replugin-host-library:replugin-host-lib',
         ':replugin-plugin-gradle',
-        ':replugin-plugin-library',
-        ':replugin-sample:host',
+        ':replugin-plugin-library:replugin-plugin-lib',
+        ':replugin-sample:host:app',
         ':replugin-sample:plugin:plugin-demo1:app',
         ':replugin-sample:plugin:plugin-demo2:app'
