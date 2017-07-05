@@ -20,7 +20,10 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 
+import com.qihoo360.replugin.DefaultRePluginCallbacks;
+import com.qihoo360.replugin.PluginDexClassLoader;
 import com.qihoo360.replugin.RePlugin;
+import com.qihoo360.replugin.RePluginConfig;
 
 /**
  * @author RePlugin Team
@@ -32,7 +35,10 @@ public class SampleApplication extends Application {
         super.attachBaseContext(base);
 
         // ======= REPLUGIN =======
-        RePlugin.App.attachBaseContext(this);
+        RePlugin.App.attachBaseContext(this, new RePluginConfig()
+                .setUseHostClassIfNotFound(true)//开启插件使用宿主的类
+                .setVerifySign(false)//关闭签名校验
+        );
         // ========================
     }
 

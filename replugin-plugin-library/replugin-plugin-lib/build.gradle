@@ -21,7 +21,7 @@ android {
     buildToolsVersion '25.0.2'
 
     defaultConfig {
-        minSdkVersion 1
+        minSdkVersion 9
         versionCode 1
         versionName "1.0"
         consumerProguardFiles 'replugin-library-rules.pro'
