@@ -129,5 +129,7 @@
         <provider
             android:name=".provider.Provider2"
             android:authorities="com.qihoo360.replugin.sample.demo1.provider2" />
+
+        <activity android:name=".activity.for_result.ForResultActivity"/>
     </application>
 </manifest>
