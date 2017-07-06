@@ -34,7 +34,6 @@ public class Replugin implements Plugin<Project> {
     def static TAG = AppConstant.TAG
     def project
     def config
-    def newManifest
 
     @Override
     public void apply(Project project) {
