@@ -16,9 +16,9 @@
 
 package com.qihoo360.replugin.sample.host;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.View;
 
 import com.qihoo360.replugin.RePlugin;
@@ -26,7 +26,7 @@ import com.qihoo360.replugin.RePlugin;
 /**
  * @author RePlugin Team
  */
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
