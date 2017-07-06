@@ -17,4 +17,5 @@
 <resources>
     <string name="app_name">RePlugin Sample</string>
     <string name="jump2demo1">启动demo1插件</string>
+    <string name="startDemo1ForResult">启动demo1插件(ForResult)</string>
 </resources>

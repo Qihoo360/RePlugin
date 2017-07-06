@@ -19,6 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.qihoo360.replugin.sample.host.MainActivity">
 
     <Button
@@ -26,5 +27,12 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center"
-        android:text="@string/jump2demo1"/>
+        android:text="@string/jump2demo1" />
+
+    <Button
+        android:id="@+id/start_plugin_for_result_btn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:text="@string/startDemo1ForResult" />
 </LinearLayout>
