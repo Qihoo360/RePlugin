@@ -37,6 +37,9 @@ class AppConstant {
     /** 用户Task:安装插件 */
     def static final TASK_SHOW_PLUGIN = TASKS_PREFIX + "ShowPlugins"
 
+    /** 用户Task:Generate任务 */
+    def static final TASK_GENERATE = TASKS_PREFIX + "Generate"
+
 
     private AppConstant() {}
 }
