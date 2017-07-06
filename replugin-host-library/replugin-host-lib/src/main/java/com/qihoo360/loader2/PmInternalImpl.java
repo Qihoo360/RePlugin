@@ -39,6 +39,7 @@ import com.qihoo360.replugin.model.PluginInfo;
 
 import com.qihoo360.replugin.ext.lang3.ClassUtils;
 import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -561,6 +562,10 @@ class PmInternalImpl implements IPluginActivityManager {
 
         // 插件 manifest 中设置的 ThemeId
         int manifestThemeId = intent.getIntExtra(PmLocalImpl.INTENT_KEY_THEME_ID, 0);
+        //如果插件上没有主题则使用Application节点的Theme
+        if (manifestThemeId == 0) {
+            manifestThemeId = activity.getApplicationInfo().theme;
+        }
 
         // 根据 manifest 中声明主题是否透明，获取默认主题
         int defaultThemeId = getDefaultThemeId();
@@ -592,7 +597,7 @@ class PmInternalImpl implements IPluginActivityManager {
                 themeId = dynamicThemeId;
             }
 
-        // 反射失败，检查 AndroidManifest 是否有声明主题
+            // 反射失败，检查 AndroidManifest 是否有声明主题
         } else {
             if (manifestThemeId != 0) {
                 themeId = manifestThemeId;
@@ -611,7 +616,7 @@ class PmInternalImpl implements IPluginActivityManager {
     /**
      * 获取默认 ThemeID
      * 如果 Host 配置了使用 AppCompat，则此处通过反射调用 AppCompat 主题。
-     *
+     * <p>
      * 注：Host 必须配置 AppCompat 依赖，否则反射调用会失败，导致宿主编译不过。
      */
     private static int getDefaultThemeId() {
