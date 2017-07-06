@@ -42,6 +42,8 @@ public class SampleApplication extends Application {
 
         // ======= REPLUGIN =======
         RePlugin.App.onCreate();
+        // Open the debug function
+        RePlugin.enableDebugger(this,true);
         // ========================
     }
 
