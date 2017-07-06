@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         versionName "1.0"
-        versionCode 100
+        versionCode 103
         targetSdkVersion 21
         applicationId "com.qihoo360.replugin.sample.demo1"
         minSdkVersion 15
@@ -50,10 +50,15 @@ android {
     }
 }
 
-// 这个plugin需要放在android配置之后，因为需要读取android中的配置项
-apply plugin: 'replugin-plugin-gradle'
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.qihoo360.replugin:replugin-plugin-lib:2.1.0'
+}
+
+// 这个plugin需要放在android配置之后，因为需要读取android中的配置项
+apply plugin: 'replugin-plugin-gradle'
+repluginPluginConfig {
+    hostApplicationId = "com.qihoo360.replugin.sample.host"
+    pluginName = "demo1"
 }
