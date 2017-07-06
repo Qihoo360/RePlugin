@@ -16,6 +16,7 @@
 
 package com.qihoo360.i;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +25,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.ServiceInfo;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
 
@@ -385,5 +387,17 @@ public final class Factory {
      */
     public static final String fetchPluginName(ClassLoader cl) {
         return sPluginManager.fetchPluginName(cl);
+    }
+
+    /**
+     * 通过 forResult 方式启动一个插件的 Activity
+     *
+     * @param activity    源 Activity
+     * @param intent      要打开 Activity 的 Intent，其中 ComponentName 的 Key 必须为插件名
+     * @param requestCode 请求码
+     * @param options     附加的数据
+     */
+    public static boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
+        return sPluginManager.startActivityForResult(activity, intent, requestCode, options);
     }
 }

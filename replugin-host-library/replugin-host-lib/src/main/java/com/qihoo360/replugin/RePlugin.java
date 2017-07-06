@@ -16,6 +16,7 @@
 
 package com.qihoo360.replugin;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -26,6 +27,7 @@ import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
@@ -249,6 +251,31 @@ public class RePlugin {
     public static boolean startActivity(Context context, Intent intent, String pluginName, String activity) {
         // TODO 先用旧的开启Activity方案，以后再优化
         return Factory.startActivity(context, intent, pluginName, activity, IPluginManager.PROCESS_AUTO);
+    }
+
+    /**
+     * 通过 forResult 方式启动一个插件的 Activity
+     *
+     * @param activity    源 Activity
+     * @param intent      要打开 Activity 的 Intent，其中 ComponentName 的 Key 必须为插件名
+     * @param requestCode 请求码
+     * @see #startActivityForResult(Activity, Intent, int, Bundle)
+     */
+    public static boolean startActivityForResult(Activity activity, Intent intent, int requestCode) {
+        return Factory.startActivityForResult(activity, intent, requestCode, null);
+    }
+
+    /**
+     * 通过 forResult 方式启动一个插件的 Activity
+     *
+     * @param activity    源 Activity
+     * @param intent      要打开 Activity 的 Intent，其中 ComponentName 的 Key 必须为插件名
+     * @param requestCode 请求码
+     * @param options     附加的数据
+     * @see #startActivityForResult(Activity, Intent, int, Bundle)
+     */
+    public static boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
+        return Factory.startActivityForResult(activity, intent, requestCode, options);
     }
 
     /**

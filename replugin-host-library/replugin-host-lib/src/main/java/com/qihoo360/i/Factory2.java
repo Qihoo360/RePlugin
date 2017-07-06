@@ -132,6 +132,19 @@ public final class Factory2 {
     }
 
     /**
+     * 通过 forResult 方式启动一个插件的 Activity
+     *
+     * @param activity    源 Activity
+     * @param intent      要打开 Activity 的 Intent，其中 ComponentName 的 Key 必须为插件名
+     * @param requestCode 请求码
+     * @param options     附加的数据
+     * @see #startActivityForResult(Activity, Intent, int, Bundle)
+     */
+    public static final boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
+        return sPluginManager.startActivityForResult(activity, intent, requestCode, options);
+    }
+
+    /**
      * @hide 内部方法，插件框架使用
      * 返回所有插件的json串，格式见plugins-builtin.json文件
      * @param name 插件名，传null或者空串表示获取全部
