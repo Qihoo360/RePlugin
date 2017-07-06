@@ -20,16 +20,11 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.qihoo360.replugin.helper.LogDebug;
-import com.qihoo360.replugin.i.IPluginManager;
 import com.qihoo360.replugin.library.BuildConfig;
-
-import static com.qihoo360.replugin.helper.LogDebug.LOG;
-import static com.qihoo360.replugin.helper.LogDebug.TAG;
 
 /**
  * 对框架暴露的一些通用的接口。
@@ -177,35 +172,18 @@ public class RePluginInternal {
             return false;
         }
 
-        String plugin = getPluginName(activity, intent);
-
-        if (LOG) {
-            LogDebug.d(TAG, "start activity with startActivityForResult: intent=" + intent);
+        try {
+            Object obj = ProxyRePluginInternalVar.startActivityForResult.call(null, activity, intent, requestCode, options);
+            if (obj != null) {
+                return (Boolean) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
         }
 
-        if (TextUtils.isEmpty(plugin)) {
-            return false;
-        }
-
-        ComponentName cn = intent.getComponent();
-        if (cn == null) {
-            return false;
-        }
-        String name = cn.getClassName();
-
-        ComponentName cnNew = loadPluginActivity(intent, plugin, name, IPluginManager.PROCESS_AUTO);
-        if (cnNew == null) {
-            return false;
-        }
-
-        intent.setComponent(cnNew);
-
-        if (Build.VERSION.SDK_INT >= 16) {
-            activity.startActivityForResult(intent, requestCode, options);
-        } else {
-            activity.startActivityForResult(intent, requestCode);
-        }
-        return true;
+        return false;
     }
 
     /**
@@ -263,6 +241,8 @@ public class RePluginInternal {
 
         private static MethodInvoker startActivity;
 
+        private static MethodInvoker startActivityForResult;
+
         private static MethodInvoker loadPluginActivity;
 
         static void initLocked(final ClassLoader classLoader) {
@@ -277,6 +257,7 @@ public class RePluginInternal {
             handleActivityDestroy = new MethodInvoker(classLoader, factory2, "handleActivityDestroy", new Class<?>[]{Activity.class});
             handleRestoreInstanceState = new MethodInvoker(classLoader, factory2, "handleRestoreInstanceState", new Class<?>[]{Activity.class, Bundle.class});
             startActivity = new MethodInvoker(classLoader, factory2, "startActivity", new Class<?>[]{Activity.class, Intent.class});
+            startActivityForResult = new MethodInvoker(classLoader, factory2, "startActivityForResult", new Class<?>[]{Activity.class, Intent.class, int.class, Bundle.class});
 
             // 初始化Factory相关方法
             loadPluginActivity = new MethodInvoker(classLoader, factory, "loadPluginActivity", new Class<?>[]{Intent.class, String.class, String.class, int.class});
