@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         versionName "1.0"
-        versionCode 100
+        versionCode 103
         targetSdkVersion 21
         applicationId "com.qihoo360.replugin.sample.demo1"
         minSdkVersion 15

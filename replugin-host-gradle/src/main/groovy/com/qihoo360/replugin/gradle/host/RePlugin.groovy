@@ -64,7 +64,7 @@ public class Replugin implements Plugin<Project> {
                 def scope = variantData.scope
 
                 //host generate task
-                def generateHostConfigTaskName = scope.getTaskName("rpGenerate", "HostConfig")
+                def generateHostConfigTaskName = scope.getTaskName(AppConstant.TASK_GENERATE, "HostConfig")
                 def generateHostConfigTask = project.task(generateHostConfigTaskName)
 
                 generateHostConfigTask.doLast {
@@ -81,7 +81,7 @@ public class Replugin implements Plugin<Project> {
                 }
 
                 //json generate task
-                def generateBuiltinJsonTaskName = scope.getTaskName("rpGenerate", "BuiltinJson")
+                def generateBuiltinJsonTaskName = scope.getTaskName(AppConstant.TASK_GENERATE, "BuiltinJson")
                 def generateBuiltinJsonTask = project.task(generateBuiltinJsonTaskName)
 
                 generateBuiltinJsonTask.doLast {
@@ -235,10 +235,10 @@ class RepluginConfig {
      */
     def static useAppCompat = false
 
-    // HOST 向下兼容的插件版本
+    /** HOST 向下兼容的插件版本 */
     def static compatibleVersion = 10
 
-    // HOST 插件版本
+    /** HOST 插件版本 */
     def static currentVersion = 12
 
     /** plugins-builtin.json 文件名自定义,默认是 "plugins-builtin.json" */
