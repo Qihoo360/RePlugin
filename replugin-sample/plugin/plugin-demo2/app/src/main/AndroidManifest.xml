@@ -56,6 +56,8 @@
             </intent-filter>
         </service>
 
+        <!-- start for result -->
+        <activity android:name=".activity.for_result.ForResultActivity"/>
     </application>
 
 </manifest>
