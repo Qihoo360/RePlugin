@@ -54,5 +54,5 @@ android {
 apply plugin: 'replugin-plugin-gradle'
 dependencies {
     compile 'com.qihoo360.replugin:replugin-plugin-lib:2.1.0'
-    provided files('libs/fragment.jar')
+    provided files('libs/fragment.jar')//这个jar就是从Support-fragment中提取出来的并非特制包目的是为了骗过编译期
 }
