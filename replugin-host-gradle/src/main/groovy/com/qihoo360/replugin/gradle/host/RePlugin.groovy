@@ -54,11 +54,11 @@ public class Replugin implements Plugin<Project> {
 
                 if (config == null) {
                     config = project.extensions.getByName(AppConstant.USER_CONFIG)
-                    def appID = variant.generateBuildConfig.appPackageName
-                    checkUserConfig(config, appID)
-                    newManifest = ComponentsGenerator.generateComponent(appID, config)
+                    checkUserConfig(config)
                 }
 
+                def appID = variant.generateBuildConfig.appPackageName
+                def newManifest = ComponentsGenerator.generateComponent(appID, config)
 
                 def variantData = variant.variantData
                 def scope = variantData.scope
@@ -149,7 +149,7 @@ public class Replugin implements Plugin<Project> {
     /**
      * 检查用户配置项
      */
-    def checkUserConfig(config, appID) {
+    def checkUserConfig(config) {
 /*
         def persistentName = config.persistentName
 
@@ -173,7 +173,7 @@ public class Replugin implements Plugin<Project> {
         doCheckConfig("countTask", config.countTask)
 
         println '--------------------------------------------------------------------------'
-        println "${TAG} appID=${appID}"
+//        println "${TAG} appID=${appID}"
         println "${TAG} useAppCompat=${config.useAppCompat}"
         // println "${TAG} persistentName=${config.persistentName}"
         println "${TAG} countProcess=${config.countProcess}"
