@@ -34,7 +34,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,6 +47,14 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName("demo1", "com.qihoo360.replugin.sample.demo1.activity.for_result.ForResultActivity"));
                 RePlugin.startActivityForResult(MainActivity.this, intent, REQUEST_CODE_DEMO1, null);
+            }
+        });
+
+        findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PluginFragmentActivity.class));
             }
         });
     }
