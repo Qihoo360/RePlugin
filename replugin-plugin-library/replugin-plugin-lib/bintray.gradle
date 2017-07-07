@@ -4,9 +4,6 @@ apply plugin: 'com.jfrog.bintray'
 def siteUrl = '' // 项目的主页
 def gitUrl = '' // Git仓库的url
 
-version = "2.1.0"
-group = 'com.qihoo360.replugin'  // 组名
-
 
 install {
     repositories.mavenInstaller {
