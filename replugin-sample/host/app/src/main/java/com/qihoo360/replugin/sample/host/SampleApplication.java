@@ -32,7 +32,7 @@ import com.qihoo360.replugin.RePluginEventCallbacks;
  * @author RePlugin Team
  */
 public class SampleApplication extends RePluginApplication {
-    
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);

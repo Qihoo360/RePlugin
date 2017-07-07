@@ -18,6 +18,7 @@ package com.qihoo360.replugin.sample.demo1;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -237,11 +238,31 @@ public class MainActivity extends Activity {
         }));
     }
 
+    private static final int REQUEST_CODE_DEMO2 = 0x021;
+    private static final int RESULT_CODE_DEMO2 = 0x022;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_DEMO2 && resultCode == RESULT_CODE_DEMO2) {
+            Toast.makeText(this, data.getStringExtra("data"), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         ListView lv = (ListView) findViewById(R.id.list_view);
+
+        mItems.add(new TestItem("跨插件 startActivityForResult", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName("demo2", "com.qihoo360.replugin.sample.demo2.activity.for_result.ForResultActivity"));
+                MainActivity.this.startActivityForResult(intent, REQUEST_CODE_DEMO2);
+            }
+        }));
+
         lv.setAdapter(new TestAdapter());
     }
 

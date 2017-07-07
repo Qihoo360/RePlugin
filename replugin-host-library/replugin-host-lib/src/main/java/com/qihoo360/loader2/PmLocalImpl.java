@@ -16,6 +16,7 @@
 
 package com.qihoo360.loader2;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
 
@@ -305,6 +307,15 @@ class PmLocalImpl implements IPluginManager {
         }
 
         return mPluginMgr.mInternal.startActivity(context, intent, plugin, activity, process, true);
+    }
+
+    @Override
+    public boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
+        if (LOG) {
+            LogDebug.d(PLUGIN_TAG, "startActivityForResult: intent=" + intent + " requestCode=" + requestCode+ " options=" + options);
+        }
+
+        return mPluginMgr.mInternal.startActivityForResult(activity, intent, requestCode, options);
     }
 
     @Override
