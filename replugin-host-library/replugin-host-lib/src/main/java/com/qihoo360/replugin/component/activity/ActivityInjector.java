@@ -134,50 +134,56 @@ public class ActivityInjector {
         String label = "";
         Resources res = activity.getResources();
 
-        // 获取 Activity label
-        try {
-            label = res.getString(ai.labelRes);
-            if (LOG) {
-                LogDebug.d(TAG, "ai.label = " + label);
-            }
-        } catch (Resources.NotFoundException e) {
-            if (LOG) {
-                LogDebug.d(TAG, "获取 ai.label 失败");
-            }
-            e.printStackTrace();
-        }
-
-        // 获取插件 Application Label
-        if (TextUtils.isEmpty(label)) {
+        // 获取 Activity label（如有）
+        if (ai.labelRes != 0) {
             try {
-                label = res.getString(ai.applicationInfo.labelRes);
+                label = res.getString(ai.labelRes);
                 if (LOG) {
-                    LogDebug.d(TAG, "ai.application.label = " + label);
+                    LogDebug.d(TAG, "ai.label = " + label);
                 }
             } catch (Resources.NotFoundException e) {
                 if (LOG) {
-                    LogDebug.d(TAG, "获取 ai.application.label 失败");
+                    LogDebug.d(TAG, "获取 ai.label 失败");
                 }
                 e.printStackTrace();
+            }
+        }
+
+        // 获取插件 Application Label（如有）
+        if (TextUtils.isEmpty(label)) {
+            if (ai.applicationInfo.labelRes != 0) {
+                try {
+                    label = res.getString(ai.applicationInfo.labelRes);
+                    if (LOG) {
+                        LogDebug.d(TAG, "ai.application.label = " + label);
+                    }
+                } catch (Resources.NotFoundException e) {
+                    if (LOG) {
+                        LogDebug.d(TAG, "获取 ai.application.label 失败");
+                    }
+                    e.printStackTrace();
+                }
             }
         }
 
         // 获取宿主 App label
         if (TextUtils.isEmpty(label)) {
-            try {
-                Context appContext = RePluginInternal.getAppContext();
-                Resources appResource = appContext.getResources();
-                ApplicationInfo appInfo = appContext.getApplicationInfo();
-                label = appResource.getString(appInfo.labelRes);
+            Context appContext = RePluginInternal.getAppContext();
+            Resources appResource = appContext.getResources();
+            ApplicationInfo appInfo = appContext.getApplicationInfo();
+            if (appInfo.labelRes != 0) {
+                try {
+                    label = appResource.getString(appInfo.labelRes);
 
-                if (LOG) {
-                    LogDebug.d(TAG, "host.application.label = " + label);
+                    if (LOG) {
+                        LogDebug.d(TAG, "host.application.label = " + label);
+                    }
+                } catch (Resources.NotFoundException e) {
+                    if (LOG) {
+                        LogDebug.d(TAG, "获取 host.application.label 失败");
+                    }
+                    e.printStackTrace();
                 }
-            } catch (Resources.NotFoundException e) {
-                if (LOG) {
-                    LogDebug.d(TAG, "获取 host.application.label 失败");
-                }
-                e.printStackTrace();
             }
         }
 
