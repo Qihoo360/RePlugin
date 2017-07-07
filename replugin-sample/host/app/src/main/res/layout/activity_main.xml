@@ -28,6 +28,12 @@
         android:layout_gravity="center"
         android:text="@string/jump2demo1" />
 
+    <Button
+        android:id="@+id/start_plugin_for_result_btn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:text="@string/startDemo1ForResult" />
 
     <Button
         android:id="@+id/btn1"
@@ -35,5 +41,4 @@
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:text="@string/jump_plugin_fragment" />
-
 </LinearLayout>

@@ -144,4 +144,9 @@ public interface IPluginActivityManager {
      * 查询某个动态映射的类对应的插件(7.7.0 later)
      */
     String getPluginByDynamicClass(String className);
+
+    /**
+     * @hide 内部方法，插件框架使用
+     */
+    boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options);
 }

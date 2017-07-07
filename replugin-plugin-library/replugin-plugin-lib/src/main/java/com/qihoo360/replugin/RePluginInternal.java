@@ -28,7 +28,6 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.i.IPluginManager;
 import com.qihoo360.replugin.library.BuildConfig;
 
-import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.TAG;
 
 /**
@@ -168,18 +167,34 @@ public class RePluginInternal {
      * @hide 内部方法，插件框架使用
      * 启动一个插件中的activity
      * 通过Extra参数IPluginManager.KEY_COMPATIBLE，IPluginManager.KEY_PLUGIN，IPluginManager.KEY_ACTIVITY，IPluginManager.KEY_PROCESS控制
-     * <p>
-     * TODO @JongXuan Zhang startActivityForResult可放置于Host的Factory2中
-     * TODO 同时PmInternalImpl中也需要加入相应的方法以支持新插件的下载，否则startActivity和startActivityForResult一个支持下载一个不支持，调用者会感到很奇怪
      */
     public static boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
         if (!RePluginFramework.mHostInitialized) {
             return false;
         }
 
+        try {
+            Object obj = ProxyRePluginInternalVar.startActivityForResult.call(null, activity, intent, requestCode, options);
+            if (obj != null) {
+                return (Boolean) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        // replugin-host-lib 版本小于 2.1.3 时
+        return startActivityForResultCompat(activity, intent, requestCode, options);
+    }
+
+    /**
+     * 如果 replugin-host-lib 版本小于 2.1.3，使用此 compat 方法。
+     */
+    private static boolean startActivityForResultCompat(Activity activity, Intent intent, int requestCode, Bundle options) {
         String plugin = getPluginName(activity, intent);
 
-        if (LOG) {
+        if (LogDebug.LOG) {
             LogDebug.d(TAG, "start activity with startActivityForResult: intent=" + intent);
         }
 
@@ -263,6 +278,8 @@ public class RePluginInternal {
 
         private static MethodInvoker startActivity;
 
+        private static MethodInvoker startActivityForResult;
+
         private static MethodInvoker loadPluginActivity;
 
         static void initLocked(final ClassLoader classLoader) {
@@ -277,6 +294,7 @@ public class RePluginInternal {
             handleActivityDestroy = new MethodInvoker(classLoader, factory2, "handleActivityDestroy", new Class<?>[]{Activity.class});
             handleRestoreInstanceState = new MethodInvoker(classLoader, factory2, "handleRestoreInstanceState", new Class<?>[]{Activity.class, Bundle.class});
             startActivity = new MethodInvoker(classLoader, factory2, "startActivity", new Class<?>[]{Activity.class, Intent.class});
+            startActivityForResult = new MethodInvoker(classLoader, factory2, "startActivityForResult", new Class<?>[]{Activity.class, Intent.class, int.class, Bundle.class});
 
             // 初始化Factory相关方法
             loadPluginActivity = new MethodInvoker(classLoader, factory, "loadPluginActivity", new Class<?>[]{Intent.class, String.class, String.class, int.class});

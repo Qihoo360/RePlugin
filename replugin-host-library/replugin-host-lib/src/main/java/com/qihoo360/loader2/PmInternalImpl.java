@@ -21,6 +21,7 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -32,13 +33,12 @@ import com.qihoo360.loader.utils.ReflectUtils;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.component.activity.ActivityInjector;
+import com.qihoo360.replugin.ext.lang3.ClassUtils;
+import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
 import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
-
-import com.qihoo360.replugin.ext.lang3.ClassUtils;
-import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,6 +46,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.Set;
 
+import static com.qihoo360.i.Factory.loadPluginActivity;
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
@@ -264,6 +265,63 @@ class PmInternalImpl implements IPluginActivityManager {
         RePlugin.getConfig().getCallbacks().onPrepareStartPitActivity(context, from, intent);
 
         return true;
+    }
+
+    /**
+     * 通过 forResult 方式启动一个插件的 Activity
+     *
+     * @param activity    源 Activity
+     * @param intent      要打开 Activity 的 Intent，其中 ComponentName 的 Key 必须为插件名
+     * @param requestCode 请求码
+     * @param options     附加的数据
+     */
+    @Override
+    public boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
+        String plugin = getPluginName(activity, intent);
+
+        if (LOG) {
+            LogDebug.d(PLUGIN_TAG, "start activity with startActivityForResult: intent=" + intent);
+        }
+
+        if (TextUtils.isEmpty(plugin)) {
+            return false;
+        }
+
+        ComponentName cn = intent.getComponent();
+        if (cn == null) {
+            return false;
+        }
+        String name = cn.getClassName();
+
+        ComponentName cnNew = loadPluginActivity(intent, plugin, name, IPluginManager.PROCESS_AUTO);
+        if (cnNew == null) {
+            return false;
+        }
+
+        intent.setComponent(cnNew);
+
+        if (Build.VERSION.SDK_INT >= 16) {
+            activity.startActivityForResult(intent, requestCode, options);
+        } else {
+            activity.startActivityForResult(intent, requestCode);
+        }
+        return true;
+    }
+
+    /**
+     * 获取插件名称
+     */
+    private static String getPluginName(Activity activity, Intent intent) {
+        String plugin = "";
+        if (intent.getComponent() != null) {
+            plugin = intent.getComponent().getPackageName();
+        }
+        // 如果 plugin 是包名，则说明启动的是本插件。
+        if (TextUtils.isEmpty(plugin) || plugin.contains(".")) {
+            plugin = RePlugin.fetchPluginNameByClassLoader(activity.getClassLoader());
+        }
+        // 否则是其它插件
+        return plugin;
     }
 
     private boolean isNeedToDownload(Context context, String plugin) {

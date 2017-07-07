@@ -16,6 +16,7 @@
 
 package com.qihoo360.i;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
 
 import com.qihoo360.replugin.component.ComponentList;
@@ -186,6 +188,12 @@ public interface IPluginManager {
      * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
      */
     boolean startActivity(Context context, Intent intent, String plugin, String activity, int process);
+
+    /**
+     * 启动一个插件中的 activity 'forResult'
+     * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
+     */
+    boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options);
 
     /**
      * 加载插件Activity，在startActivity之前调用
