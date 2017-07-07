@@ -24,20 +24,15 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
-import android.view.Display;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.WindowManager;
 
 import com.qihoo360.loader.utils2.FilePermissionUtils;
-import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.ContextInjector;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.component.service.PluginServiceClient;
@@ -136,66 +131,7 @@ public class PluginContext extends ContextThemeWrapper {
             }
             return mInflater;
         }
-        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT < 24) {
-            if (WINDOW_SERVICE.equals(name)) {
-                return new WmWrapper((WindowManager) super.getSystemService(name));
-            }
-        }
         return super.getSystemService(name);
-    }
-
-    /**
-     * 调试类
-     */
-    public static class WmWrapper implements WindowManager {
-
-        WindowManager wm;
-
-        public WmWrapper(WindowManager wm) {
-            this.wm = wm;
-        }
-
-        @Override
-        public void updateViewLayout(View view, ViewGroup.LayoutParams params) {
-            if (LOGR) {
-                // 混淆后，getPackage() 可能返回 null。
-                LogRelease.i(PLUGIN_TAG, "WMR updateViewLayout view=" + view + " getPackage=" + view.getClass().getSimpleName());
-                LogRelease.i(PLUGIN_TAG, "WMR " + view.getClass().getClassLoader());
-            }
-            wm.updateViewLayout(view, params);
-        }
-
-        @Override
-        public void removeView(View view) {
-            if (LOGR) {
-                LogRelease.i(PLUGIN_TAG, "WMR removeView view=" + view + " getPackage=" + view.getClass().getSimpleName());
-                LogRelease.i(PLUGIN_TAG, "WMR " + view.getClass().getClassLoader());
-            }
-            wm.removeView(view);
-        }
-
-        @Override
-        public void addView(View view, ViewGroup.LayoutParams params) {
-            if (LOGR) {
-                LogRelease.i(PLUGIN_TAG, "WMR addView view=" + view + " getPackage=" + view.getClass().getSimpleName());
-                LogRelease.i(PLUGIN_TAG, "WMR " + view.getClass().getClassLoader());
-            }
-            wm.addView(view, params);
-        }
-
-        @Override
-        public void removeViewImmediate(View view) {
-            if (LOGR) {
-                LogRelease.i(PLUGIN_TAG, "WMR removeViewImmediate view=" + view + " getPackage=" + view.getClass().getSimpleName());
-                LogRelease.i(PLUGIN_TAG, "WMR " + view.getClass().getClassLoader());
-            }
-            wm.removeViewImmediate(view);
-        }
-
-        @Override
-        public Display getDefaultDisplay() {
-            return wm.getDefaultDisplay();
-        }
     }
 
     @Override
