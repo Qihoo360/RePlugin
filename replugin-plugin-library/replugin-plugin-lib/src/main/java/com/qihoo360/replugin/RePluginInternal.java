@@ -20,11 +20,15 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.qihoo360.replugin.helper.LogDebug;
+import com.qihoo360.replugin.i.IPluginManager;
 import com.qihoo360.replugin.library.BuildConfig;
+
+import static com.qihoo360.replugin.helper.LogDebug.TAG;
 
 /**
  * 对框架暴露的一些通用的接口。
@@ -163,9 +167,6 @@ public class RePluginInternal {
      * @hide 内部方法，插件框架使用
      * 启动一个插件中的activity
      * 通过Extra参数IPluginManager.KEY_COMPATIBLE，IPluginManager.KEY_PLUGIN，IPluginManager.KEY_ACTIVITY，IPluginManager.KEY_PROCESS控制
-     * <p>
-     * TODO @JongXuan Zhang startActivityForResult可放置于Host的Factory2中
-     * TODO 同时PmInternalImpl中也需要加入相应的方法以支持新插件的下载，否则startActivity和startActivityForResult一个支持下载一个不支持，调用者会感到很奇怪
      */
     public static boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
         if (!RePluginFramework.mHostInitialized) {
@@ -183,7 +184,43 @@ public class RePluginInternal {
             }
         }
 
-        return false;
+        // replugin-host-lib 版本小于 2.1.3 时
+        return startActivityForResultCompat(activity, intent, requestCode, options);
+    }
+
+    /**
+     * 如果 replugin-host-lib 版本小于 2.1.3，使用此 compat 方法。
+     */
+    private static boolean startActivityForResultCompat(Activity activity, Intent intent, int requestCode, Bundle options) {
+        String plugin = getPluginName(activity, intent);
+
+        if (LogDebug.LOG) {
+            LogDebug.d(TAG, "start activity with startActivityForResult: intent=" + intent);
+        }
+
+        if (TextUtils.isEmpty(plugin)) {
+            return false;
+        }
+
+        ComponentName cn = intent.getComponent();
+        if (cn == null) {
+            return false;
+        }
+        String name = cn.getClassName();
+
+        ComponentName cnNew = loadPluginActivity(intent, plugin, name, IPluginManager.PROCESS_AUTO);
+        if (cnNew == null) {
+            return false;
+        }
+
+        intent.setComponent(cnNew);
+
+        if (Build.VERSION.SDK_INT >= 16) {
+            activity.startActivityForResult(intent, requestCode, options);
+        } else {
+            activity.startActivityForResult(intent, requestCode);
+        }
+        return true;
     }
 
     /**
