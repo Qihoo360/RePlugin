@@ -396,6 +396,7 @@ public final class Factory {
      * @param intent      要打开 Activity 的 Intent，其中 ComponentName 的 Key 必须为插件名
      * @param requestCode 请求码
      * @param options     附加的数据
+     * @since 2.1.3
      */
     public static boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
         return sPluginManager.startActivityForResult(activity, intent, requestCode, options);
