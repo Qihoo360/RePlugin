@@ -26,17 +26,17 @@ import android.text.TextUtils;
 
 import com.qihoo360.loader2.CertUtils;
 import com.qihoo360.loader2.MP;
+import com.qihoo360.loader2.PluginNativeLibsHelper;
 import com.qihoo360.mobilesafe.utils.pkg.PackageFilesUtil;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginEventCallbacks;
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.base.IPC;
+import com.qihoo360.replugin.ext.io.FileUtils;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.model.PluginInfoList;
-
-import com.qihoo360.replugin.ext.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -168,14 +168,17 @@ public class PluginManagerServer {
             return null;
         }
 
-        // 5. 若已经安装旧版本插件，则尝试更新插件信息，否则直接加入到列表中
+        // 5. 从插件中释放 So 文件
+        PluginNativeLibsHelper.install(instPli.getPath(), instPli.getNativeLibsDir());
+
+        // 6. 若已经安装旧版本插件，则尝试更新插件信息，否则直接加入到列表中
         if (curPli != null) {
             updateOrLater(curPli, instPli);
         } else {
             mList.add(instPli);
         }
 
-        // 6. 保存插件信息到文件中，下次可直接使用
+        // 7. 保存插件信息到文件中，下次可直接使用
         mList.save(mContext);
 
         return instPli;
