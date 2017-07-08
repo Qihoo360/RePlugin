@@ -17,9 +17,6 @@
 
 package com.qihoo360.replugin.gradle.plugin.manifest
 
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.BasePlugin
-import com.android.build.gradle.internal.TaskManager
 import org.gradle.api.Project
 
 /**
@@ -38,7 +35,6 @@ public class ManifestAPI {
 
     /**
      * 获取 AndroidManifest.xml 路径
-     * @return
      */
     def static manifestPath(Project project, String variantDir) {
         def variantDirArray = variantDir.split("/")
@@ -55,28 +51,34 @@ public class ManifestAPI {
         //如果processManifestTask存在的话
         //transform的task目前能保证在processManifestTask之后执行
         if (processManifestTask) {
-            //保存返回值
             File result = null
             //正常的manifest
             File manifestOutputFile = processManifestTask.getManifestOutputFile()
             //instant run的manifest
             File instantRunManifestOutputFile = processManifestTask.getInstantRunManifestOutputFile()
+
             //打印
             println " manifestOutputFile:${manifestOutputFile} ${manifestOutputFile.exists()}"
             println " instantRunManifestOutputFile:${instantRunManifestOutputFile} ${instantRunManifestOutputFile.exists()}"
+
             //先设置为正常的manifest
             result = manifestOutputFile
-            //获取instant run 的Task
-            def instantRunTask = project.tasks.getByName("transformClassesWithInstantRunFor${variantName}")
-            //查找instant run是否存在且文件存在
-            if (instantRunTask && instantRunManifestOutputFile.exists()) {
-                println ' Instant run is enabled and the manifest is exist.'
-                if (!manifestOutputFile.exists()) {
-                    //因为这里只是为了读取activity，所以无论用哪个manifest差别不大
-                    //正常情况下不建议用instant run的manifest，除非正常的manifest不存在
-                    //只有当正常的manifest不存在时，才会去使用instant run产生的manifest
-                    result = instantRunManifestOutputFile
+
+            try {
+                //获取instant run 的Task
+                def instantRunTask = project.tasks.getByName("transformClassesWithInstantRunFor${variantName}")
+                //查找instant run是否存在且文件存在
+                if (instantRunTask && instantRunManifestOutputFile.exists()) {
+                    println ' Instant run is enabled and the manifest is exist.'
+                    if (!manifestOutputFile.exists()) {
+                        //因为这里只是为了读取activity，所以无论用哪个manifest差别不大
+                        //正常情况下不建议用instant run的manifest，除非正常的manifest不存在
+                        //只有当正常的manifest不存在时，才会去使用instant run产生的manifest
+                        result = instantRunManifestOutputFile
+                    }
                 }
+            } catch (ignored) {
+                // transformClassesWithInstantRunForXXX may not exists
             }
 
             //最后检测文件是否存在，打印
