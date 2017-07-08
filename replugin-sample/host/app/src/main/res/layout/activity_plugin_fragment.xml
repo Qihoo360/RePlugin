@@ -12,6 +12,12 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
+    <!-- line -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:background="@color/colorAccent"
+        android:layout_height="1dp"/>
+
     <FrameLayout
         android:id="@+id/container2"
         android:layout_width="match_parent"

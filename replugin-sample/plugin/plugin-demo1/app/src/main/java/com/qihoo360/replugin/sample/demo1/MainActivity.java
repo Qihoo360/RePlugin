@@ -17,12 +17,10 @@
 package com.qihoo360.replugin.sample.demo1;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -55,9 +53,20 @@ import java.util.List;
  */
 public class MainActivity extends Activity {
 
-    private static List<TestItem> mItems = new ArrayList<>();
+    private List<TestItem> mItems = new ArrayList<>();
 
-    static {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        initData();
+
+        ListView lv = (ListView) findViewById(R.id.list_view);
+        lv.setAdapter(new TestAdapter());
+    }
+
+    private void initData() {
         // TODO UI丑是丑了点儿，但能说明问题。以后会优化的
 
         // =========
@@ -236,6 +245,14 @@ public class MainActivity extends Activity {
                 }
             }
         }));
+        mItems.add(new TestItem("startActivityForResult(data from demo2)", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName("demo2", "com.qihoo360.replugin.sample.demo2.activity.for_result.ForResultActivity"));
+                MainActivity.this.startActivityForResult(intent, REQUEST_CODE_DEMO2);
+            }
+        }));
     }
 
     private static final int REQUEST_CODE_DEMO2 = 0x021;
@@ -246,24 +263,6 @@ public class MainActivity extends Activity {
         if (requestCode == REQUEST_CODE_DEMO2 && resultCode == RESULT_CODE_DEMO2) {
             Toast.makeText(this, data.getStringExtra("data"), Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        ListView lv = (ListView) findViewById(R.id.list_view);
-
-        mItems.add(new TestItem("跨插件 startActivityForResult", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setComponent(new ComponentName("demo2", "com.qihoo360.replugin.sample.demo2.activity.for_result.ForResultActivity"));
-                MainActivity.this.startActivityForResult(intent, REQUEST_CODE_DEMO2);
-            }
-        }));
-
-        lv.setAdapter(new TestAdapter());
     }
 
     private class TestAdapter extends BaseAdapter {

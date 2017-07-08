@@ -19,6 +19,6 @@ public class DemoCodeFragment extends DemoFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         TextView textView = (TextView) view.findViewById(R.id.text);
-        textView.setText("我是代码注册的");
+        textView.setText("DemoCodeFragment from plugin demo1");
     }
 }
