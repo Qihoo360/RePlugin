@@ -43,7 +43,6 @@ import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeDialogActivity;
 import com.qihoo360.replugin.sample.demo1.service.PluginDemoService1;
 import com.qihoo360.replugin.sample.demo2.IDemo2;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,10 +122,18 @@ public class MainActivity extends Activity {
                 v.getContext().startActivity(intent);
             }
         }));
-        mItems.add(new TestItem("Activity: DataBinding (Other Plugin)", new View.OnClickListener() {
+        mItems.add(new TestItem("Activity: DataBinding (to Demo2)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 RePlugin.startActivity(v.getContext(), new Intent(), "demo2", "com.qihoo360.replugin.sample.demo2.databinding.DataBindingActivity");
+            }
+        }));
+        mItems.add(new TestItem("Activity: startForResult (to Demo2)", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName("demo2", "com.qihoo360.replugin.sample.demo2.activity.for_result.ForResultActivity"));
+                MainActivity.this.startActivityForResult(intent, REQUEST_CODE_DEMO2);
             }
         }));
         mItems.add(new TestItem("Activity: By Action", new View.OnClickListener() {
@@ -142,7 +149,7 @@ public class MainActivity extends Activity {
                 v.getContext().startActivity(intent);
             }
         }));
-        mItems.add(new TestItem("Activity: By Action (Other Plugin)", new View.OnClickListener() {
+        mItems.add(new TestItem("Activity: By Action (to Demo2)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent("com.qihoo360.replugin.sample.demo2.action.theme_fullscreen_2");
@@ -154,7 +161,7 @@ public class MainActivity extends Activity {
         // =========
         // Other Components
         // =========
-        mItems.add(new TestItem("Broadcast: Send", new View.OnClickListener() {
+        mItems.add(new TestItem("Broadcast: Send (to All)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
@@ -163,7 +170,7 @@ public class MainActivity extends Activity {
                 v.getContext().sendBroadcast(intent);
             }
         }));
-        mItems.add(new TestItem("Service: Start(at :p0 process)", new View.OnClickListener() {
+        mItems.add(new TestItem("Service: Start (at :p0 process)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), PluginDemoService1.class);
@@ -171,8 +178,7 @@ public class MainActivity extends Activity {
                 v.getContext().startService(intent);
             }
         }));
-
-        mItems.add(new TestItem("Provider: Current process", new View.OnClickListener() {
+        mItems.add(new TestItem("Provider: Query (at UI process)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri uri = Uri.parse("content://com.qihoo360.replugin.sample.demo1.provider2/" + "test");
@@ -194,10 +200,11 @@ public class MainActivity extends Activity {
         // =========
         // Communication
         // =========
-        mItems.add(new TestItem("ClassLoader: Use demo2's class", new View.OnClickListener() {
+        mItems.add(new TestItem("ClassLoader: Reflection (to Demo2, Recommend)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO 近期会添加RePlugin.fetchClass方法，无需catch一堆
+                // 这是RePlugin的推荐玩法：反射调用Demo2，这样"天然的"做好了"版本控制"
+                // 避免出现我们当年2013年的各种问题
                 ClassLoader cl = RePlugin.fetchClassLoader("demo2");
                 if (cl == null) {
                     Toast.makeText(v.getContext(), "Not install Demo2", Toast.LENGTH_SHORT).show();
@@ -208,29 +215,14 @@ public class MainActivity extends Activity {
                     Class clz = cl.loadClass("com.qihoo360.replugin.sample.demo2.MainApp");
                     Method m = clz.getDeclaredMethod("helloFromDemo1", Context.class, String.class);
                     m.invoke(null, v.getContext(), "Demo1");
-                } catch (ClassNotFoundException e) {
-                    // 有可能Demo2根本没有这个类，直接返回
-                    Toast.makeText(v.getContext(), "MainApp not found", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    // 有可能没有这个方法
-                    Toast.makeText(v.getContext(), "helloFromDemo1() not found", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    // 也有可能不允许你访问
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
+                } catch (Exception e) {
+                    // 有可能Demo2根本没有这个类，也有可能没有相应方法（通常出现在"插件版本升级"的情况）
+                    Toast.makeText(v.getContext(), "", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
         }));
-        mItems.add(new TestItem("Fragment: Use demo2", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO 志伟请搞定这里，谢谢！
-            }
-        }));
-        mItems.add(new TestItem("Binder: Fast-Fetch", new View.OnClickListener() {
+        mItems.add(new TestItem("Binder: Fast-Fetch (to Demo2)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 IBinder b = RePlugin.fetchBinder("demo2", "demo2test");
@@ -243,14 +235,6 @@ public class MainActivity extends Activity {
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-            }
-        }));
-        mItems.add(new TestItem("startActivityForResult(data from demo2)", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setComponent(new ComponentName("demo2", "com.qihoo360.replugin.sample.demo2.activity.for_result.ForResultActivity"));
-                MainActivity.this.startActivityForResult(intent, REQUEST_CODE_DEMO2);
             }
         }));
     }

@@ -26,7 +26,6 @@ import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginApplication;
 import com.qihoo360.replugin.RePluginCallbacks;
 import com.qihoo360.replugin.RePluginConfig;
-import com.qihoo360.replugin.RePluginEventCallbacks;
 
 /**
  * @author RePlugin Team
