@@ -163,7 +163,7 @@ public class MainActivity extends Activity {
                 v.getContext().sendBroadcast(intent);
             }
         }));
-        mItems.add(new TestItem("Service: Start", new View.OnClickListener() {
+        mItems.add(new TestItem("Service: Start(at :p0 process)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), PluginDemoService1.class);

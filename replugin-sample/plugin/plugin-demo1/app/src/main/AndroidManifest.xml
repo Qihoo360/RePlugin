@@ -24,6 +24,12 @@
         android:label="@string/app_name">
 
         <meta-data
+            android:name="process_map"
+            android:value="[
+            {'from':'com.qihoo360.replugin.sample.demo1:bg','to':'$p0'}
+            ]" />
+
+        <meta-data
             android:name="com.qihoo360.plugin.name"
             android:value="demo1" />
         <meta-data
@@ -77,7 +83,9 @@
         </receiver>
 
         <!-- service -->
-        <service android:name=".service.PluginDemoService1" />
+        <service
+            android:name=".service.PluginDemoService1"
+            android:process=":bg" />
 
         <!-- TaskAffinity -->
         <activity
