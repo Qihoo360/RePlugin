@@ -34,14 +34,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_start_demo1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 RePlugin.startActivity(MainActivity.this, RePlugin.createIntent("demo1", "com.qihoo360.replugin.sample.demo1.MainActivity"));
             }
         });
 
-        findViewById(R.id.start_plugin_for_result_btn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_start_plugin_for_result).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_load_fragment_from_demo1).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {

@@ -16,7 +16,7 @@
 
 <resources>
     <string name="app_name">RePlugin Sample</string>
-    <string name="jump2demo1">启动demo1插件</string>
-    <string name="startDemo1ForResult">启动demo1插件(ForResult)</string>
-    <string name="jump_plugin_fragment">启动demo1插件中的Fragment</string>
+    <string name="startDemo1">Start plugin demo1</string>
+    <string name="startDemo1ForResult">Start plugin demo1(forResult)</string>
+    <string name="startDemo1LoadFragment">Start plugin demo1(Fragment from demo1)</string>
 </resources>

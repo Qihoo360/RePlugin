@@ -22,23 +22,23 @@
     tools:context="com.qihoo360.replugin.sample.host.MainActivity">
 
     <Button
-        android:id="@+id/btn"
+        android:id="@+id/btn_start_demo1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center"
-        android:text="@string/jump2demo1" />
+        android:text="@string/startDemo1" />
 
     <Button
-        android:id="@+id/start_plugin_for_result_btn"
+        android:id="@+id/btn_start_plugin_for_result"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:text="@string/startDemo1ForResult" />
 
     <Button
-        android:id="@+id/btn1"
+        android:id="@+id/btn_load_fragment_from_demo1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center"
-        android:text="@string/jump_plugin_fragment" />
+        android:text="@string/startDemo1LoadFragment" />
 </LinearLayout>
