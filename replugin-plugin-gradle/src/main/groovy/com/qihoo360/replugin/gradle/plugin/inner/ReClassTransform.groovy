@@ -37,6 +37,7 @@ public class ReClassTransform extends Transform {
 
     /* 需要处理的 jar 包 */
     def includeJars = [] as Set
+    def map = [:]
 
     public ReClassTransform(Project p) {
         this.project = p
@@ -198,7 +199,7 @@ public class ReClassTransform extends Transform {
         Util.newSection()
         def pool = new ClassPool(true)
         // 添加编译时需要引用的到类到 ClassPool, 同时记录要修改的 jar 到 includeJars
-        Util.getClassPaths(project, globalScope, inputs, includeJars).each {
+        Util.getClassPaths(project, globalScope, inputs, includeJars, map).each {
             println "    $it"
             pool.insertClassPath(it)
         }
@@ -222,6 +223,10 @@ public class ReClassTransform extends Transform {
      */
     def copyJar(TransformOutputProvider output, JarInput input) {
         File jar = input.file
+        String jarPath = map.get(jar.absolutePath);
+        if (jarPath != null) {
+            jar = new File(jarPath)
+        }
 
         String destName = input.name
         def hexName = DigestUtils.md5Hex(jar.absolutePath)
@@ -229,7 +234,7 @@ public class ReClassTransform extends Transform {
             destName = destName.substring(0, destName.length() - 4)
         }
         File dest = output.getContentLocation(destName + '_' + hexName, input.contentTypes, input.scopes, Format.JAR)
-        FileUtils.copyFile(input.file, dest)
+        FileUtils.copyFile(jar, dest)
 
 /*
         def path = jar.absolutePath
