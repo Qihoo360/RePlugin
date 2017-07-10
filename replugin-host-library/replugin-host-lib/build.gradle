@@ -36,17 +36,12 @@ android {
 
         consumerProguardFiles 'replugin-rules.pro'
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'replugin-rules.pro'
-        }
-    }
 
     lintOptions {
         abortOnError false
     }
 
+    // 务必要加上此段话，这样默认会出Debug版AAR，会带上日志方便定位
     defaultPublishConfig "debug"
 }
 
