@@ -82,8 +82,16 @@ class PluginDebugger {
             return false
         }
 
+        //此处是在安卓机上的目录，直接"/"路径
+        String apkPath = "${config.phoneStorageDir}"
+        if (!apkPath.endsWith("/")) {
+            //容错处理
+            apkPath += "/"
+        }
+        apkPath += "${apkFile.name}"
+
         //发送安装广播
-        String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.install -e path ${config.phoneStorageDir}${apkFile.name} -e immediately true "
+        String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.install -e path ${apkPath} -e immediately true "
         if (0 != CmdUtil.syncExecute(installBrCmd)) {
             return false
         }
