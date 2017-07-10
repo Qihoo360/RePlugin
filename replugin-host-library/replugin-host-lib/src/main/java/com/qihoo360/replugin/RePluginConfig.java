@@ -359,7 +359,7 @@ public final class RePluginConfig {
         }
 
         if (eventCallbacks == null) {
-            eventCallbacks = new DefaultRePluginEventCallbacks(context);
+            eventCallbacks = new RePluginEventCallbacks(context);
         }
     }
 
