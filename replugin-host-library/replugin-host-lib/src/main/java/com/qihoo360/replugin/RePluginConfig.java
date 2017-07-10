@@ -47,8 +47,6 @@ public final class RePluginConfig {
     private boolean moveFileWhenInstalling = true;
     private boolean printDetailLog = false;
     private int defaultFrameworkVersion = 4;
-    private String appID;
-    private String channel;
 
     /**
      * 获取插件回调方法。通常无需调用此方法。
@@ -295,56 +293,6 @@ public final class RePluginConfig {
             return this;
         }
         this.defaultFrameworkVersion = defaultFrameworkVersion;
-        return this;
-    }
-
-    /**
-     * 获取 AppID
-     *
-     * @return AppID
-     * @since 1.3.6
-     */
-    public String getAppID() {
-        return appID;
-    }
-
-    /**
-     * 设置 AppID
-     *
-     * @param appId AppID
-     * @return RePluginConfig自己。这样可以连环调用set方法
-     * @since 1.3.6
-     */
-    public RePluginConfig setAppID(String appID) {
-        if (!checkAllowModify()) {
-            return this;
-        }
-        this.appID = appID;
-        return this;
-    }
-
-    /**
-     * 获取Channel（渠道信息）
-     *
-     * @return Channel
-     * @since 1.3.6
-     */
-    public String getChannel() {
-        return channel;
-    }
-
-    /**
-     * 设置Channel（渠道信息）
-     *
-     * @param channel Channel
-     * @return RePluginConfig自己。这样可以连环调用set方法
-     * @since 1.3.6
-     */
-    public RePluginConfig setChannel(String channel) {
-        if (!checkAllowModify()) {
-            return this;
-        }
-        this.channel = channel;
         return this;
     }
 
