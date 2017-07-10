@@ -82,9 +82,8 @@ class PluginDebugger {
             return false
         }
 
-        File destStorageFile = new File(config.phoneStorageDir, apkFile.name)
         //发送安装广播
-        String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.install -e path ${destStorageFile.absolutePath} -e immediately true "
+        String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.install -e path ${config.phoneStorageDir}${apkFile.name} -e immediately true "
         if (0 != CmdUtil.syncExecute(installBrCmd)) {
             return false
         }
