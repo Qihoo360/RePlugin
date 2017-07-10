@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.qihoo360.loader2.PluginContext;
+import com.qihoo360.mobilesafe.utils.pkg.PackageFilesUtil;
 import com.qihoo360.replugin.model.PluginInfo;
 
 import java.io.InputStream;
@@ -30,13 +31,16 @@ import java.io.InputStream;
  * 插件框架对外回调接口集
  * <p>
  * 宿主需继承DefaultPluginCallbacks，并复写相应的方法来自定义插件框架
- * <p>
- * 因为经常添加相应方法，故请不要直接实现此接口
  *
  * @author RePlugin Team
- * @see DefaultRePluginCallbacks
  */
-public interface RePluginCallbacks {
+public class RePluginCallbacks {
+
+    protected final Context mContext;
+
+    public RePluginCallbacks(Context context) {
+        mContext = context;
+    }
 
     /**
      * 创建【宿主用的】 RePluginClassLoader 对象以支持大多数插件化特征。默认为：RePluginClassLoader的实例
@@ -48,7 +52,9 @@ public interface RePluginCallbacks {
      * @return 支持插件化方案的ClassLoader对象，可直接返回RePluginClassLoader
      * @see RePluginClassLoader
      */
-    RePluginClassLoader createClassLoader(ClassLoader parent, ClassLoader original);
+    public RePluginClassLoader createClassLoader(ClassLoader parent, ClassLoader original) {
+        return new RePluginClassLoader(parent, original);
+    }
 
     /**
      * 插件【插件用的】 ClassLoader对象。默认为：PluginDexClassLoader的实例
@@ -66,7 +72,9 @@ public interface RePluginCallbacks {
      * @param parent             插件ClassLoader的父亲
      * @return 插件自己可用的PluginDexClassLoader对象。
      */
-    PluginDexClassLoader createPluginClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent);
+    public PluginDexClassLoader createPluginClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
+        return new PluginDexClassLoader(dexPath, optimizedDirectory, librarySearchPath, parent);
+    }
 
     /**
      * 当要打开的Activity所对应的插件不存在时触发。通常在这里会触发“下载”逻辑
@@ -78,7 +86,10 @@ public interface RePluginCallbacks {
      * @param intent  要打开的Activity的Intent信息
      * @param process 要打开的Activity所在进程
      */
-    boolean onPluginNotExistsForActivity(Context context, String plugin, Intent intent, int process);
+    public boolean onPluginNotExistsForActivity(Context context, String plugin, Intent intent, int process) {
+        // Nothing
+        return false;
+    }
 
     /**
      * 当要打开的Activity所对应的插件过大，需要弹Loading窗提示时触发
@@ -90,14 +101,19 @@ public interface RePluginCallbacks {
      * @param intent  要打开的Activity的Intent信息
      * @param process 要打开的Activity所在进程
      */
-    boolean onLoadLargePluginForActivity(Context context, String plugin, Intent intent, int process);
+    public boolean onLoadLargePluginForActivity(Context context, String plugin, Intent intent, int process) {
+        // Nothing
+        return false;
+    }
 
     /**
      * 当插件Activity准备分配坑位时执行
      *
      * @param intent 要打开的插件的Activity
      */
-    void onPrepareAllocPitActivity(Intent intent);
+    public void onPrepareAllocPitActivity(Intent intent) {
+        // Nothing
+    }
 
     /**
      * 当插件Activity即将被打开时执行，在onActivityPitAllocated之后被执行
@@ -106,19 +122,25 @@ public interface RePluginCallbacks {
      * @param intent       原来要打开的插件的Activity
      * @param pittedIntent 目标坑位的Activity
      */
-    void onPrepareStartPitActivity(Context context, Intent intent, Intent pittedIntent);
+    public void onPrepareStartPitActivity(Context context, Intent intent, Intent pittedIntent) {
+        // Nothing
+    }
 
     /**
      * 当插件Activity所在的坑位被执行“销毁”时被执行
      *
      * @param activity 要销毁的Activity对象，通常是插件里的Activity
      */
-    void onActivityDestroyed(Activity activity);
+    public void onActivityDestroyed(Activity activity) {
+        // Nothing
+    }
 
     /**
      * 当插件Service的Binder被释放时被执行
      */
-    void onBinderReleased();
+    public void onBinderReleased() {
+        // Nothing
+    }
 
     /**
      * 获取SharedPreferences对象
@@ -133,7 +155,9 @@ public interface RePluginCallbacks {
      * @return The single {@link SharedPreferences} instance that can be used
      * to retrieve and modify the preference values.
      */
-    SharedPreferences getSharedPreferences(Context context, String name, int mode);
+    public SharedPreferences getSharedPreferences(Context context, String name, int mode) {
+        return context.getSharedPreferences(name, mode);
+    }
 
     /**
      * 打开一个可被云控的，插件框架方面的文件（如plugin-list.json等）
@@ -149,7 +173,9 @@ public interface RePluginCallbacks {
      * @param filename 要打开的文件名
      * @return InputStream对象
      */
-    InputStream openLatestFile(Context context, String filename);
+    public InputStream openLatestFile(Context context, String filename) {
+        return PackageFilesUtil.openLatestInputFile(context, filename);
+    }
 
     /**
      * 获取业务层定义的ContextInjector实现对象，允许业务层对PluginContext中的startActivity等接口处进行自定义操作
@@ -160,13 +186,20 @@ public interface RePluginCallbacks {
      *
      * @since 2.0.0
      */
-    ContextInjector createContextInjector();
+    public ContextInjector createContextInjector() {
+        // Nothing
+        return null;
+    }
 
     /**
      * 判断当前插件是否已经处于“禁用”状态，允许业务层自定义该禁用逻辑
      *
-     * @param pluginInfo
-     * @return
+     * @param pluginInfo 插件的信息
+     * @return 是否被禁用
+     * @since 2.1.0
      */
-    boolean isPluginBlocked(PluginInfo pluginInfo);
+    public boolean isPluginBlocked(PluginInfo pluginInfo) {
+        // Nothing, allow all
+        return false;
+    }
 }

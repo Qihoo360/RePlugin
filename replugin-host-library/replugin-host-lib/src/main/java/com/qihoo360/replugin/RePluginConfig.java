@@ -355,7 +355,7 @@ public final class RePluginConfig {
         }
 
         if (callbacks == null) {
-            callbacks = new DefaultRePluginCallbacks(context);
+            callbacks = new RePluginCallbacks(context);
         }
 
         if (eventCallbacks == null) {
