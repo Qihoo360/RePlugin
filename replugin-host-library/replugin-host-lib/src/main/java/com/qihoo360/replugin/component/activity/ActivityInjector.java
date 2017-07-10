@@ -65,12 +65,9 @@ public class ActivityInjector {
         if (cl == null) {
             return false;
         }
-        ActivityInfo ai = cl.getActivity(realActivity);
-        if (ai == null) {
-            return false;
-        }
 
-        return inject(activity, ai, pi.getFrameworkVersion());
+        ActivityInfo ai = cl.getActivity(realActivity);
+        return ai != null && inject(activity, ai, pi.getFrameworkVersion());
     }
 
     private static boolean inject(Activity activity, ActivityInfo ai, int frameworkVer) {
@@ -131,39 +128,15 @@ public class ActivityInjector {
      * 获取 activity 的 label 属性
      */
     private static String getLabel(Activity activity, ActivityInfo ai) {
-        String label = "";
+        String label;
         Resources res = activity.getResources();
 
         // 获取 Activity label（如有）
-        if (ai.labelRes != 0) {
-            try {
-                label = res.getString(ai.labelRes);
-                if (LOG) {
-                    LogDebug.d(TAG, "ai.label = " + label);
-                }
-            } catch (Resources.NotFoundException e) {
-                if (LOG) {
-                    LogDebug.d(TAG, "获取 ai.label 失败");
-                }
-                e.printStackTrace();
-            }
-        }
+        label = getLabelById(res, ai.labelRes);
 
         // 获取插件 Application Label（如有）
         if (TextUtils.isEmpty(label)) {
-            if (ai.applicationInfo.labelRes != 0) {
-                try {
-                    label = res.getString(ai.applicationInfo.labelRes);
-                    if (LOG) {
-                        LogDebug.d(TAG, "ai.application.label = " + label);
-                    }
-                } catch (Resources.NotFoundException e) {
-                    if (LOG) {
-                        LogDebug.d(TAG, "获取 ai.application.label 失败");
-                    }
-                    e.printStackTrace();
-                }
-            }
+            label = getLabelById(res, ai.applicationInfo.labelRes);
         }
 
         // 获取宿主 App label
@@ -171,20 +144,7 @@ public class ActivityInjector {
             Context appContext = RePluginInternal.getAppContext();
             Resources appResource = appContext.getResources();
             ApplicationInfo appInfo = appContext.getApplicationInfo();
-            if (appInfo.labelRes != 0) {
-                try {
-                    label = appResource.getString(appInfo.labelRes);
-
-                    if (LOG) {
-                        LogDebug.d(TAG, "host.application.label = " + label);
-                    }
-                } catch (Resources.NotFoundException e) {
-                    if (LOG) {
-                        LogDebug.d(TAG, "获取 host.application.label 失败");
-                    }
-                    e.printStackTrace();
-                }
-            }
+            label = getLabelById(appResource, appInfo.labelRes);
         }
 
         if (LOG) {
@@ -193,57 +153,39 @@ public class ActivityInjector {
         return label;
     }
 
+    private static String getLabelById(Resources res, int id) {
+        if (id == 0) {
+            return null;
+        }
+        try {
+            return res.getString(id);
+        } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
-     * 获取 activity 的 label 属性
+     * 获取 activity 的 icon 属性
      */
     private static Bitmap getIcon(Activity activity, ActivityInfo ai) {
-        Drawable iconDrawable = null;
+        Drawable iconDrawable;
         Resources res = activity.getResources();
 
         // 获取 Activity icon
-        try {
-            iconDrawable = res.getDrawable(ai.icon);
-            if (LOG) {
-                LogDebug.d(TAG, "ai.icon = " + iconDrawable);
-            }
-        } catch (Resources.NotFoundException e) {
-            if (LOG) {
-                LogDebug.d(TAG, "获取 ai.icon 失败");
-            }
-            e.printStackTrace();
-        }
+        iconDrawable = getIconById(res, ai.icon);
 
         // 获取插件 Application Icon
         if (iconDrawable == null) {
-            try {
-                iconDrawable = res.getDrawable(ai.applicationInfo.icon);
-                if (LOG) {
-                    LogDebug.d(TAG, "ai.application.icon = " + iconDrawable);
-                }
-            } catch (Resources.NotFoundException e) {
-                if (LOG) {
-                    LogDebug.d(TAG, "获取 ai.application.icon 失败");
-                }
-                e.printStackTrace();
-            }
+            iconDrawable = getIconById(res, ai.applicationInfo.icon);
         }
 
         // 获取 App(Host) Icon
         if (iconDrawable == null) {
-            try {
-                Context appContext = RePluginInternal.getAppContext();
-                Resources appResource = appContext.getResources();
-                ApplicationInfo appInfo = appContext.getApplicationInfo();
-                iconDrawable = appResource.getDrawable(appInfo.icon);
-                if (LOG) {
-                    LogDebug.d(TAG, "host.application.icon = " + iconDrawable);
-                }
-            } catch (Resources.NotFoundException e) {
-                if (LOG) {
-                    LogDebug.d(TAG, "获取 host.application.icon 失败");
-                }
-                e.printStackTrace();
-            }
+            Context appContext = RePluginInternal.getAppContext();
+            Resources appResource = appContext.getResources();
+            ApplicationInfo appInfo = appContext.getApplicationInfo();
+            iconDrawable = getIconById(appResource, appInfo.icon);
         }
 
         Bitmap bitmap = null;
@@ -255,5 +197,17 @@ public class ActivityInjector {
             LogDebug.d(TAG, "bitmap = " + bitmap);
         }
         return bitmap;
+    }
+
+    private static Drawable getIconById(Resources res, int id) {
+        if (id == 0) {
+            return null;
+        }
+        try {
+            return res.getDrawable(id);
+        } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -158,9 +158,11 @@ public class PluginDesc {
         in = null;
         try {
             in = RePlugin.getConfig().getCallbacks().openLatestFile(context, "plugins-list.json");
-            String str = IOUtils.toString(in, Charsets.UTF_8);
-            return new JSONArray(str);
-        } catch (Throwable e) {
+            if (in != null) {
+                String str = IOUtils.toString(in, Charsets.UTF_8);
+                return new JSONArray(str);
+            }
+        } catch (Exception e) {
             if (DEBUG) {
                 Log.e(TAG, e.getMessage(), e);
             }

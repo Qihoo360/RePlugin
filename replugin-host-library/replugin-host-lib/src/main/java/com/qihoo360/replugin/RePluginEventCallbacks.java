@@ -16,19 +16,26 @@
 
 package com.qihoo360.replugin;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+
 import com.qihoo360.replugin.model.PluginInfo;
 
 /**
  * 插件化框架对外事件回调接口集
  * <p>
- * 宿主需继承DefaultRePluginEventCallbacks，并复写相应的方法来自定义插件框架
- * <p>
- * 因为经常添加相应方法，故请不要直接实现此接口
+ * 宿主需继承此类，并复写相应的方法来自定义插件框架的事件处理机制
  *
  * @author RePlugin Team
- * @see DefaultRePluginEventCallbacks
  */
-public interface RePluginEventCallbacks {
+public class RePluginEventCallbacks {
+
+    protected final Context mContext;
+
+    public RePluginEventCallbacks(Context context) {
+        mContext = context;
+    }
 
     /**
      * 安装插件失败
@@ -36,14 +43,18 @@ public interface RePluginEventCallbacks {
      * @param path 插件路径
      * @param code 安装失败的原因
      */
-    void onInstallPluginFailed(String path, InstallResult code);
+    public void onInstallPluginFailed(String path, InstallResult code) {
+        // Nothing
+    }
 
     /**
      * 安装插件成功
      *
      * @param info 插件信息
      */
-    void onInstallPluginSucceed(PluginInfo info);
+    public void onInstallPluginSucceed(PluginInfo info) {
+        // Nothing
+    }
 
     /**
      * 启动 Activity 完成
@@ -52,12 +63,50 @@ public interface RePluginEventCallbacks {
      * @param activity 插件 Activity
      * @param result   启动是否成功
      */
-    void onStartActivityCompleted(String plugin, String activity, boolean result);
+    public void onStartActivityCompleted(String plugin, String activity, boolean result) {
+        // Nothing
+    }
+
+    /**
+     * 当插件Activity准备分配坑位时执行
+     *
+     * @param intent 要打开的插件的Activity
+     */
+    public void onPrepareAllocPitActivity(Intent intent) {
+        // Nothing
+    }
+
+    /**
+     * 当插件Activity即将被打开时执行，在onActivityPitAllocated之后被执行
+     *
+     * @param context      要打开的Activity所在的Context
+     * @param intent       原来要打开的插件的Activity
+     * @param pittedIntent 目标坑位的Activity
+     */
+    public void onPrepareStartPitActivity(Context context, Intent intent, Intent pittedIntent) {
+        // Nothing
+    }
+
+    /**
+     * 当插件Activity所在的坑位被执行“销毁”时被执行
+     *
+     * @param activity 要销毁的Activity对象，通常是插件里的Activity
+     */
+    public void onActivityDestroyed(Activity activity) {
+        // Nothing
+    }
+
+    /**
+     * 当插件Service的Binder被释放时被执行
+     */
+    public void onBinderReleased() {
+        // Nothing
+    }
 
     /**
      * 插件安装结果值
      */
-    enum InstallResult {
+    public enum InstallResult {
         SUCCEED,
         V5_FILE_BUILD_FAIL,
         V5_FILE_UPDATE_FAIL,
