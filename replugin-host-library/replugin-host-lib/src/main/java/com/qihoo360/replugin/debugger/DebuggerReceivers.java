@@ -41,6 +41,9 @@ public class DebuggerReceivers {
 
     private final String BR_POSTFIX_INSTALL = ".install";
     private final String BR_POSTFIX_INSTALL_WITH_PN = ".install_with_pn";
+
+    private final String BR_POSTFIX_UNINSTALL = ".uninstall";
+
     private final String BR_POSTFIX_ACTIVITY = ".start_activity";
 
     private final String PARAM_PATH = "path";
@@ -56,6 +59,10 @@ public class DebuggerReceivers {
     // 安装"纯APK"插件
     // 举例:adb shell am broadcast -a com.qihoo360.repluginapp.replugin.install -e path [Path_In_SDCard]
     private String actionInstall;
+
+    // 卸载"纯APK"插件
+    // 举例:adb shell am broadcast -a com.qihoo360.repluginapp.replugin.uninstall -e plugin [Name]
+    private String actionUninstall;
 
     // 安装"p-n-"开头的插件
     // 举例:adb shell am broadcast -a com.qihoo360.repluginapp.replugin.install_with_pn -e path [Path_In_SDCard]
@@ -87,6 +94,8 @@ public class DebuggerReceivers {
 
         actionInstall = packageName + BR_LOGO + BR_POSTFIX_INSTALL;
 
+        actionUninstall = packageName + BR_LOGO + BR_POSTFIX_UNINSTALL;
+
         actionInstallWithPN = packageName + BR_LOGO + BR_POSTFIX_INSTALL_WITH_PN;
 
         actionStartActivity = packageName + BR_LOGO + BR_POSTFIX_ACTIVITY;
@@ -94,6 +103,7 @@ public class DebuggerReceivers {
         sDebugerReceiver = new DebugerReceiver();
         IntentFilter itf = new IntentFilter();
         itf.addAction(actionInstall);
+        itf.addAction(actionUninstall);
         itf.addAction(actionInstallWithPN);
         itf.addAction(actionStartActivity);
         context.registerReceiver(sDebugerReceiver, itf);
@@ -122,6 +132,24 @@ public class DebuggerReceivers {
             onInstallByApk(path, immediately);
 
             return true;
+        }
+
+        /**
+         * 卸载"纯APK"插件
+         *
+         * @param context
+         * @param intent
+         * @return 执行是否成功
+         */
+        private boolean doActionUninstall(final Context context, final Intent intent) {
+
+            String plugin = intent.getStringExtra(PARAM_PLUGIN);
+
+            if (TextUtils.isEmpty(plugin)){
+                return false;
+            }
+
+            return RePlugin.uninstall(plugin);
         }
 
 
@@ -179,6 +207,8 @@ public class DebuggerReceivers {
 
             if (act.equals(actionInstall)) {
                 doActionInstall(context, intent);
+            } else if (act.equals(actionUninstall)) {
+                doActionUninstall(context, intent);
             } else if (act.equals(actionInstallWithPN)) {
                 doActionInstallWithPN(context, intent);
             } else if (act.equals(actionStartActivity)) {
