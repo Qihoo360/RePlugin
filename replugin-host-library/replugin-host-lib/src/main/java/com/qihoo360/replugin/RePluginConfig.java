@@ -40,7 +40,7 @@ public final class RePluginConfig {
     private RePluginEventCallbacks eventCallbacks;
 
     private File pnInstallDir;
-    private boolean verifySign = true;
+    private boolean verifySign = false;
     private boolean persistentEnable = true;
     private String persistentName = RePluginConstants.PERSISTENT_NAME_DEFAULT;
     private boolean useHostClassIfNotFound = false;
@@ -130,8 +130,9 @@ public final class RePluginConfig {
     }
 
     /**
-     * 设置插件是否开启签名校验 <p>
-     * 注意：该功能仅针对“纯APK”插件，“p-n”插件已默认开启了签名校验
+     * 设置插件是否开启签名校验。默认为False。但强烈建议开启此开关。 <p>
+     * 此开关将必须和 RePlugin.addCertSignature 配合使用。<p>
+     * 注意：该功能仅针对“纯APK”插件
      *
      * @param verifySign
      * @return RePluginConfig自己。这样可以连环调用set方法
