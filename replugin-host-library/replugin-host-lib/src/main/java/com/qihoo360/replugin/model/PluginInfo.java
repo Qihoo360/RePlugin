@@ -190,23 +190,37 @@ public class PluginInfo implements Parcelable, Cloneable {
      * 注意：框架内部接口，外界请不要直接使用
      */
     public static PluginInfo parseFromPackageInfo(PackageInfo pi, String path) {
-        // TODO 需要改插件的plugin.gradle
         ApplicationInfo ai = pi.applicationInfo;
+        if (ai == null) {
+            // 几乎不可能，但为保险起见，返回Null
+            return null;
+        }
+
+        String pn = pi.packageName;
+        String alias = null;
+        int low = 0;
+        int high = 0;
+        int ver = 0;
+
         Bundle metaData = ai.metaData;
 
-        // 获取插件包名和插件别名（如有），如无则将"包名"当做插件名
-        String pn = pi.packageName;
-        String alias = metaData.getString("com.qihoo360.plugin.name");
+        // 优先读取MetaData中的内容（如有），并覆盖上面的默认值
+        if (metaData != null) {
+            // 获取插件别名（如有），如无则将"包名"当做插件名
+            alias = metaData.getString("com.qihoo360.plugin.name");
 
-        // 获取最低/最高协议版本（默认为应用的最小支持版本，以保证一定能在宿主中运行）
-        int low = metaData.getInt("com.qihoo360.plugin.version.low", Constant.ADAPTER_COMPATIBLE_VERSION);
-        int high = metaData.getInt("com.qihoo360.plugin.version.high", Constant.ADAPTER_COMPATIBLE_VERSION);
+            // 获取最低/最高协议版本（默认为应用的最小支持版本，以保证一定能在宿主中运行）
+            low = metaData.getInt("com.qihoo360.plugin.version.low");
+            high = metaData.getInt("com.qihoo360.plugin.version.high");
 
-        // 获取插件的版本号。优先从metaData中读取，如无则使用插件的VersionCode
-        int ver = metaData.getInt("com.qihoo360.plugin.version.ver");
-        if (ver <= 0) {
-            ver = pi.versionCode;
+            // 获取插件的版本号。优先从metaData中读取，如无则使用插件的VersionCode
+            ver = metaData.getInt("com.qihoo360.plugin.version.ver");
         }
+
+        // 针对有问题的字段做除错处理
+        if (low <= 0) { low = Constant.ADAPTER_COMPATIBLE_VERSION; }
+        if (high <= 0) { high = Constant.ADAPTER_COMPATIBLE_VERSION; }
+        if (ver <= 0) { ver = pi.versionCode; }
 
         PluginInfo pli = new PluginInfo(pn, alias, low, high, ver, path, PluginInfo.TYPE_NOT_INSTALL);
 
