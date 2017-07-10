@@ -20,12 +20,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.qihoo360.replugin.DefaultRePluginCallbacks;
-import com.qihoo360.replugin.DefaultRePluginEventCallbacks;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginApplication;
 import com.qihoo360.replugin.RePluginCallbacks;
 import com.qihoo360.replugin.RePluginConfig;
+import com.qihoo360.replugin.RePluginEventCallbacks;
 
 /**
  * @author RePlugin Team
@@ -74,7 +73,7 @@ public class SampleApplication extends RePluginApplication {
     /**
      * 宿主针对RePlugin的自定义行为
      */
-    private class HostCallbacks extends DefaultRePluginCallbacks {
+    private class HostCallbacks extends RePluginCallbacks {
 
         private static final String TAG = "HostCallbacks";
 
@@ -93,7 +92,7 @@ public class SampleApplication extends RePluginApplication {
         }
     }
 
-    private class HostEventCallbacks extends DefaultRePluginEventCallbacks {
+    private class HostEventCallbacks extends RePluginEventCallbacks {
 
         private static final String TAG = "HostEventCallbacks";
 
