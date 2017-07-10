@@ -16,7 +16,6 @@
 
 package com.qihoo360.replugin;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -104,42 +103,6 @@ public class RePluginCallbacks {
     public boolean onLoadLargePluginForActivity(Context context, String plugin, Intent intent, int process) {
         // Nothing
         return false;
-    }
-
-    /**
-     * 当插件Activity准备分配坑位时执行
-     *
-     * @param intent 要打开的插件的Activity
-     */
-    public void onPrepareAllocPitActivity(Intent intent) {
-        // Nothing
-    }
-
-    /**
-     * 当插件Activity即将被打开时执行，在onActivityPitAllocated之后被执行
-     *
-     * @param context      要打开的Activity所在的Context
-     * @param intent       原来要打开的插件的Activity
-     * @param pittedIntent 目标坑位的Activity
-     */
-    public void onPrepareStartPitActivity(Context context, Intent intent, Intent pittedIntent) {
-        // Nothing
-    }
-
-    /**
-     * 当插件Activity所在的坑位被执行“销毁”时被执行
-     *
-     * @param activity 要销毁的Activity对象，通常是插件里的Activity
-     */
-    public void onActivityDestroyed(Activity activity) {
-        // Nothing
-    }
-
-    /**
-     * 当插件Service的Binder被释放时被执行
-     */
-    public void onBinderReleased() {
-        // Nothing
     }
 
     /**

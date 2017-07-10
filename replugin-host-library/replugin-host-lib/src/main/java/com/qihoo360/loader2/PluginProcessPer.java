@@ -135,7 +135,7 @@ class PluginProcessPer extends IPluginClient.Stub {
     @Override
     public String allocActivityContainer(String plugin, int process, String target, Intent intent) throws RemoteException {
         // 一旦有分配，则进入监控状态（一是避免不退出的情况，二也是最重要的是避免现在就退出的情况）
-        RePlugin.getConfig().getCallbacks().onPrepareAllocPitActivity(intent);
+        RePlugin.getConfig().getEventCallbacks().onPrepareAllocPitActivity(intent);
 
         String loadPlugin = null;
         // 如果UI进程启用，尝试使用传过来的插件，强制用UI进程
@@ -214,7 +214,7 @@ class PluginProcessPer extends IPluginClient.Stub {
             LogDebug.d(PLUGIN_TAG, "PluginImpl.releaseBinder");
         }
         // 告诉外界Binder已经被释放
-        RePlugin.getConfig().getCallbacks().onBinderReleased();
+        RePlugin.getConfig().getEventCallbacks().onBinderReleased();
     }
 
     @Override

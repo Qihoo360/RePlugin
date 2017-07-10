@@ -262,7 +262,7 @@ class PmInternalImpl implements IPluginActivityManager {
 
         // 通知外界，已准备好要打开Activity了
         // 其中：from为要打开的插件的Intent，to为坑位Intent
-        RePlugin.getConfig().getCallbacks().onPrepareStartPitActivity(context, from, intent);
+        RePlugin.getConfig().getEventCallbacks().onPrepareStartPitActivity(context, from, intent);
 
         return true;
     }
@@ -549,7 +549,7 @@ class PmInternalImpl implements IPluginActivityManager {
         }
 
         // 触发退出检测
-        RePlugin.getConfig().getCallbacks().onActivityDestroyed(activity);
+        RePlugin.getConfig().getEventCallbacks().onActivityDestroyed(activity);
     }
 
     @Override
