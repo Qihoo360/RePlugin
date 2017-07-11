@@ -23,10 +23,13 @@ import com.android.build.api.transform.TransformInput
 import com.android.build.gradle.internal.scope.GlobalScope
 import com.android.sdklib.IAndroidTarget
 import org.apache.commons.io.FileUtils
+import com.google.common.base.Charsets
+import com.google.common.hash.Hashing
 import org.gradle.api.Project
 
 import java.nio.file.Files
 import java.nio.file.Paths
+import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES;
 
 /**
  * @author RePlugin Team
@@ -35,14 +38,14 @@ public class Util {
 
     /** 生成 ClassPool 使用的 ClassPath 集合，同时将要处理的 jar 写入 includeJars */
     def
-    static getClassPaths(Project project, GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars) {
+    static getClassPaths(Project project, GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
         def classpathList = []
 
         // android.jar
         classpathList.add(getAndroidJarPath(globalScope))
 
         // 原始项目中引用的 classpathList
-        getProjectClassPath(project, inputs, includeJars).each {
+        getProjectClassPath(project, inputs, includeJars, map).each {
             classpathList.add(it)
         }
 
@@ -54,7 +57,7 @@ public class Util {
     /** 获取原始项目中的 ClassPath */
     def private static getProjectClassPath(Project project,
                                            Collection<TransformInput> inputs,
-                                           Set<String> includeJars) {
+                                           Set<String> includeJars, Map<String, String> map) {
         def classPath = []
         def visitor = new ClassFileVisitor()
         def projectDir = project.getRootDir().absolutePath
@@ -75,10 +78,19 @@ public class Util {
                 File jar = jarInput.file
                 def jarPath = jar.absolutePath
 
-                // 不处理 Project 之外的文件
                 if (!jarPath.contains(projectDir)) {
-                    classPath << jarPath
-                    println ">>> Skip ${jarPath}"
+
+                    String jarZipDir = project.getBuildDir().path +
+                            File.separator + FD_INTERMEDIATES + File.separator + "exploded-aar" +
+                            File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class";
+                    unzip(jarPath, jarZipDir)
+                    def jarZip = jarZipDir + ".jar"
+                    includeJars << jarZip
+                    classPath << jarZipDir
+                    visitor.setBaseDir(jarZipDir)
+                    Files.walkFileTree(Paths.get(jarZipDir), visitor)
+                    map.put(jarPath, jarZip)
+
                 } else {
 
                     includeJars << jarPath
