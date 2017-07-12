@@ -44,6 +44,11 @@ public class ReClassPlugin implements Plugin<Project> {
             def config = project.extensions.getByName(AppConstant.USER_CONFIG)
 
             def android = project.extensions.getByType(AppExtension)
+
+            def forceStopHostAppTask = null
+            def startHostAppTask = null
+            def restartHostAppTask = null
+
             android.applicationVariants.all { variant ->
                 PluginDebugger pluginDebugger = new PluginDebugger(project, config, variant)
 
@@ -60,6 +65,47 @@ public class ReClassPlugin implements Plugin<Project> {
                     pluginDebugger.install()
                 }
                 installPluginTask.group = AppConstant.TASKS_GROUP
+
+
+                def uninstallPluginTaskName = scope.getTaskName(AppConstant.TASK_UNINSTALL_PLUGIN, "")
+                def uninstallPluginTask = project.task(uninstallPluginTaskName)
+
+                uninstallPluginTask.doLast {
+                    //generate json
+                    pluginDebugger.uninstall()
+                }
+                uninstallPluginTask.group = AppConstant.TASKS_GROUP
+
+
+                if (null == forceStopHostAppTask) {
+                    forceStopHostAppTask = project.task(AppConstant.TASK_FORCE_STOP_HOST_APP)
+                    forceStopHostAppTask.doLast {
+                        //generate json
+                        pluginDebugger.forceStopHostApp()
+                    }
+                    forceStopHostAppTask.group = AppConstant.TASKS_GROUP
+                }
+
+                if (null == startHostAppTask) {
+                    startHostAppTask = project.task(AppConstant.TASK_START_HOST_APP)
+                    startHostAppTask.doLast {
+                        //generate json
+                        pluginDebugger.startHostApp()
+                    }
+                    startHostAppTask.group = AppConstant.TASKS_GROUP
+                }
+
+                if (null == restartHostAppTask) {
+                    restartHostAppTask = project.task(AppConstant.TASK_RESTART_HOST_APP)
+                    restartHostAppTask.doLast {
+                        //generate json
+                        pluginDebugger.startHostApp()
+                    }
+                    restartHostAppTask.group = AppConstant.TASKS_GROUP
+                    restartHostAppTask.dependsOn(forceStopHostAppTask)
+                }
+
+
                 if (assembleTask) {
                     installPluginTask.dependsOn assembleTask
                 }
@@ -111,6 +157,9 @@ class ReClassConfig {
     /** 手机存储目录,默认"/sdcard/" */
     def phoneStorageDir = "/sdcard/"
 
-    /** 宿主包名,默认"com.qihoo360.repluginapp" */
-    def hostApplicationId = "com.qihoo360.repluginapp"
+    /** 宿主包名,默认null */
+    def hostApplicationId = null
+
+    /** 宿主launcherActivity,默认null */
+    def hostAppLauncherActivity = null
 }

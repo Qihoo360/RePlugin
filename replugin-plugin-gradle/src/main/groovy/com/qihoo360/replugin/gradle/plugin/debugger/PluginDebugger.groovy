@@ -53,6 +53,16 @@ class PluginDebugger {
         apkFile = new File(apkDir, apkName)
 
         adbFile = globalScope.androidBuilder.sdkInfo.adb;
+
+        //检查adb环境
+        if (null == adbFile || !adbFile.exists()) {
+            System.err.println "${AppConstant.TAG} Could not find the adb file !!!"
+        }
+
+        if (isConfigNull(config)) {
+            System.err.println "${AppConstant.CONFIG_EXAMPLE}"
+        }
+
     }
 
     /**
@@ -60,21 +70,6 @@ class PluginDebugger {
      * @return 是否命令执行成功
      */
     public boolean install() {
-
-        if (isConfigNull(config)) {
-            return false
-        }
-
-        //检查adb环境
-        if (null == adbFile || !adbFile.exists()) {
-            System.err.println "${AppConstant.TAG} Could not find the adb file !!!"
-        }
-
-        //检查apk文件是否存在
-        if (null == apkFile || !apkFile.exists()) {
-            System.err.println "${AppConstant.TAG} Could not find the available apk !!!"
-            return false
-        }
 
         //推送apk文件到手机
         String pushCmd = "${adbFile.absolutePath} push ${apkFile.absolutePath} ${config.phoneStorageDir}"
@@ -100,22 +95,43 @@ class PluginDebugger {
     }
 
     /**
+     * 卸载插件
+     * @return 是否命令执行成功
+     */
+    public boolean uninstall() {
+        String cmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.uninstall -e plugin ${config.pluginName}"
+        if (0 != CmdUtil.syncExecute(cmd)) {
+            return false
+        }
+    }
+
+    /**
+     * 强制停止宿主app
+     * @return 是否命令执行成功
+     */
+    public boolean forceStopHostApp() {
+        String cmd = "${adbFile.absolutePath} shell am force-stop ${config.hostApplicationId}"
+        if (0 != CmdUtil.syncExecute(cmd)) {
+            return false
+        }
+    }
+
+    /**
+     * 启动宿主app
+     * @return 是否命令执行成功
+     */
+    public boolean startHostApp() {
+        String cmd = "${adbFile.absolutePath} shell am start -n \"${config.hostApplicationId}/${config.hostAppLauncherActivity}\" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER"
+        if (0 != CmdUtil.syncExecute(cmd)) {
+            return false
+        }
+    }
+
+    /**
      * 运行插件
      * @return 是否命令执行成功
      */
     public boolean run() {
-
-        if (isConfigNull(config)) {
-            return false
-        }
-
-        if (null == config.pluginName) {
-            System.err.println "${AppConstant.TAG} you must to config the pluginName !!!"
-            return false
-        }
-
-        //发送运行广播
-        // adb shell am broadcast -a com.qihoo360.repluginapp.replugin.start_activity -e plugin [Name] -e activity [Class]
         String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.start_activity -e plugin ${config.pluginName}"
         if (0 != CmdUtil.syncExecute(installBrCmd)) {
             return false
@@ -132,6 +148,17 @@ class PluginDebugger {
             System.err.println "${AppConstant.TAG} the config object can not be null!!!"
             return true
         }
+
+        if (null == config.hostApplicationId) {
+            System.err.println "${AppConstant.TAG} the config hostApplicationId can not be null!!!"
+            return true
+        }
+
+        if (null == config.hostAppLauncherActivity) {
+            System.err.println "${AppConstant.TAG} the config hostAppLauncherActivity can not be null!!!"
+            return true
+        }
+
         return false
     }
 
