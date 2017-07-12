@@ -16,9 +16,8 @@
 
 package com.qihoo360.replugin;
 
-import com.qihoo360.replugin.helper.LogDebug;
-
 import com.qihoo360.replugin.ext.lang3.reflect.MethodUtils;
+import com.qihoo360.replugin.helper.LogDebug;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -75,6 +74,22 @@ public class PluginDexClassLoader extends DexClassLoader {
         // 插件自己的Class。从自己开始一直到BootClassLoader，采用正常的双亲委派模型流程，读到了就直接返回
         Class<?> pc = null;
         ClassNotFoundException cnfException = null;
+
+        // 如果用户自定义了默写类从宿主加载，则优先加载宿主的类
+        for (String packageName : RePlugin.getConfig().getPackagesNeedToBeLoadedFromHost()) {
+            if (className.startsWith(packageName)) {
+                pc = loadClassFromHost(className, resolve);
+            }
+        }
+
+        if (pc != null) {
+            // 只有开启“详细日志”才会输出，防止“刷屏”现象
+            if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
+                LogDebug.d(TAG, "loadClass: load host class, cn=" + className);
+            }
+            return pc;
+        }
+
         try {
             pc = super.loadClass(className, resolve);
             if (pc != null) {
@@ -91,24 +106,26 @@ public class PluginDexClassLoader extends DexClassLoader {
         // 若插件里没有此类，则会从宿主ClassLoader中找，找到了则直接返回
         // 注意：需要读取isUseHostClassIfNotFound开关。默认为关闭的。可参见该开关的说明
         if (RePlugin.getConfig().isUseHostClassIfNotFound()) {
-            try {
-                pc = (Class<?>) sLoadClassMethod.invoke(mHostClassLoader, className, resolve);
-                if (pc != null) {
-                    // 只有开启“详细日志”才会输出，防止“刷屏”现象
-                    if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
-                        LogDebug.w(TAG, "loadClass: load host class, cn=" + className);
-                    }
-                }
-            } catch (IllegalAccessException e) {
-                // Just rethrow
-                throw new ClassNotFoundException("iae", e);
-            } catch (InvocationTargetException e) {
-                // Just rethrow
-                throw new ClassNotFoundException("ite", e);
+            pc = loadClassFromHost(className, resolve);
+            if (pc == null) {
+                cnfException = new ClassNotFoundException("class " + className + " can not be found!");
             }
-        } else if (cnfException != null) {
+        }
+        if (cnfException != null) {
             throw cnfException;
         }
         return pc;
+    }
+
+    protected Class<?> loadClassFromHost(String className, boolean resolve) {
+        Class<?> clazz = null;
+        try {
+            clazz = (Class<?>) sLoadClassMethod.invoke(mHostClassLoader, className, resolve);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return clazz;
     }
 }

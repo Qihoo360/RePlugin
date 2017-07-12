@@ -22,6 +22,8 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 用来自定义RePlugin行为的类。 <p>
@@ -47,6 +49,10 @@ public final class RePluginConfig {
     private boolean moveFileWhenInstalling = true;
     private boolean printDetailLog = false;
     private int defaultFrameworkVersion = 4;
+
+
+
+    private List<String> packagesNeedToBeLoadedFromHost = new ArrayList<>();
 
     /**
      * 获取插件回调方法。通常无需调用此方法。
@@ -322,5 +328,17 @@ public final class RePluginConfig {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 可以指定默写特定的包下的所有的类均从宿主加载，从而实现一些公关类的共享
+     * @param packageName
+     */
+    public void addPackagesNeedToBeLoadedFromHost(String packageName) {
+        packagesNeedToBeLoadedFromHost.add(packageName);
+    }
+
+    public List<String> getPackagesNeedToBeLoadedFromHost() {
+        return packagesNeedToBeLoadedFromHost;
     }
 }
