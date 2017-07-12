@@ -1,0 +1,30 @@
+/*
+ * Copyright (C) 2005-2017 Qihoo 360 Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed To in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+include ':replugin-host-gradle'
+project(':replugin-host-gradle').projectDir = new File('replugin-host-gradle')
+include ':HostLib'
+project(':HostLib').projectDir = new File('replugin-host-library/replugin-host-lib')
+include ':replugin-plugin-gradle'
+project(':replugin-plugin-gradle').projectDir = new File('replugin-plugin-gradle')
+include ':PluginLib'
+project(':PluginLib').projectDir = new File('replugin-plugin-library/replugin-plugin-lib')
+include ':SampleHost'
+project(':SampleHost').projectDir = new File('replugin-sample/host/app')
+include ':SamplePlugin1'
+project(':SamplePlugin1').projectDir = new File('replugin-sample/plugin/plugin-demo1/app')
+include ':SamplePlugin2'
+project(':SamplePlugin2').projectDir = new File('replugin-sample/plugin/plugin-demo2/app')

@@ -23,12 +23,12 @@ version = "2.1.4"
 group = 'com.qihoo360.replugin'  // 组名
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 25
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
 
         testVariants.all {
             it.mergedFlavor.manifestPlaceholders = [persistentName: ":GuardService"]
@@ -50,7 +50,7 @@ dependencies {
 
     // 以“占位符”（Provided）的方式来引用support-v4，不会编入AAR
     // 但宿主需要支持Support-v4（至少应支持LocalBroadcastManager）
-    provided 'com.android.support:support-v4:25.2.0'
+    provided "com.android.support:support-v4:$rootProject.supportLibraryVersion"
 }
 
 apply from: 'bintray.gradle'

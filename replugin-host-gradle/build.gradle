@@ -99,6 +99,7 @@ publishing {
             } else {
                 from components.java
             }
+            artifactId 'replugin-host-gradle'
 
             artifact sourcesJar
             artifact javadocJar
