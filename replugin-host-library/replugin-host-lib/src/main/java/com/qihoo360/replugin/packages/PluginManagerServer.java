@@ -491,11 +491,11 @@ public class PluginManagerServer {
         // 3. 给各进程发送广播，同步更新
         final Intent intent = new Intent(PluginInfoUpdater.ACTION_UNINSTALL_PLUGIN);
         intent.putExtra("obj", info);
-        // 注意：attachBaseContext内部获取getApplicationContext会为空，则此情况仅在UI线程进行更新
+        // 注意：若在attachBaseContext中调用此方法，则由于此时getApplicationContext为空，导致发送广播时会出现空指针异常。
+        // 则应该Post一下，待getApplicationContext有值后再发送广播。
         if (RePluginInternal.getAppContext().getApplicationContext() != null) {
             IPC.sendLocalBroadcast2AllSync(RePluginInternal.getAppContext(), intent);
         } else {
-            Tasks.init();
             Tasks.post2UI(new Runnable() {
                 @Override
                 public void run() {
