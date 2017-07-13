@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import com.qihoo360.loader2.CertUtils;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
+import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.mobilesafe.utils.pkg.PackageFilesUtil;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginEventCallbacks;
@@ -340,10 +341,8 @@ public class PluginManagerServer {
                 LogDebug.d(TAG, "updateIfNeeded: delete plugin. pn=" + curInfo.getName());
             }
 
-            // 移除插件及其已释放的Dex、Native库等文件
-            PackageFilesUtil.forceDelete(curInfo.getPendingDelete());
-            mList.remove(curInfo.getName());
-            return true;
+            // 移除插件及其已释放的Dex、Native库等文件并向各进程发送广播，同步更新
+            return uninstallNow(curInfo.getPendingDelete());
 
         } else if (curInfo.isNeedUpdate()) {
             // 需要更新插件？那就直接来
@@ -436,14 +435,25 @@ public class PluginManagerServer {
         // 1. 移除插件及其已释放的Dex、Native库等文件
         PackageFilesUtil.forceDelete(info);
 
-        // 2. 给各进程发送广播，同步更新
-        Intent intent = new Intent(PluginInfoUpdater.ACTION_UNINSTALL_PLUGIN);
-        intent.putExtra("obj", info);
-        IPC.sendLocalBroadcast2AllSync(RePluginInternal.getAppContext(), intent);
-
-        // 3. 保存插件信息到文件中
+        // 2. 保存插件信息到文件中
         mList.remove(info.getName());
         mList.save(mContext);
+
+        // 3. 给各进程发送广播，同步更新
+        final Intent intent = new Intent(PluginInfoUpdater.ACTION_UNINSTALL_PLUGIN);
+        intent.putExtra("obj", info);
+        // 注意：attachBaseContext内部获取getApplicationContext会为空，则此情况仅在UI线程进行更新
+        if (RePluginInternal.getAppContext().getApplicationContext() != null) {
+            IPC.sendLocalBroadcast2AllSync(RePluginInternal.getAppContext(), intent);
+        } else {
+            Tasks.init();
+            Tasks.post2UI(new Runnable() {
+                @Override
+                public void run() {
+                    IPC.sendLocalBroadcast2All(RePluginInternal.getAppContext(), intent);
+                }
+            });
+        }
         return true;
     }
 
