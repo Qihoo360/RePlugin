@@ -108,6 +108,10 @@ public class PluginInfo implements Parcelable, Cloneable {
     // 若插件需要卸载，则会有此值
     private PluginInfo mPendingDelete;
 
+    // 若插件需要同版本覆盖安装更新，则会有此值
+    private PluginInfo mPendingCover;
+    private boolean mIsPendingCover;
+
     private PluginInfo(JSONObject jo) {
         initPluginInfo(jo);
     }
@@ -155,6 +159,10 @@ public class PluginInfo implements Parcelable, Cloneable {
         if (pi.mPendingDelete != null) {
             this.mPendingDelete = new PluginInfo(pi.mPendingDelete);
         }
+        this.mIsPendingCover = pi.mIsPendingCover;
+        if (pi.mPendingCover != null) {
+            this.mPendingCover = new PluginInfo(pi.mPendingCover);
+        }
     }
 
     private void initPluginInfo(JSONObject jo) {
@@ -171,6 +179,15 @@ public class PluginInfo implements Parcelable, Cloneable {
         if (djo != null) {
             mPendingDelete = new PluginInfo(djo);
         }
+
+        // 缓存"待覆盖安装"的插件信息
+        JSONObject cjo = jo.optJSONObject("coverinfo");
+        if (cjo != null) {
+            mPendingCover = new PluginInfo(cjo);
+        }
+
+        // 缓存"待覆盖安装"的插件覆盖字段
+        mIsPendingCover = jo.optBoolean("cover");
     }
 
     // 通过别名和包名来最终确认插件名
@@ -347,6 +364,7 @@ public class PluginInfo implements Parcelable, Cloneable {
     /**
      * 获取APK存放的文件信息 <p>
      * 若为"纯APK"插件，则会位于app_p_a中；若为"p-n"插件，则会位于"app_plugins_v3"中 <p>
+     * 注意：若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
      *
      * @return Apk所在的File对象
      */
@@ -356,6 +374,8 @@ public class PluginInfo implements Parcelable, Cloneable {
         File dir;
         if (isPnPlugin()) {
             dir = context.getDir(Constant.LOCAL_PLUGIN_SUB_DIR, 0);
+        } else if (getIsPendingCover()) {
+            dir = context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
         } else {
             dir = context.getDir(Constant.LOCAL_PLUGIN_APK_SUB_DIR, 0);
         }
@@ -365,6 +385,7 @@ public class PluginInfo implements Parcelable, Cloneable {
     /**
      * 获取Dex（优化后）生成时所在的目录 <p>
      * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
+     * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
      * 注意：仅供框架内部使用
      *
      * @return 优化后Dex所在目录的File对象
@@ -374,6 +395,8 @@ public class PluginInfo implements Parcelable, Cloneable {
         Context context = RePluginInternal.getAppContext();
         if (isPnPlugin()) {
             return context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
+        } else if (getIsPendingCover()) {
+            return context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
         } else {
             return context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
         }
@@ -394,6 +417,7 @@ public class PluginInfo implements Parcelable, Cloneable {
     /**
      * 根据类型来获取SO释放的路径 <p>
      * 若为"纯APK"插件，则会位于app_p_n中；若为"p-n"插件，则会位于"app_plugins_v3_libs"中 <p>
+     * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
      * 注意：仅供框架内部使用
      *
      * @return SO释放路径所在的File对象
@@ -404,6 +428,8 @@ public class PluginInfo implements Parcelable, Cloneable {
         File dir;
         if (isPnPlugin()) {
             dir = context.getDir(Constant.LOCAL_PLUGIN_DATA_LIB_DIR, 0);
+        } else if (getIsPendingCover()) {
+            dir = context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
         } else {
             dir = context.getDir(Constant.LOCAL_PLUGIN_APK_LIB_DIR, 0);
         }
@@ -488,6 +514,62 @@ public class PluginInfo implements Parcelable, Cloneable {
             JSONHelper.putNoThrows(mJson, "delinfo", info.getJSON());
         } else {
             mJson.remove("delinfo");
+        }
+    }
+
+    /**
+     * 是否已准备好了新待覆盖的版本？
+     *
+     * @return 是否已准备好
+     */
+    public boolean isNeedCover() {
+        return mPendingCover != null;
+    }
+
+    /**
+     * 获取将来要覆盖更新的插件的信息，将会在下次启动时才能被使用
+     *
+     * @return 插件覆盖安装信息
+     */
+    public PluginInfo getPendingCover() {
+        return mPendingCover;
+    }
+
+    /**
+     * 设置插件的覆盖更新信息。此信息有可能等到下次才能被使用 <p>
+     * 注意：若为“纯APK”方案所用，则修改后需调用PluginInfoList.save来保存，否则会无效
+     *
+     * @param info 插件覆盖安装信息
+     */
+    public void setPendingCover(PluginInfo info) {
+        mPendingCover = info;
+        if (info != null) {
+            JSONHelper.putNoThrows(mJson, "coverinfo", info.getJSON());
+        } else {
+            mJson.remove("coverinfo");
+        }
+    }
+
+    /**
+     * 此PluginInfo是否包含同版本覆盖的字段？只在调用RePlugin.install方法才能看到 <p>
+     * 注意：仅框架内部使用
+     *
+     * @return 是否包含同版本覆盖字段
+     */
+    public boolean getIsPendingCover() {
+        return mIsPendingCover;
+    }
+
+    /**
+     * 设置PluginInfo的同版本覆盖的字段 <p>
+     * 注意：仅框架内部使用
+     */
+    public void setIsPendingCover(boolean coverInfo) {
+        mIsPendingCover = coverInfo;
+        if (mIsPendingCover) {
+            JSONHelper.putNoThrows(mJson, "cover", mIsPendingCover);
+        } else {
+            mJson.remove("cover");
         }
     }
 

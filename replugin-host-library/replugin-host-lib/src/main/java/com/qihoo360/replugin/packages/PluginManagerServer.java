@@ -201,7 +201,19 @@ public class PluginManagerServer {
     }
 
     private boolean checkVersion(PluginInfo instPli, PluginInfo curPli) {
-        if (instPli.getVersion() <= curPli.getVersion()) {
+        // 支持插件同版本覆盖安装？
+        // 若现在要安装的，与之前的版本相同，则覆盖掉之前的版本；
+        if (instPli.getVersion() == curPli.getVersion()) {
+            if (LogDebug.LOG) {
+                LogDebug.d(TAG, "isSameVersion: same version. " +
+                        "inst_ver=" + instPli.getVersion() + "; cur_ver=" + curPli.getVersion());
+            }
+            instPli.setIsPendingCover(true);
+            return true;
+        }
+
+        // 若现在要安装的，比之前的版本还要旧，则忽略更新；
+        if (instPli.getVersion() < curPli.getVersion()) {
             if (LogDebug.LOG) {
                 LogDebug.e(TAG, "checkVersion: Older than current, install fail. pn=" + curPli.getName() +
                         "; inst_ver=" + instPli.getVersion() + "; cur_ver=" + curPli.getVersion());
@@ -210,9 +222,9 @@ public class PluginManagerServer {
         }
 
         // 已有“待更新版本”？
-        // 若现在要安装的，比“待更新版本”还要旧（或相同），则也可以忽略
+        // 若现在要安装的，比“待更新版本”还要旧，则也可以忽略
         PluginInfo curUpdatePli = curPli.getPendingUpdate();
-        if (curUpdatePli != null && instPli.getVersion() <= curUpdatePli.getVersion()) {
+        if (curUpdatePli != null && instPli.getVersion() < curUpdatePli.getVersion()) {
             if (LogDebug.LOG) {
                 LogDebug.e(TAG, "checkVersion: Older than updating plugin. Ignore. pn=" + curPli.getName() + "; " +
                         "cur_ver=" + curPli.getVersion() + "; old_ver=" + curUpdatePli.getVersion() + "; new_ver=" + instPli.getVersion());
@@ -273,8 +285,14 @@ public class PluginManagerServer {
             if (LogDebug.LOG) {
                 LogDebug.w(TAG, "updateOrLater: Plugin is running. Later. pn=" + curPli.getName());
             }
-            instPli.setIsThisPendingUpdateInfo(true);
-            curPli.setPendingUpdate(instPli);
+            if (instPli.getVersion() > curPli.getVersion()) {
+                // 高版本升级
+                instPli.setIsThisPendingUpdateInfo(true);
+                curPli.setPendingUpdate(instPli);
+            } else if (instPli.getVersion() == curPli.getVersion()){
+                // 同版本覆盖
+                curPli.setPendingCover(instPli);
+            }
         } else {
             if (LogDebug.LOG) {
                 LogDebug.i(TAG, "updateOrLater: Not running. Update now! pn=" + curPli.getName());
@@ -348,7 +366,9 @@ public class PluginManagerServer {
             // 需要更新插件？那就直接来
             updateNow(curInfo, curInfo.getPendingUpdate());
             return true;
-
+        } else if (curInfo.isNeedCover()) {
+            updateNow(curInfo, curInfo.getPendingCover());
+            return true;
         } else {
             // 既不需要删除也不需要更新
             if (LogDebug.LOG) {
@@ -359,8 +379,13 @@ public class PluginManagerServer {
     }
 
     private void updateNow(PluginInfo curInfo, PluginInfo newInfo) {
-        // 删除旧版本插件，不管是不是p-n的，且清掉Dex和Native目录
-        delete(curInfo);
+        final boolean covered = newInfo.getIsPendingCover();
+        if (covered) {
+            move(curInfo, newInfo);
+        } else {
+            // 删除旧版本插件，不管是不是p-n的，且清掉Dex和Native目录
+            delete(curInfo);
+        }
 
         newInfo.setType(PluginInfo.TYPE_EXTRACTED);
         if (LogDebug.LOG) {
@@ -368,8 +393,32 @@ public class PluginManagerServer {
                     "; cur_ver=" + curInfo.getVersion() + "; update_ver=" + newInfo.getVersion());
         }
 
-        curInfo.update(newInfo);
-        curInfo.setPendingUpdate(null);
+        if (covered) {
+            curInfo.setPendingCover(null);
+        } else {
+            curInfo.update(newInfo);
+            curInfo.setPendingUpdate(null);
+        }
+    }
+
+    private void move(@NonNull PluginInfo curPi, @NonNull PluginInfo newPi) {
+        try {
+            FileUtils.copyFile(newPi.getApkFile(), curPi.getApkFile());
+            FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
+            FileUtils.copyFile(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+        } catch (IOException e) {
+            if (LogRelease.LOGR) {
+                e.printStackTrace();
+            }
+        } finally {
+            try {
+                FileUtils.forceDelete(newPi.getApkFile().getParentFile());
+            } catch (IOException e) {
+                if (LogRelease.LOGR) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void delete(@NonNull PluginInfo pi) {
