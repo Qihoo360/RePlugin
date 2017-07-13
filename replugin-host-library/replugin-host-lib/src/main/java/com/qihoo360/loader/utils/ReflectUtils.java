@@ -87,6 +87,20 @@ public final class ReflectUtils {
         }
     }
 
+    public static Method getMethod(ClassLoader loader, String clzName,
+                                   String methodName, Class<?>[] methodParamTypes) throws
+            ClassNotFoundException, NoSuchMethodException {
+
+        Class clz = Class.forName(clzName, false, loader);
+
+        if (clz != null) {
+            return clz.getDeclaredMethod(methodName, methodParamTypes);
+        }
+
+        return null;
+    }
+
+
     public static Object invokeMethod(ClassLoader loader, String clzName,
                                       String methodName, Object methodReceiver,
                                       Class<?>[] methodParamTypes, Object... methodParamValues) throws
@@ -103,6 +117,28 @@ public final class ReflectUtils {
                 return med.invoke(methodReceiver, methodParamValues);
             }
         }
+        return null;
+    }
+
+    public static Object invokeMethod(Method method, Object methodReceiver, Object... methodParamValues) throws
+            InvocationTargetException, IllegalAccessException {
+
+        if (method != null) {
+            boolean acc = method.isAccessible();
+
+            if (!acc) {
+                method.setAccessible(true);
+            }
+
+            Object ret = method.invoke(methodReceiver, methodParamValues);
+
+            if (!acc) {
+                method.setAccessible(false);
+            }
+
+            return ret;
+        }
+
         return null;
     }
 }

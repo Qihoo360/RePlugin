@@ -38,8 +38,11 @@ buildscript {
     }
 }
 
+// 排除 root project 引入的 com.qihoo360.replugin:replugin-host-gradle
+configurations.compile.exclude group: 'com.qihoo360.replugin'
+
 group = 'com.qihoo360.replugin'  // 组名
-version = '2.1.3' // 版本
+version = rootProject.ext.nextReleaseVersion // 版本
 
 dependencies {
     compile 'com.android.tools.build:gradle:2.1.3'

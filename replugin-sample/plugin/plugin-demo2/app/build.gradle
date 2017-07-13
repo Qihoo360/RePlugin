@@ -70,5 +70,8 @@ apply plugin: 'replugin-plugin-gradle'
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    // 在开发调试的时候，可以直接引用项目
+    // compile project(":PluginLib")
     compile "com.qihoo360.replugin:replugin-plugin-lib:${rootProject.repluginPluginLibVersion}"
+    provided "com.qihoo360.replugin:replugin-host-lib:${rootProject.repluginHostLibVersion}@jar"
 }

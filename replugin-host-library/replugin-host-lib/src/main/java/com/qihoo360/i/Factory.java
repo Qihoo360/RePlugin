@@ -89,7 +89,7 @@ public final class Factory {
      * 新版SDK（RePlugin-library）插件入口报名前缀
      * 在插件中，该包名不能混淆
      */
-    public static final String REPLUGIN_LIBRARY_ENTRY_PACKAGE_PREFIX = "com.qihoo360.replugin";
+    public static final String REPLUGIN_LIBRARY_ENTRY_PACKAGE_PREFIX = "com.qihoo360.replugin.plugin";
 
     /**
      * 插件的入口类

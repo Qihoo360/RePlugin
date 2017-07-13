@@ -3,7 +3,7 @@ package com.qihoo360.replugin.sample.demo1.activity.for_result;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.qihoo360.replugin.loader.a.PluginActivity;
+import com.qihoo360.replugin.plugin.loader.a.PluginActivity;
 
 /**
  * @author RePlugin Team

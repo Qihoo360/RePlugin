@@ -26,7 +26,7 @@ import javassist.expr.MethodCall
  */
 public class ProviderExprEditor extends ExprEditor {
 
-    static def PROVIDER_CLASS = 'com.qihoo360.replugin.loader.p.PluginProviderClient'
+    static def PROVIDER_CLASS = 'com.qihoo360.loader2.mgr.PluginProviderClient'
 
     public def filePath
 
@@ -46,9 +46,9 @@ public class ProviderExprEditor extends ExprEditor {
 
     def private replaceStatement(MethodCall methodCall, String method, def line) {
         if (methodCall.getMethodName() == 'registerContentObserver' || methodCall.getMethodName() == 'notifyChange') {
-            methodCall.replace('{' + PROVIDER_CLASS + '.' + method + '(com.qihoo360.replugin.RePlugin.getPluginContext(), $$);}')
+            methodCall.replace('{' + PROVIDER_CLASS + '.' + method + '(com.qihoo360.replugin.RePluginEnv.getPluginContext(), $$);}')
         } else {
-            methodCall.replace('{$_ = ' + PROVIDER_CLASS + '.' + method + '(com.qihoo360.replugin.RePlugin.getPluginContext(), $$);}')
+            methodCall.replace('{$_ = ' + PROVIDER_CLASS + '.' + method + '(com.qihoo360.replugin.RePluginEnv.getPluginContext(), $$);}')
         }
         println ">>> Replace: ${filePath} Provider.${method}():${line}"
     }

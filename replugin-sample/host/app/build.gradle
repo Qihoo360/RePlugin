@@ -25,6 +25,17 @@ buildscript {
 }
 
 
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.qihoo360.replugin:replugin-host-gradle:$repluginHostGradleVersion"
+    }
+}
+
 apply plugin: 'com.android.application'
 
 apply plugin: 'replugin-host-gradle'
@@ -49,6 +60,8 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    // 在开发调试的时候，可以直接引用项目
+    // compile project(":HostLib")
     compile "com.qihoo360.replugin:replugin-host-lib:${rootProject.repluginHostLibVersion}"
     compile "com.android.support:support-v4:${rootProject.supportLibraryVersion}"
 }

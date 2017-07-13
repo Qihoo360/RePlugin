@@ -14,42 +14,36 @@
  * the License.
  */
 
-package com.qihoo360.replugin.loader.a;
+package com.qihoo360.replugin.plugin.loader.a;
 
-import android.app.ListActivity;
+import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.qihoo360.replugin.RePluginInternal;
+import com.qihoo360.i.Factory2;
 import com.qihoo360.replugin.helper.LogRelease;
 
 /**
  * @author RePlugin Team
  */
-public abstract class PluginListActivity extends ListActivity {
+public abstract class PluginTabActivity extends TabActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        newBase = RePluginInternal.createActivityContext(this, newBase);
+        newBase = Factory2.createActivityContext(this, newBase);
         super.attachBaseContext(newBase);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //
-        RePluginInternal.handleActivityCreateBefore(this, savedInstanceState);
+        Factory2.handleActivityCreateBefore(this, savedInstanceState);
 
         super.onCreate(savedInstanceState);
 
         //
-        RePluginInternal.handleActivityCreate(this, savedInstanceState);
-    }
-
-    @Override
-    protected void onDestroy() {
-        //
-        RePluginInternal.handleActivityDestroy(this);
+        Factory2.handleActivityDestroy(this);
 
         super.onDestroy();
     }
@@ -57,7 +51,7 @@ public abstract class PluginListActivity extends ListActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         //
-        RePluginInternal.handleRestoreInstanceState(this, savedInstanceState);
+        Factory2.handleRestoreInstanceState(this, savedInstanceState);
 
         try {
             super.onRestoreInstanceState(savedInstanceState);
@@ -73,30 +67,27 @@ public abstract class PluginListActivity extends ListActivity {
             // 1、可能无法恢复系统级View的保存的状态；
             // 2、如果自己代码处理不当，可能会出现异常。故自己代码一定要用SecExtraUtils来获取Bundle数据
             if (LogRelease.LOGR) {
-                LogRelease.e("PluginListActivity", "o r i s: p=" + getPackageCodePath() + "; " + e.getMessage(), e);
+                LogRelease.e("PluginTabActivity", "o r i s: p=" + getPackageCodePath() + "; " + e.getMessage(), e);
             }
         }
     }
 
-
     @Override
     public void startActivity(Intent intent) {
         //
-        if (RePluginInternal.startActivity(this, intent)) {
-            // 这个地方不需要回调startActivityAfter，因为RePluginInternal最终还是会回调回来，最终还是要走super.startActivity()
+        if (Factory2.startActivity(this, intent)) {
+            // 这个地方不需要回调startActivityAfter，因为Factory2最终还是会回调回来，最终还是要走super.startActivity()
             return;
         }
 
-
         super.startActivity(intent);
-
     }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
         //
-        if (RePluginInternal.startActivityForResult(this, intent, requestCode)) {
-            // 这个地方不需要回调startActivityAfter，因为RePluginInternal最终还是会回调回来，最终还是要走super.startActivityForResult()
+        if (Factory2.startActivityForResult(this, intent, requestCode, null)) {
+            // 这个地方不需要回调startActivityAfter，因为Factory2最终还是会回调回来，最终还是要走super.startActivityForResult()
             return;
         }
 

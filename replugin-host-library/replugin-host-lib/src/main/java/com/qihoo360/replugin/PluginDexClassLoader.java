@@ -16,9 +16,9 @@
 
 package com.qihoo360.replugin;
 
-import com.qihoo360.replugin.helper.LogDebug;
 
 import com.qihoo360.replugin.ext.lang3.reflect.MethodUtils;
+import com.qihoo360.replugin.helper.LogDebug;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -75,6 +75,29 @@ public class PluginDexClassLoader extends DexClassLoader {
         // 插件自己的Class。从自己开始一直到BootClassLoader，采用正常的双亲委派模型流程，读到了就直接返回
         Class<?> pc = null;
         ClassNotFoundException cnfException = null;
+        //TODO 如果把 host-lib 的包名字重新命名为 com.qihoo360.replugin.host 则可以简化下面的逻辑
+        boolean isPluginLib = className.startsWith("com.qihoo360.replugin.plugin");
+        boolean isSample = className.startsWith("com.qihoo360.replugin.sample");
+        boolean isHostLib = className.startsWith("com.qihoo360");
+        boolean isLBM = "android.support.v4.content.LocalBroadcastManager".equals(className);
+        if (isLBM || (isHostLib && !isSample && !isPluginLib)) {
+            // LocalBroadcastManager 或者其他 host 中的类从 mHostClassLoader 中读取
+            try {
+                pc = (Class<?>) sLoadClassMethod.invoke(mHostClassLoader, className, resolve);
+                if (pc != null) {
+                    // 只有开启“详细日志”才会输出，防止“刷屏”现象
+                    if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
+                        LogDebug.w(TAG, "loadClass: load host class, cn=" + className);
+                    }
+                    return pc;
+                }
+            } catch (IllegalAccessException e) {
+                // Just rethrow
+            } catch (InvocationTargetException e) {
+                // Just rethrow
+            }
+        }
+
         try {
             pc = super.loadClass(className, resolve);
             if (pc != null) {

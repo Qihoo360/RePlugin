@@ -39,14 +39,14 @@ public class LoaderActivityInjector extends BaseInjector {
 
     /* LoaderActivity 替换规则 */
     def private static loaderActivityRules = [
-            'android.app.Activity'                    : 'com.qihoo360.replugin.loader.a.PluginActivity',
-            'android.app.TabActivity'                 : 'com.qihoo360.replugin.loader.a.PluginTabActivity',
-            'android.app.ListActivity'                : 'com.qihoo360.replugin.loader.a.PluginListActivity',
-            'android.app.ActivityGroup'               : 'com.qihoo360.replugin.loader.a.PluginActivityGroup',
-            'android.support.v4.app.FragmentActivity' : 'com.qihoo360.replugin.loader.a.PluginFragmentActivity',
-            'android.support.v7.app.AppCompatActivity': 'com.qihoo360.replugin.loader.a.PluginAppCompatActivity',
-            'android.preference.PreferenceActivity'   : 'com.qihoo360.replugin.loader.a.PluginPreferenceActivity',
-            'android.app.ExpandableListActivity'      : 'com.qihoo360.replugin.loader.a.PluginExpandableListActivity'
+            'android.app.Activity'                    : 'com.qihoo360.replugin.plugin.loader.a.PluginActivity',
+            'android.app.TabActivity'                 : 'com.qihoo360.replugin.plugin.loader.a.PluginTabActivity',
+            'android.app.ListActivity'                : 'com.qihoo360.replugin.plugin.loader.a.PluginListActivity',
+            'android.app.ActivityGroup'               : 'com.qihoo360.replugin.plugin.loader.a.PluginActivityGroup',
+            'android.support.v4.app.FragmentActivity' : 'com.qihoo360.replugin.plugin.loader.a.PluginFragmentActivity',
+            'android.support.v7.app.AppCompatActivity': 'com.qihoo360.replugin.plugin.loader.a.PluginAppCompatActivity',
+            'android.preference.PreferenceActivity'   : 'com.qihoo360.replugin.plugin.loader.a.PluginPreferenceActivity',
+            'android.app.ExpandableListActivity'      : 'com.qihoo360.replugin.plugin.loader.a.PluginExpandableListActivity'
     ]
 
     @Override

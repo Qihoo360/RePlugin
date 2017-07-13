@@ -22,7 +22,7 @@ public class PluginFragmentActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         //注册相关Fragment的类
         //注册一个全局Hook用于拦截系统对XX类的寻找定向到Demo1中的XX类主要是用于在xml中可以直接使用插件中的类
-        RePlugin.registerHookingClass("com.qihoo360.replugin.sample.demo1.fragment.DemoFragment", RePlugin.createComponentName("demo1", "com.qihoo360.replugin.sample.demo1.fragment.DemoFragment"), null);
+        RePlugin.registerHookingClass("com.qihoo360.replugin.sample.demo1.DemoFragment", RePlugin.createComponentName("demo1", "com.qihoo360.replugin.sample.demo1.fragment.DemoFragment"), null);
         setContentView(R.layout.activity_plugin_fragment);
 
 

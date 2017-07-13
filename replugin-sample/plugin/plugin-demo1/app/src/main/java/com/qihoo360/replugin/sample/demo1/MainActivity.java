@@ -17,14 +17,17 @@
 package com.qihoo360.replugin.sample.demo1;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +66,13 @@ public class MainActivity extends Activity {
 
         ListView lv = (ListView) findViewById(R.id.list_view);
         lv.setAdapter(new TestAdapter());
+        IntentFilter filter = new IntentFilter("Test");
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(context, "receiver....", Toast.LENGTH_SHORT).show();
+            }
+        }, filter);
     }
 
     private void initData() {
@@ -71,6 +81,13 @@ public class MainActivity extends Activity {
         // =========
         // Activity
         // =========
+        mItems.add(new TestItem("LocalBroadcastManager", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent("Test");
+                LocalBroadcastManager.getInstance(v.getContext()).sendBroadcast(intent);
+            }
+        }));
         mItems.add(new TestItem("Activity: Theme BlackNoTitleBar", new View.OnClickListener() {
             @Override
             public void onClick(View v) {

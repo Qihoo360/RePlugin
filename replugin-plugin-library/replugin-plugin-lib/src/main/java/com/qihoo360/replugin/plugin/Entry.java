@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2005-2017 Qihoo 360 Inc.
  *
@@ -14,42 +15,50 @@
  * the License.
  */
 
-package com.qihoo360.replugin;
+package com.qihoo360.replugin.plugin;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.IBinder;
+import android.os.RemoteException;
+
+import com.qihoo360.loader2.IPlugin;
 
 /**
- * 插件环境相关变量的封装
- *
  * @author RePlugin Team
  */
-public class RePluginEnv {
-
+public class Entry {
+    @SuppressLint("StaticFieldLeak")
     private static Context sPluginContext;
-
+    @SuppressLint("StaticFieldLeak")
     private static Context sHostContext;
-
     private static ClassLoader sHostClassLoader;
-
     private static IBinder sPluginManager;
 
     /**
-     * NOTE：如需使用MobileSafeHelper类，请务必先在Entry中调用此方法
+     * 加载插件的时候会调用这个函数来初始化插件
+     *
+     * @param context 插件上下文
+     * @param cl      HOST程序的类加载器
+     * @param manager 插件管理器
+     * @return
      */
-    static void init(Context context, ClassLoader cl, IBinder manager) {
+    public static IBinder create(Context context, ClassLoader cl, IBinder manager) {
         sPluginContext = context;
-
         // 确保获取的一定是主程序的Context
         sHostContext = ((ContextWrapper) context).getBaseContext();
-
         sHostClassLoader = cl;
-
         // 从宿主传过来的，目前恒为null
         sPluginManager = manager;
-    }
 
+        return new IPlugin.Stub() {
+            @Override
+            public IBinder query(String name) throws RemoteException {
+                return RePluginServiceManager.getInstance().getService(name);
+            }
+        };
+    }
     /**
      * 获取宿主部分的Context对象
      * 可用来：获取宿主部分的资源、反射类、Info等信息

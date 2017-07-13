@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.qihoo360.replugin;
+package com.qihoo360.replugin.plugin;
 
 import android.os.IBinder;
 import android.text.TextUtils;
