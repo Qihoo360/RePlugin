@@ -17,15 +17,18 @@
 package com.qihoo360.replugin.sample.demo1;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -220,6 +223,23 @@ public class MainActivity extends Activity {
                     Toast.makeText(v.getContext(), "", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
+            }
+        }));
+        mItems.add(new TestItem("Resources: Use demo2's layout", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Resources res = RePlugin.fetchResources("demo2");
+                int id = res.getIdentifier("com.qihoo360.replugin.sample.demo2:layout/from_demo1", null, null);
+                if (id == 0) {
+                    Toast.makeText(v.getContext(), "from_demo1 Not Found", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // 这块儿得拿demo2的Context，才能Inflate到资源
+                View contentView = LayoutInflater.from(RePlugin.fetchContext("demo2")).inflate(id, null);
+                Dialog d = new Dialog(v.getContext());
+                d.setContentView(contentView);
+                d.show();
             }
         }));
         mItems.add(new TestItem("Binder: Fast-Fetch (to Demo2)", new View.OnClickListener() {
