@@ -272,7 +272,7 @@ public class MP {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "MP.pluginUninstall ... pluginName=" + pluginName);
         }
-        PluginInfo pi = getPlugin(pluginName, false);
+        PluginInfo pi = getPlugin(pluginName, true);
 
         // 插件未安装
         if (pi == null) {

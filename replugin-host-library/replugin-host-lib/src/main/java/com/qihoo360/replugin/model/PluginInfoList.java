@@ -74,6 +74,20 @@ public class PluginInfoList implements Iterable<PluginInfo> {
                 JSONHelper.remove(mJson, i);
             }
         }
+        if (mMap.containsKey(pn)) {
+            mMap.remove(pn);
+        }
+        removeListElement(mList, pn);
+    }
+
+    private void removeListElement(List<PluginInfo> list, String pn) {
+        Iterator<PluginInfo> iterator = list.iterator();
+        while(iterator.hasNext()) {
+            PluginInfo pluginInfo = iterator.next();
+            if(TextUtils.equals(pn, pluginInfo.getName())) {
+                iterator.remove();
+            }
+        }
     }
 
     public PluginInfo get(String pn) {

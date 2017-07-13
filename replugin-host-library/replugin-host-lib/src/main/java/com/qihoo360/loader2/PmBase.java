@@ -1121,6 +1121,11 @@ class PmBase {
             LogDebug.d(PLUGIN_TAG, "Clear plugin cache. pn=" + info.getName());
         }
 
+        // 移除卸载插件的HashMap缓存
+        if (mPlugins.containsKey(info.getName())) {
+            mPlugins.remove(info.getName());
+        }
+
         // 移除卸载插件表快照
         PluginTable.removeInfo(info);
 
