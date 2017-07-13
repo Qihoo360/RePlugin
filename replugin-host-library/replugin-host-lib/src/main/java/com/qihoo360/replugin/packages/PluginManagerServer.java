@@ -156,9 +156,12 @@ public class PluginManagerServer {
             }
 
             // 版本较老？直接返回
-            if (!checkVersion(instPli, curPli)) {
+            final int checkResult = checkVersion(instPli, curPli);
+            if (checkResult < 0) {
                 RePlugin.getConfig().getEventCallbacks().onInstallPluginFailed(path, RePluginEventCallbacks.InstallResult.VERIFY_VER_FAIL);
                 return null;
+            } else if (checkResult == 0){
+                instPli.setIsPendingCover(true);
             }
         }
 
@@ -200,7 +203,7 @@ public class PluginManagerServer {
         return true;
     }
 
-    private boolean checkVersion(PluginInfo instPli, PluginInfo curPli) {
+    private int checkVersion(PluginInfo instPli, PluginInfo curPli) {
         // 支持插件同版本覆盖安装？
         // 若现在要安装的，与之前的版本相同，则覆盖掉之前的版本；
         if (instPli.getVersion() == curPli.getVersion()) {
@@ -208,8 +211,7 @@ public class PluginManagerServer {
                 LogDebug.d(TAG, "isSameVersion: same version. " +
                         "inst_ver=" + instPli.getVersion() + "; cur_ver=" + curPli.getVersion());
             }
-            instPli.setIsPendingCover(true);
-            return true;
+            return 0;
         }
 
         // 若现在要安装的，比之前的版本还要旧，则忽略更新；
@@ -218,7 +220,7 @@ public class PluginManagerServer {
                 LogDebug.e(TAG, "checkVersion: Older than current, install fail. pn=" + curPli.getName() +
                         "; inst_ver=" + instPli.getVersion() + "; cur_ver=" + curPli.getVersion());
             }
-            return false;
+            return -1;
         }
 
         // 已有“待更新版本”？
@@ -229,9 +231,9 @@ public class PluginManagerServer {
                 LogDebug.e(TAG, "checkVersion: Older than updating plugin. Ignore. pn=" + curPli.getName() + "; " +
                         "cur_ver=" + curPli.getVersion() + "; old_ver=" + curUpdatePli.getVersion() + "; new_ver=" + instPli.getVersion());
             }
-            return false;
+            return -1;
         }
-        return true;
+        return 1;
     }
 
     private boolean copyOrMoveApk(String path, PluginInfo instPli) {
@@ -289,9 +291,19 @@ public class PluginManagerServer {
                 // 高版本升级
                 instPli.setIsThisPendingUpdateInfo(true);
                 curPli.setPendingUpdate(instPli);
+                curPli.setPendingDelete(null);
+                curPli.setPendingCover(null);
+                if (LogDebug.LOG) {
+                    LogDebug.w(TAG, "updateOrLater: Plugin need update high version. clear PendingDelete and PendingCover.");
+                }
             } else if (instPli.getVersion() == curPli.getVersion()){
                 // 同版本覆盖
                 curPli.setPendingCover(instPli);
+                curPli.setPendingDelete(null);
+                // 注意：并不需要对PendingUpdate信息做处理，因为此前的updatePendingUpdate方法时就已经返回了
+                if (LogDebug.LOG) {
+                    LogDebug.w(TAG, "updateOrLater: Plugin need update same version. clear PendingDelete.");
+                }
             }
         } else {
             if (LogDebug.LOG) {
@@ -412,7 +424,8 @@ public class PluginManagerServer {
             }
         } finally {
             try {
-                FileUtils.forceDelete(newPi.getApkFile().getParentFile());
+                File parentDir = newPi.getApkFile().getParentFile();
+                FileUtils.forceDelete(parentDir);
             } catch (IOException e) {
                 if (LogRelease.LOGR) {
                     e.printStackTrace();

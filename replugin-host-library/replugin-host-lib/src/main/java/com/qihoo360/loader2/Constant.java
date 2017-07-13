@@ -74,7 +74,6 @@ public class Constant {
 
     /**
      * "纯APK"插件同版本升级时插件、Odex、Native（SO库）的用于覆盖的存放目录
-     * Added by Zhiwei Liu
      */
     public static final String LOCAL_PLUGIN_APK_COVER_DIR = "p_c";
 
