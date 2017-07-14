@@ -9,7 +9,7 @@ install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
         pom {
-            artifactId = ""
+            artifactId = "replugin-plugin-lib"
 
             project {
 

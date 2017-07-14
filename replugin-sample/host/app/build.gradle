@@ -13,18 +13,29 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.qihoo360.replugin:replugin-host-gradle:$repluginHostGradleVersion"
+    }
+}
+
 
 apply plugin: 'com.android.application'
 
 apply plugin: 'replugin-host-gradle'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId "com.qihoo360.replugin.sample.host"
-        minSdkVersion 9
-        targetSdkVersion 22
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -38,6 +49,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.qihoo360.replugin:replugin-host-lib:2.1.4'
+    compile "com.qihoo360.replugin:replugin-host-lib:${rootProject.repluginHostLibVersion}"
+    compile "com.android.support:support-v4:${rootProject.supportLibraryVersion}"
 }
