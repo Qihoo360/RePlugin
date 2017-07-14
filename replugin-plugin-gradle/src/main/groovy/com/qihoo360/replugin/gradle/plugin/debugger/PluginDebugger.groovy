@@ -54,15 +54,6 @@ class PluginDebugger {
 
         adbFile = globalScope.androidBuilder.sdkInfo.adb;
 
-        //检查adb环境
-        if (null == adbFile || !adbFile.exists()) {
-            System.err.println "${AppConstant.TAG} Could not find the adb file !!!"
-        }
-
-        if (isConfigNull(config)) {
-            System.err.println "${AppConstant.CONFIG_EXAMPLE}"
-        }
-
     }
 
     /**
@@ -70,6 +61,10 @@ class PluginDebugger {
      * @return 是否命令执行成功
      */
     public boolean install() {
+
+        if (isConfigNull()) {
+            return false
+        }
 
         //推送apk文件到手机
         String pushCmd = "${adbFile.absolutePath} push ${apkFile.absolutePath} ${config.phoneStorageDir}"
@@ -99,10 +94,16 @@ class PluginDebugger {
      * @return 是否命令执行成功
      */
     public boolean uninstall() {
+
+        if (isConfigNull()) {
+            return false
+        }
+
         String cmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.uninstall -e plugin ${config.pluginName}"
         if (0 != CmdUtil.syncExecute(cmd)) {
             return false
         }
+        return true
     }
 
     /**
@@ -110,10 +111,16 @@ class PluginDebugger {
      * @return 是否命令执行成功
      */
     public boolean forceStopHostApp() {
+
+        if (isConfigNull()) {
+            return false
+        }
+
         String cmd = "${adbFile.absolutePath} shell am force-stop ${config.hostApplicationId}"
         if (0 != CmdUtil.syncExecute(cmd)) {
             return false
         }
+        return true
     }
 
     /**
@@ -121,10 +128,16 @@ class PluginDebugger {
      * @return 是否命令执行成功
      */
     public boolean startHostApp() {
+
+        if (isConfigNull()) {
+            return false
+        }
+
         String cmd = "${adbFile.absolutePath} shell am start -n \"${config.hostApplicationId}/${config.hostAppLauncherActivity}\" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER"
         if (0 != CmdUtil.syncExecute(cmd)) {
             return false
         }
+        return true
     }
 
     /**
@@ -132,10 +145,16 @@ class PluginDebugger {
      * @return 是否命令执行成功
      */
     public boolean run() {
+
+        if (isConfigNull()) {
+            return false
+        }
+
         String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.start_activity -e plugin ${config.pluginName}"
         if (0 != CmdUtil.syncExecute(installBrCmd)) {
             return false
         }
+        return true
     }
 
     /**
@@ -143,19 +162,29 @@ class PluginDebugger {
      * @param config
      * @return
      */
-    private static boolean isConfigNull(def config) {
+    private boolean isConfigNull() {
+
+        //检查adb环境
+        if (null == adbFile || !adbFile.exists()) {
+            System.err.println "${AppConstant.TAG} Could not find the adb file !!!"
+            return true
+        }
+
         if (null == config) {
             System.err.println "${AppConstant.TAG} the config object can not be null!!!"
+            System.err.println "${AppConstant.CONFIG_EXAMPLE}"
             return true
         }
 
         if (null == config.hostApplicationId) {
             System.err.println "${AppConstant.TAG} the config hostApplicationId can not be null!!!"
+            System.err.println "${AppConstant.CONFIG_EXAMPLE}"
             return true
         }
 
         if (null == config.hostAppLauncherActivity) {
             System.err.println "${AppConstant.TAG} the config hostAppLauncherActivity can not be null!!!"
+            System.err.println "${AppConstant.CONFIG_EXAMPLE}"
             return true
         }
 
