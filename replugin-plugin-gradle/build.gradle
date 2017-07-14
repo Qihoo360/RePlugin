@@ -40,7 +40,13 @@ buildscript {
 }
 
 group = 'com.qihoo360.replugin'  // 组名
-version = '2.1.4' // 版本
+
+String classPath = ".src.main.groovy.com.qihoo360.replugin.gradle.plugin.AppConstant".replace(".", java.io.File.separator)
+String verPath = "${project.projectDir}" + classPath + ".groovy"
+String verLine = new File(verPath).filterLine { it =~ /def static final VER =/ }
+version = "${verLine.split("\"")[1]}" // 版本
+//红色醒目打印显示版本号
+java.lang.System.err.println "version=${version}"
 
 dependencies {
     compile 'com.android.tools.build:gradle:2.1.3'

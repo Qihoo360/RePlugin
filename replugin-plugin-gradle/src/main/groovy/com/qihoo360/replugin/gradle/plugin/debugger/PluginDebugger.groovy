@@ -53,6 +53,7 @@ class PluginDebugger {
         apkFile = new File(apkDir, apkName)
 
         adbFile = globalScope.androidBuilder.sdkInfo.adb;
+
     }
 
     /**
@@ -61,18 +62,7 @@ class PluginDebugger {
      */
     public boolean install() {
 
-        if (isConfigNull(config)) {
-            return false
-        }
-
-        //检查adb环境
-        if (null == adbFile || !adbFile.exists()) {
-            System.err.println "${AppConstant.TAG} Could not find the adb file !!!"
-        }
-
-        //检查apk文件是否存在
-        if (null == apkFile || !apkFile.exists()) {
-            System.err.println "${AppConstant.TAG} Could not find the available apk !!!"
+        if (isConfigNull()) {
             return false
         }
 
@@ -100,26 +90,71 @@ class PluginDebugger {
     }
 
     /**
+     * 卸载插件
+     * @return 是否命令执行成功
+     */
+    public boolean uninstall() {
+
+        if (isConfigNull()) {
+            return false
+        }
+
+        String cmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.uninstall -e plugin ${config.pluginName}"
+        if (0 != CmdUtil.syncExecute(cmd)) {
+            return false
+        }
+        return true
+    }
+
+    /**
+     * 强制停止宿主app
+     * @return 是否命令执行成功
+     */
+    public boolean forceStopHostApp() {
+
+        if (isConfigNull()) {
+            return false
+        }
+
+        String cmd = "${adbFile.absolutePath} shell am force-stop ${config.hostApplicationId}"
+        if (0 != CmdUtil.syncExecute(cmd)) {
+            return false
+        }
+        return true
+    }
+
+    /**
+     * 启动宿主app
+     * @return 是否命令执行成功
+     */
+    public boolean startHostApp() {
+
+        if (isConfigNull()) {
+            return false
+        }
+
+        String cmd = "${adbFile.absolutePath} shell am start -n \"${config.hostApplicationId}/${config.hostAppLauncherActivity}\" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER"
+        if (0 != CmdUtil.syncExecute(cmd)) {
+            return false
+        }
+        return true
+    }
+
+    /**
      * 运行插件
      * @return 是否命令执行成功
      */
     public boolean run() {
 
-        if (isConfigNull(config)) {
+        if (isConfigNull()) {
             return false
         }
 
-        if (null == config.pluginName) {
-            System.err.println "${AppConstant.TAG} you must to config the pluginName !!!"
-            return false
-        }
-
-        //发送运行广播
-        // adb shell am broadcast -a com.qihoo360.repluginapp.replugin.start_activity -e plugin [Name] -e activity [Class]
         String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.start_activity -e plugin ${config.pluginName}"
         if (0 != CmdUtil.syncExecute(installBrCmd)) {
             return false
         }
+        return true
     }
 
     /**
@@ -127,11 +162,32 @@ class PluginDebugger {
      * @param config
      * @return
      */
-    private static boolean isConfigNull(def config) {
-        if (null == config) {
-            System.err.println "${AppConstant.TAG} the config object can not be null!!!"
+    private boolean isConfigNull() {
+
+        //检查adb环境
+        if (null == adbFile || !adbFile.exists()) {
+            System.err.println "${AppConstant.TAG} Could not find the adb file !!!"
             return true
         }
+
+        if (null == config) {
+            System.err.println "${AppConstant.TAG} the config object can not be null!!!"
+            System.err.println "${AppConstant.CONFIG_EXAMPLE}"
+            return true
+        }
+
+        if (null == config.hostApplicationId) {
+            System.err.println "${AppConstant.TAG} the config hostApplicationId can not be null!!!"
+            System.err.println "${AppConstant.CONFIG_EXAMPLE}"
+            return true
+        }
+
+        if (null == config.hostAppLauncherActivity) {
+            System.err.println "${AppConstant.TAG} the config hostAppLauncherActivity can not be null!!!"
+            System.err.println "${AppConstant.CONFIG_EXAMPLE}"
+            return true
+        }
+
         return false
     }
 

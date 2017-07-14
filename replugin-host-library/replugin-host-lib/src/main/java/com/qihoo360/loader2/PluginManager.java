@@ -20,6 +20,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.qihoo360.i.IPluginManager;
+import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.component.process.PluginProcessHost;
 import com.qihoo360.replugin.helper.LogDebug;
@@ -84,6 +85,8 @@ public class PluginManager {
      */
     @Deprecated
     static final void init(Context context) {
+        // 初始化操作，方便后面执行任务，不必担心Handler为空的情况
+        Tasks.init();
         //
         sUid = android.os.Process.myUid();
 

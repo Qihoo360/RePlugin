@@ -995,8 +995,8 @@ class PmBase {
         // 2. 要安装的版本比当前的要高，且未运行
         // 3. "待定更新"插件（插件未运行）
         return p == null ||
-                (p.mInfo.getVersionValue() < info.getVersionValue() && !RePlugin.isPluginRunning(p.mInfo.getName())) ||
-                (info.getPendingUpdate() != null && RePlugin.isPluginRunning(info.getName()));
+                (p.mInfo.getVersionValue() < info.getVersionValue() && !RePlugin.isPluginRunning(info.getName())) ||
+                (info.getPendingUpdate() != null && !RePlugin.isPluginRunning(info.getName()));
     }
 
     final Plugin loadPackageInfoPlugin(String plugin, IPluginManager pm) {
@@ -1119,6 +1119,11 @@ class PmBase {
     final void pluginUninstalled(PluginInfo info) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "Clear plugin cache. pn=" + info.getName());
+        }
+
+        // 移除卸载插件的HashMap缓存
+        if (mPlugins.containsKey(info.getName())) {
+            mPlugins.remove(info.getName());
         }
 
         // 移除卸载插件表快照

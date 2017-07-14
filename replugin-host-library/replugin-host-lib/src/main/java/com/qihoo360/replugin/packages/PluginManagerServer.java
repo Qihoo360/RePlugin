@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import com.qihoo360.loader2.CertUtils;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
+import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.mobilesafe.utils.pkg.PackageFilesUtil;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginEventCallbacks;
@@ -155,9 +156,12 @@ public class PluginManagerServer {
             }
 
             // 版本较老？直接返回
-            if (!checkVersion(instPli, curPli)) {
+            final int checkResult = checkVersion(instPli, curPli);
+            if (checkResult < 0) {
                 RePlugin.getConfig().getEventCallbacks().onInstallPluginFailed(path, RePluginEventCallbacks.InstallResult.VERIFY_VER_FAIL);
                 return null;
+            } else if (checkResult == 0){
+                instPli.setIsPendingCover(true);
             }
         }
 
@@ -199,26 +203,37 @@ public class PluginManagerServer {
         return true;
     }
 
-    private boolean checkVersion(PluginInfo instPli, PluginInfo curPli) {
-        if (instPli.getVersion() <= curPli.getVersion()) {
+    private int checkVersion(PluginInfo instPli, PluginInfo curPli) {
+        // 支持插件同版本覆盖安装？
+        // 若现在要安装的，与之前的版本相同，则覆盖掉之前的版本；
+        if (instPli.getVersion() == curPli.getVersion()) {
+            if (LogDebug.LOG) {
+                LogDebug.d(TAG, "isSameVersion: same version. " +
+                        "inst_ver=" + instPli.getVersion() + "; cur_ver=" + curPli.getVersion());
+            }
+            return 0;
+        }
+
+        // 若现在要安装的，比之前的版本还要旧，则忽略更新；
+        if (instPli.getVersion() < curPli.getVersion()) {
             if (LogDebug.LOG) {
                 LogDebug.e(TAG, "checkVersion: Older than current, install fail. pn=" + curPli.getName() +
                         "; inst_ver=" + instPli.getVersion() + "; cur_ver=" + curPli.getVersion());
             }
-            return false;
+            return -1;
         }
 
         // 已有“待更新版本”？
-        // 若现在要安装的，比“待更新版本”还要旧（或相同），则也可以忽略
+        // 若现在要安装的，比“待更新版本”还要旧，则也可以忽略
         PluginInfo curUpdatePli = curPli.getPendingUpdate();
-        if (curUpdatePli != null && instPli.getVersion() <= curUpdatePli.getVersion()) {
+        if (curUpdatePli != null && instPli.getVersion() < curUpdatePli.getVersion()) {
             if (LogDebug.LOG) {
                 LogDebug.e(TAG, "checkVersion: Older than updating plugin. Ignore. pn=" + curPli.getName() + "; " +
                         "cur_ver=" + curPli.getVersion() + "; old_ver=" + curUpdatePli.getVersion() + "; new_ver=" + instPli.getVersion());
             }
-            return false;
+            return -1;
         }
-        return true;
+        return 1;
     }
 
     private boolean copyOrMoveApk(String path, PluginInfo instPli) {
@@ -272,8 +287,24 @@ public class PluginManagerServer {
             if (LogDebug.LOG) {
                 LogDebug.w(TAG, "updateOrLater: Plugin is running. Later. pn=" + curPli.getName());
             }
-            instPli.setIsThisPendingUpdateInfo(true);
-            curPli.setPendingUpdate(instPli);
+            if (instPli.getVersion() > curPli.getVersion()) {
+                // 高版本升级
+                instPli.setIsThisPendingUpdateInfo(true);
+                curPli.setPendingUpdate(instPli);
+                curPli.setPendingDelete(null);
+                curPli.setPendingCover(null);
+                if (LogDebug.LOG) {
+                    LogDebug.w(TAG, "updateOrLater: Plugin need update high version. clear PendingDelete and PendingCover.");
+                }
+            } else if (instPli.getVersion() == curPli.getVersion()){
+                // 同版本覆盖
+                curPli.setPendingCover(instPli);
+                curPli.setPendingDelete(null);
+                // 注意：并不需要对PendingUpdate信息做处理，因为此前的updatePendingUpdate方法时就已经返回了
+                if (LogDebug.LOG) {
+                    LogDebug.w(TAG, "updateOrLater: Plugin need update same version. clear PendingDelete.");
+                }
+            }
         } else {
             if (LogDebug.LOG) {
                 LogDebug.i(TAG, "updateOrLater: Not running. Update now! pn=" + curPli.getName());
@@ -340,16 +371,16 @@ public class PluginManagerServer {
                 LogDebug.d(TAG, "updateIfNeeded: delete plugin. pn=" + curInfo.getName());
             }
 
-            // 移除插件及其已释放的Dex、Native库等文件
-            PackageFilesUtil.forceDelete(curInfo.getPendingDelete());
-            mList.remove(curInfo.getName());
-            return true;
+            // 移除插件及其已释放的Dex、Native库等文件并向各进程发送广播，同步更新
+            return uninstallNow(curInfo.getPendingDelete());
 
         } else if (curInfo.isNeedUpdate()) {
             // 需要更新插件？那就直接来
             updateNow(curInfo, curInfo.getPendingUpdate());
             return true;
-
+        } else if (curInfo.isNeedCover()) {
+            updateNow(curInfo, curInfo.getPendingCover());
+            return true;
         } else {
             // 既不需要删除也不需要更新
             if (LogDebug.LOG) {
@@ -360,8 +391,13 @@ public class PluginManagerServer {
     }
 
     private void updateNow(PluginInfo curInfo, PluginInfo newInfo) {
-        // 删除旧版本插件，不管是不是p-n的，且清掉Dex和Native目录
-        delete(curInfo);
+        final boolean covered = newInfo.getIsPendingCover();
+        if (covered) {
+            move(curInfo, newInfo);
+        } else {
+            // 删除旧版本插件，不管是不是p-n的，且清掉Dex和Native目录
+            delete(curInfo);
+        }
 
         newInfo.setType(PluginInfo.TYPE_EXTRACTED);
         if (LogDebug.LOG) {
@@ -369,8 +405,33 @@ public class PluginManagerServer {
                     "; cur_ver=" + curInfo.getVersion() + "; update_ver=" + newInfo.getVersion());
         }
 
-        curInfo.update(newInfo);
-        curInfo.setPendingUpdate(null);
+        if (covered) {
+            curInfo.setPendingCover(null);
+        } else {
+            curInfo.update(newInfo);
+            curInfo.setPendingUpdate(null);
+        }
+    }
+
+    private void move(@NonNull PluginInfo curPi, @NonNull PluginInfo newPi) {
+        try {
+            FileUtils.copyFile(newPi.getApkFile(), curPi.getApkFile());
+            FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
+            FileUtils.copyFile(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+        } catch (IOException e) {
+            if (LogRelease.LOGR) {
+                e.printStackTrace();
+            }
+        } finally {
+            try {
+                File parentDir = newPi.getApkFile().getParentFile();
+                FileUtils.forceDelete(parentDir);
+            } catch (IOException e) {
+                if (LogRelease.LOGR) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void delete(@NonNull PluginInfo pi) {
@@ -436,14 +497,25 @@ public class PluginManagerServer {
         // 1. 移除插件及其已释放的Dex、Native库等文件
         PackageFilesUtil.forceDelete(info);
 
-        // 2. 给各进程发送广播，同步更新
-        Intent intent = new Intent(PluginInfoUpdater.ACTION_UNINSTALL_PLUGIN);
-        intent.putExtra("obj", info);
-        IPC.sendLocalBroadcast2AllSync(RePluginInternal.getAppContext(), intent);
-
-        // 3. 保存插件信息到文件中
+        // 2. 保存插件信息到文件中
         mList.remove(info.getName());
         mList.save(mContext);
+
+        // 3. 给各进程发送广播，同步更新
+        final Intent intent = new Intent(PluginInfoUpdater.ACTION_UNINSTALL_PLUGIN);
+        intent.putExtra("obj", info);
+        // 注意：若在attachBaseContext中调用此方法，则由于此时getApplicationContext为空，导致发送广播时会出现空指针异常。
+        // 则应该Post一下，待getApplicationContext有值后再发送广播。
+        if (RePluginInternal.getAppContext().getApplicationContext() != null) {
+            IPC.sendLocalBroadcast2AllSync(RePluginInternal.getAppContext(), intent);
+        } else {
+            Tasks.post2UI(new Runnable() {
+                @Override
+                public void run() {
+                    IPC.sendLocalBroadcast2All(RePluginInternal.getAppContext(), intent);
+                }
+            });
+        }
         return true;
     }
 
