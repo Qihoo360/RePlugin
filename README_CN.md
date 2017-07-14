@@ -5,7 +5,7 @@
 </p>
 
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
-[![Release Version](https://img.shields.io/badge/release-2.1.3-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/wiki/%E5%8F%91%E8%A1%8C%E6%B3%A8%E8%AE%B0)
+[![Release Version](https://img.shields.io/badge/release-2.1.5-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/wiki/%E5%8F%91%E8%A1%8C%E6%B3%A8%E8%AE%B0)
 
 
 ## RePlugin —— 历经三年多考验，数亿设备使用的，稳定占坑类插件化方案
@@ -73,66 +73,13 @@ RePlugin是一套完整的、稳定的、适合全面使用的，占坑类插件
 
 RePlugin的使用方法非常简单，大部分情况下和“单品”开发无异。
 
-若您是第一次接触RePlugin，则[请点击这里阅读《快速上手》](https://github.com/Qihoo360/RePlugin/wiki/%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B)，跟随我们的指引，了解更多的内容。
+若您是**第一次接触RePlugin，则[请点击这里阅读《快速上手》](https://github.com/Qihoo360/RePlugin/wiki/%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B)**，跟随我们的指引，了解更多的内容。
 
-若您想了解更多有关RePlugin的玩法，则[请点击这里阅读《详细教程》](https://github.com/Qihoo360/RePlugin/wiki/%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B)，了解更多好玩的玩法。
+若您想**了解更多有关RePlugin的玩法，则[请点击这里阅读《详细教程》](https://github.com/Qihoo360/RePlugin/wiki/%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B)，**了解更多好玩的玩法。
 
-若您想看下RePlugin的Sample工程，进而了解框架的具体用法，则[请点击这里查看Sample源代码](https://github.com/Qihoo360/RePlugin/blob/master/replugin-sample)。
+若您想**看下RePlugin的Sample工程，进而了解框架的具体用法，则[请点击这里查看Sample源代码](https://github.com/Qihoo360/RePlugin/blob/master/replugin-sample)**。
 
-## 常见问题
-
-以下针对在Issue中提到的“最常见问题”做出回答，希望能对您有帮助。
-
-* Q：您们和360之前发的DroidPlugin的主要区别是什么？
-* Q：插件与插件、主程序间可以共用资源吗？
-* Q：您们是否支持DataBinding？
-* Q: java.lang.ClassNotFoundException: Didn't find class "xxx.loader.p.ProviderN1"
-
-#### Q：您们和360之前发的DroidPlugin的主要区别是什么？
-A：这个问题问得很好。很多人都有这个疑惑——“*为什么你们360要开发两套不同的插件化框架呢*”？
-
-其实归根结底，最根本的区别是——**目标的不同**：
-
-* DroidPlugin主要解决的是各个独立功能拼装在一起，能够快速发布，其间不需要有任何的交互。**目前市面上的一些双开应用，和DroidPlugin的思路有共同之处**。当然了，要做到完整的双开，则仍需要大量的修改，如Native Hook等。
-
-* RePlugin解决的是各个功能模块能独立升级，又能需要和宿主、插件之间有一定交互和耦合。
-
-此外，从技术层面上，其最核心的区别就一个：**Hook点的多少**。
-
-* DroidPlugin可以做到**让APK“直接运行在主程序”中**，无需任何额外修改。但需要Hook大量的API（包括AMS、PackageManager等），在适配上需要做大量的工作。
-
-* RePlugin只Hook了ClassLoader，所以**极为稳定**，且同样**支持绝大多数单品的特性**，但需要插件做“少许修改”。好在作为插件开发者而言无需过于关心，因为通过“动态编译方案”，开发者可做到“无需开发者修改Java Code，即可运行在主程序中”的效果。
-
-可以肯定的是，**DroidPlugin也是一款业界公认的，优秀的免安装插件方案**。我相信，随着时间的推移，RePlugin和DroidPlugin会分别在各自领域（全面插件化 & 应用免安装）打造出属于自己的一番天地。
-
-#### Q：插件与插件、主程序间可以共用资源吗？
-
-A：可以的，RePlugin会同时把Host和Plugin的Context传递给插件，供开发者选择。
-
-补充：目前业内用得较多的，我们称之为“共享资源”方案——也即需要修改Aapt、做addAssetPath，以达到“宿主和插件用同一套资源”的效果。其好处是插件和主程序可以“直接使用”各自的资源，交互容易。**但代价是需要做“资源分区”，以及针对不同机型（如ZTEResources、MiuiResources）等做适配，稳定性上值得考量**。
-
-> 细心的朋友，可以看一下360手机卫士在2013年的APK，会发现一个小惊喜：其实，我们当年就是这个方案（彼时业内还没有相应公开方案）
-
-而对于RePlugin而言，**稳定永远是第一要义**，因此我们采用的**是“独立资源”方案，插件与应用间是完全独立的**，每个插件都是一个Resources。
-
-但是，“独立”不代表“不能共用”。想象一下，我们卫士有很多插件（如WebView等）都是需要将自己的资源（如Layout-XML等）共享给宿主和其它插件。这时候我们的做法是有两种：
-* 可以直接通过调用RePlugin.fetchResources接口，直接拿到资源
-* 通过反射获取View来间接拿到资源。
-
-例如360手机助手所用的“换肤CommonView”就是采用第二种方式来做的，目前来看，没有问题。
-
-#### Q：您们是否支持DataBinding？
-
-A：支持。我们有几个插件在用。除此之外，我们的Sample工程，其Demo2就是用DataBinding做的，而Demo1是ButterKnife。您们可以体验一下。
-
-#### Q: java.lang.ClassNotFoundException: Didn't find class "xxx.loader.p.ProviderN1"
-
-A：通常遇到这个问题是因为没有在主程序的AndroidManifest.xml中声明Application，或在Application中没有调用RePlugin.App.attachBaseContext等方法导致。
-
-请严格按照“[主程序接入指南](https://github.com/Qihoo360/RePlugin/wiki/%E4%B8%BB%E7%A8%8B%E5%BA%8F%E6%8E%A5%E5%85%A5%E6%8C%87%E5%8D%97)”所述来完成接入，一共只有三个步骤，非常简单。
-
-当然，如果在严格按照接入文档后，仍出现这个问题（这种情况非常罕见），请向我们提交Issue。Issue中应包括：完整的Logcat信息（含崩溃前后上下文）、手机型号、ROM版本、Android版本等。感谢您的理解。
-
+若您在接入RePlugin中**遇到了任何问题，则[请点击这里阅读《FAQ》](https://github.com/Qihoo360/RePlugin/wiki/FAQ)**，相信会有您想要的答案。
 
 ## 已接入RePlugin的应用
 
