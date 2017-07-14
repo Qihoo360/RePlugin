@@ -71,7 +71,7 @@ If you wish to **learn more gameplays about RePlugin, please [click here to read
 
 If you want to **view RePlugin’s sample project, and learn concrete usage of the frame, please [click here to check Sample SC](https://github.com/Qihoo360/RePlugin/blob/master/replugin-sample)**.
 
-If you **have any question, please [click here to read FAQ(Chinese Version](https://github.com/Qihoo360/RePlugin/wiki/FAQ)**.
+If you **have any question, please [click here to read FAQ(Chinese Version)](https://github.com/Qihoo360/RePlugin/wiki/FAQ)**.
 
 
 ## These apps are using RePlugin
