@@ -61,7 +61,10 @@ public class ReClassPlugin implements Plugin<Project> {
                 def installPluginTask = project.task(installPluginTaskName)
 
                 installPluginTask.doLast {
-                    //generate json
+                    pluginDebugger.startHostApp()
+                    pluginDebugger.uninstall()
+                    pluginDebugger.forceStopHostApp()
+                    pluginDebugger.startHostApp()
                     pluginDebugger.install()
                 }
                 installPluginTask.group = AppConstant.TASKS_GROUP
