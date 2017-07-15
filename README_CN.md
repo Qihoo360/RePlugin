@@ -87,13 +87,51 @@ RePlugin的使用方法非常简单，大部分情况下和“单品”开发无
 
 除了**360集团旗下的亿级别应用**以外，还有一些对**稳定要求极其严苛的“金融类”产品**，及第三方合作应用也接入了RePlugin（含SDK）：
 
-**360 手机卫士** | **360 手机助手** | **360 手机浏览器** | **花椒相机** | **360 清理大师** |
--------------------------------------------------------------------|----------|---------------|--------|--------------|
-[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/mobilesafe.png" width="80" height="80">](https://shouji.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/appstore.png" width="80" height="80">](http://sj.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/browser.png" width="80" height="80">](http://mse.360.cn/m/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/camera.png" width="80" height="80">](http://xj.huajiao.com/xji/home/pc) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/clean.png" width="80" height="80">](https://shouji.360.cn/360cleandroid/index.html)| 
-**360 影视大全** | **借钱吧** | **借了吗** | **海淘一号** | **华润通** |
-[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/movie.png" width="80" height="80">](http://www.360kan.com/appdownload) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jieqianba.png" width="80" height="80">](http://www.jielem.com/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jielema.png" width="80" height="80"> | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/haitao1hao.png" width="80" height="80">](http://www.1haitao.com/) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/huaruntong.png" width="80" height="80">](http://www.huaruntong.com/)| 
-**360OS 应用** | **360借条** | **（即将公开）** | **（即将公开）** | **你的App** |
-[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360os.jpg" width="80" height="80">](http://www.qiku.com/product/360os2/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360jietiao.jpg" width="80" height="80">](https://www.360jie.com.cn/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80">| 
+
+<table align="center">
+    <tr align="center">
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/mobilesafe.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/appstore.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/browser.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/camera.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/clean.png" width="80" height="80"/></td>
+    </tr>
+    <tr align="center">
+        <td><b><a href="https://shouji.360.cn/index.html">360 手机卫士</a></b></td>
+        <td><b><a href="http://sj.360.cn/index.html">360 手机助手</a></b></td>
+        <td><b><a href="http://mse.360.cn/m/index.html">360 手机浏览器</a></b></td>
+        <td><b><a href="http://xj.huajiao.com/xji/home/pc">花椒相机</a></b></td>
+        <td><b><a href="https://shouji.360.cn/360cleandroid/index.html">360 清理大师</a></b></td>
+    </tr>
+    <tr align="center">
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/movie.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jieqianba.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/haitao1hao.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/huaruntong.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jielema.png" width="80" height="80"/></td>
+    </tr>
+    <tr align="center">
+        <td><b><a href="http://www.360kan.com/appdownload">360 影视大全</a></b></td>
+        <td><b><a href="">J借钱吧</a></b></td>
+        <td><b><a href="http://www.1haitao.com/">海淘1号</a></b></td>
+        <td><b><a href="http://www.huaruntong.com/">华润通</a></b></td>
+        <td><b><a href="http://www.jielem.com/">借了吗</a></b></td>
+    </tr>
+    <tr align="center">
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/os.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jietiao.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
+    </tr>
+    <tr align="center">
+        <td><b><a href="http://www.qiku.com/product/360os2/index.html">360OS 系统应用</a></b></td>
+        <td><b><a href="https://www.360jie.com.cn/">360 借条</a></b></td>
+        <td><b><a href="">(即将发布)</a></b></td>
+        <td><b><a href="">(即将发布)</a></b></td>
+        <td><b><a href="">(即将发布)</a></b></td>
+    </tr>
+</table>
 
 这里**衷心感谢** “360手机助手”，以及其它各App团队成员，帮助我们发现了很多需要改进的地方，并给予了非常积极的反馈。您们的鼓励与支持，让咱们的RePlugin能走的更远、更好！
 
