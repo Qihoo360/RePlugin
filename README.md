@@ -76,13 +76,50 @@ If you **have any question, please [click here to read FAQ(Chinese Version)](htt
 
 ## These apps are using RePlugin
 
-**360 MobileSafe** | **360 AppStore** | **360 MobileBrowser** | **HuaJiao Camera** | **360 CleanMaster** |
--------------------------------------------------------------------|----------|---------------|--------|--------------|
-[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/mobilesafe.png" width="80" height="80">](https://shouji.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/appstore.png" width="80" height="80">](http://sj.360.cn/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/browser.png" width="80" height="80">](http://mse.360.cn/m/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/camera.png" width="80" height="80">](http://xj.huajiao.com/xji/home/pc) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/clean.png" width="80" height="80">](https://shouji.360.cn/360cleandroid/index.html)| 
-**360 Movie** | **JieQianBa** | **JieLeMa** | **HaiTao 1 Hao** | **Huarun Tong** |
-[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/movie.png" width="80" height="80">](http://www.360kan.com/appdownload) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jieqianba.png" width="80" height="80">](http://www.jielem.com/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jielema.png" width="80" height="80"> | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/haitao1hao.png" width="80" height="80">](http://www.1haitao.com/) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/huaruntong.png" width="80" height="80">](http://www.huaruntong.com/)| 
-**360OS App** | **360 Loan** | **(Internal App)** | **(Internal App)** | **Your App** |
-[<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360os.jpg" width="80" height="80">](http://www.qiku.com/product/360os2/index.html) | [<img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/360jietiao.jpg" width="80" height="80">](https://www.360jie.com.cn/) | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"> | <img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80">| 
+<table align="center">
+    <tr align="center">
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/mobilesafe.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/appstore.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/browser.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/camera.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/clean.png" width="80" height="80"/></td>
+    </tr>
+    <tr align="center">
+        <td><b><a href="https://shouji.360.cn/index.html">360 Mobile Safe</a></b></td>
+        <td><b><a href="http://sj.360.cn/index.html">360 App Store</a></b></td>
+        <td><b><a href="http://mse.360.cn/m/index.html">360 Mobile Browser</a></b></td>
+        <td><b><a href="http://xj.huajiao.com/xji/home/pc">HuaJiao Camera</a></b></td>
+        <td><b><a href="https://shouji.360.cn/360cleandroid/index.html">360 Clean Master</a></b></td>
+    </tr>
+    <tr align="center">
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/movie.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jieqianba.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/haitao1hao.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/huaruntong.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jielema.png" width="80" height="80"/></td>
+    </tr>
+    <tr align="center">
+        <td><b><a href="http://www.360kan.com/appdownload">360 Kan Movie</a></b></td>
+        <td><b><a href="">JieQianBa</a></b></td>
+        <td><b><a href="http://www.1haitao.com/">1 HaiTao</a></b></td>
+        <td><b><a href="http://www.huaruntong.com/">HuaRun Tong</a></b></td>
+        <td><b><a href="http://www.jielem.com/">JieLeMa</a></b></td>
+    </tr>
+    <tr align="center">
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/os.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jietiao.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
+        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
+    </tr>
+    <tr align="center">
+        <td><b><a href="http://www.qiku.com/product/360os2/index.html">360OS App</a></b></td>
+        <td><b><a href="https://www.360jie.com.cn/">360 Loan</a></b></td>
+        <td><b><a href="">(Internal App)</a></b></td>
+        <td><b><a href="">(Internal App)</a></b></td>
+        <td><b><a href="">(Internal App)</a></b></td>
+    </tr>
+</table>
 
 ## Plug-ins Accessed in RePlugin
 
