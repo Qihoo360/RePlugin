@@ -37,7 +37,8 @@ public class ManifestAPI {
      * 获取 AndroidManifest.xml 路径
      */
     def static manifestPath(Project project, String variantDir) {
-        def variantDirArray = variantDir.split("/")
+        // Compatible with path separators for window and Linux, and fit split param based on 'Pattern.quote'
+        def variantDirArray = variantDir.split(Pattern.quote(File.separator))
         String variantName = ""
         variantDirArray.each {
             //首字母大写进行拼接
