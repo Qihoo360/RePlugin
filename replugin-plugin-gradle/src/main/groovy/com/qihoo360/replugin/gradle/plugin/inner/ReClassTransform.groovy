@@ -27,6 +27,9 @@ import javassist.ClassPool
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
+
+import java.util.regex.Pattern
+
 /**
  * @author RePlugin Team
  */
