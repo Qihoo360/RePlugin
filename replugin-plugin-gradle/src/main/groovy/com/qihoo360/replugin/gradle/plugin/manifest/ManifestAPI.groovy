@@ -19,6 +19,8 @@ package com.qihoo360.replugin.gradle.plugin.manifest
 
 import org.gradle.api.Project
 
+import java.util.regex.Pattern
+
 /**
  * @author RePlugin Team
  */
