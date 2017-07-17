@@ -26,7 +26,9 @@ import com.qihoo360.replugin.gradle.plugin.injector.Injectors
 import javassist.ClassPool
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
+import org.gradle.api.GradleException
 import org.gradle.api.Project
+
 /**
  * @author RePlugin Team
  */
@@ -65,7 +67,18 @@ public class ReClassTransform extends Transform {
         /* 读取用户配置 */
         def config = project.extensions.getByName('repluginPluginConfig')
 
-        File rootLocation = outputProvider.rootLocation
+        File rootLocation = null
+        try {
+            rootLocation = outputProvider.rootLocation
+        } catch (Throwable e) {
+            //android gradle plugin 3.0.0+ 修改了私有变量，将其移动到了IntermediateFolderUtils中去
+            rootLocation = outputProvider.folderUtils.getRootFolder()
+        }
+        if (rootLocation == null) {
+            throw new GradleException("can't get transform root location")
+        }
+        println ">>> rootLocation: ${rootLocation}"
+
         // Windows 系统路径分隔符为 \，split 函数参数为正则表达式，而 \ 在正则表达式中为转义字符，
         // 所以不能直接使用 （getName()+File.separatorChar），为了方便直接使用 name 分割过滤掉
         // 第一个路径分割字符
