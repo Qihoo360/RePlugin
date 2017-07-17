@@ -18,14 +18,12 @@ package com.qihoo360.replugin;
 
 import android.os.Build;
 
+import com.qihoo360.replugin.utils.ReflectUtils;
 import com.qihoo360.loader.utils.StringUtils;
 import com.qihoo360.loader2.PMF;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
-
-import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
-import com.qihoo360.replugin.ext.lang3.reflect.MethodUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -83,19 +81,19 @@ public class RePluginClassLoader extends PathClassLoader {
 
     private void initMethods(ClassLoader cl) {
         Class<?> c = cl.getClass();
-        findResourceMethod = MethodUtils.getMatchingMethod(c, "findResource", String.class);
+        findResourceMethod = ReflectUtils.getMethod(c, "findResource", String.class);
         findResourceMethod.setAccessible(true);
-        findResourcesMethod = MethodUtils.getMatchingMethod(c, "findResources", String.class);
+        findResourcesMethod = ReflectUtils.getMethod(c, "findResources", String.class);
         findResourcesMethod.setAccessible(true);
-        findLibraryMethod = MethodUtils.getMatchingMethod(c, "findLibrary", String.class);
+        findLibraryMethod = ReflectUtils.getMethod(c, "findLibrary", String.class);
         findLibraryMethod.setAccessible(true);
-        getPackageMethod = MethodUtils.getMatchingMethod(c, "getPackage", String.class);
+        getPackageMethod = ReflectUtils.getMethod(c, "getPackage", String.class);
         getPackageMethod.setAccessible(true);
     }
 
     private void copyFromOriginal(ClassLoader orig) {
         if (LOG && IPC.isPersistentProcess()) {
-            LogDebug.d(TAG, "copyFromOriginal: Fields=" + StringUtils.toStringWithLines(FieldUtils.getAllFieldsList(orig.getClass())));
+            LogDebug.d(TAG, "copyFromOriginal: Fields=" + StringUtils.toStringWithLines(ReflectUtils.getAllFieldsList(orig.getClass())));
         }
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
@@ -116,7 +114,7 @@ public class RePluginClassLoader extends PathClassLoader {
 
     private void copyFieldValue(String field, ClassLoader orig) {
         try {
-            Field f = FieldUtils.getField(orig.getClass(), field, true);
+            Field f = ReflectUtils.getField(orig.getClass(), field);
             if (f == null) {
                 if (LOGR) {
                     LogRelease.e(PLUGIN_TAG, "rpcl.cfv: null! f=" + field);
@@ -125,14 +123,14 @@ public class RePluginClassLoader extends PathClassLoader {
             }
 
             // 删除final修饰符
-            FieldUtils.removeFinalModifier(f);
+            ReflectUtils.removeFieldFinalModifier(f);
 
             // 复制Field中的值到this里
-            Object o = FieldUtils.readField(f, orig);
-            FieldUtils.writeField(f, this, o);
+            Object o = ReflectUtils.readField(f, orig);
+            ReflectUtils.writeField(f, this, o);
 
             if (LOG) {
-                Object test = FieldUtils.readField(f, this);
+                Object test = ReflectUtils.readField(f, this);
                 LogDebug.d(TAG, "copyFieldValue: Copied. f=" + field + "; actually=" + test + "; orig=" + o);
             }
         } catch (IllegalAccessException e) {

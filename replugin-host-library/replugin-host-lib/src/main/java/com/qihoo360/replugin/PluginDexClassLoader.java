@@ -16,9 +16,8 @@
 
 package com.qihoo360.replugin;
 
+import com.qihoo360.replugin.utils.ReflectUtils;
 import com.qihoo360.replugin.helper.LogDebug;
-
-import com.qihoo360.replugin.ext.lang3.reflect.MethodUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -63,7 +62,7 @@ public class PluginDexClassLoader extends DexClassLoader {
     private static void initMethods(ClassLoader cl) {
         Class<?> clz = cl.getClass();
         if (sLoadClassMethod == null) {
-            sLoadClassMethod = MethodUtils.getMatchingMethod(clz, "loadClass", String.class, Boolean.TYPE);
+            sLoadClassMethod = ReflectUtils.getMethod(clz, "loadClass", String.class, Boolean.TYPE);
             if (sLoadClassMethod == null) {
                 throw new NoSuchMethodError("loadClass");
             }

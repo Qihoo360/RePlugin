@@ -16,8 +16,7 @@
 
 package com.qihoo360.replugin.helper;
 
-import com.qihoo360.replugin.ext.lang3.ClassUtils;
-import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
+import com.qihoo360.replugin.utils.ReflectUtils;
 
 /**
  * 从宿主的 RePluginHostConfig 中获取一些字段值，
@@ -69,89 +68,89 @@ public class HostConfigHelper {
     static {
 
         try {
-            HOST_CONFIG_CLASS = ClassUtils.getClass(HOST_CONFIG_FILE_PATH + HOST_CONFIG_FILE_NAME);
+            HOST_CONFIG_CLASS = ReflectUtils.getClass(HOST_CONFIG_FILE_PATH + HOST_CONFIG_FILE_NAME);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_USE_APPCOMPAT = readField("ACTIVITY_PIT_USE_APPCOMPAT");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_COUNT_TS_STANDARD = readField("ACTIVITY_PIT_COUNT_TS_STANDARD");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_COUNT_TS_SINGLE_TOP = readField("ACTIVITY_PIT_COUNT_TS_SINGLE_TOP");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_COUNT_TS_SINGLE_TASK = readField("ACTIVITY_PIT_COUNT_TS_SINGLE_TASK");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE = readField("ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_COUNT_NTS_STANDARD = readField("ACTIVITY_PIT_COUNT_NTS_STANDARD");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP = readField("ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK = readField("ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE = readField("ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ACTIVITY_PIT_COUNT_TASK = readField("ACTIVITY_PIT_COUNT_TASK");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ADAPTER_COMPATIBLE_VERSION = readField("ADAPTER_COMPATIBLE_VERSION");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
 
         try {
             ADAPTER_CURRENT_VERSION = readField("ADAPTER_CURRENT_VERSION");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
         }
     }
 
-    private static <T> T readField(String name) {
+    private static <T> T readField(String name) throws NoSuchFieldException {
         try {
             // 就是要强转
             //noinspection unchecked
-            return (T) FieldUtils.readStaticField(HOST_CONFIG_CLASS, name, true);
+            return (T) ReflectUtils.readStaticField(HOST_CONFIG_CLASS, name);
         } catch (IllegalAccessException e) {
             // 此Field可能为非Public权限，不过由于我们做了Accessible处理，可能性非常低
             // NOTE 因为类型转换发生在readField返回值之后才做，故“ClassCastException”只会出现在static方法块内
@@ -159,7 +158,7 @@ public class HostConfigHelper {
             throw new IllegalStateException(e);
         }
 
-        // NOTE 不需要Catch IllegalArgumentException，因为只要此Field找不到就抛，符合预期
+        // NOTE 不需要Catch NoSuchFieldException，因为只要此Field找不到就抛，符合预期
     }
 
     public static void init() {
