@@ -208,50 +208,50 @@ public class Replugin implements Plugin<Project> {
 class RepluginConfig {
 
     /** 自定义进程的数量(除 UI 和 Persistent 进程) */
-    def static countProcess = 3
+    def countProcess = 3
 
     /** 常驻进程名称（暂未使用）*/
-    def static persistentName = ':GuardService'
+    def persistentName = ':GuardService'
 
     /** 背景不透明的坑的数量 */
-    def static countNotTranslucentStandard = 6
-    def static countNotTranslucentSingleTop = 2
-    def static countNotTranslucentSingleTask = 3
-    def static countNotTranslucentSingleInstance = 2
+    def countNotTranslucentStandard = 6
+    def countNotTranslucentSingleTop = 2
+    def countNotTranslucentSingleTask = 3
+    def countNotTranslucentSingleInstance = 2
 
     /** 背景透明的坑的数量（每种 launchMode 相同） */
-    def static countTranslucentStandard = 2
-    def static countTranslucentSingleTop = 2
-    def static countTranslucentSingleTask = 2
-    def static countTranslucentSingleInstance = 2
+    def countTranslucentStandard = 2
+    def countTranslucentSingleTop = 2
+    def countTranslucentSingleTask = 2
+    def countTranslucentSingleInstance = 2
 
     /** 宿主中声明的 TaskAffinity 的组数 */
-    def static countTask = 2
+    def countTask = 2
 
     /**
      * 是否使用 AppCompat 库
      * com.android.support:appcompat-v7:25.2.0
      */
-    def static useAppCompat = false
+    def useAppCompat = false
 
     /** HOST 向下兼容的插件版本 */
-    def static compatibleVersion = 10
+    def compatibleVersion = 10
 
     /** HOST 插件版本 */
-    def static currentVersion = 12
+    def currentVersion = 12
 
     /** plugins-builtin.json 文件名自定义,默认是 "plugins-builtin.json" */
-    def static builtInJsonFileName = "plugins-builtin.json"
+    def builtInJsonFileName = "plugins-builtin.json"
 
     /** 是否自动管理 plugins-builtin.json 文件,默认自动管理 */
-    def static autoManageBuiltInJsonFile = true
+    def autoManageBuiltInJsonFile = true
 
     /** assert目录下放置插件文件的目录自定义,默认是 assert 的 "plugins" */
-    def static pluginDir = "plugins"
+    def pluginDir = "plugins"
 
     /** 插件文件的后缀自定义,默认是".jar" 暂时支持 jar 格式*/
-    def static pluginFilePostfix = ".jar"
+    def pluginFilePostfix = ".jar"
 
     /** 当发现插件目录下面有不合法的插件 jar (有可能是特殊定制 jar)时是否停止构建,默认是 true */
-    def static enablePluginFileIllegalStopBuild = true
+    def enablePluginFileIllegalStopBuild = true
 }
