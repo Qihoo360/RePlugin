@@ -55,89 +55,13 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Black.NoTitleBar" />
 
-        <!-- NoTitleBar -->
-        <activity
-            android:name="com.qihoo360.replugin.sample.demo3.activity.theme.ThemeDialogActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" />
-
-        <!-- NoTitleBarFullScreen -->
-        <activity
-            android:name="com.qihoo360.replugin.sample.demo3.activity.theme.ThemeBlackNoTitleBarFullscreenActivity"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
-            <intent-filter>
-                <action android:name="com.qihoo360.replugin.sample.demo1.action.theme_fullscreen" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="com.qihoo360.repluginapp.replugin.demo1.CATEGORY1" />
-            </intent-filter>
-        </activity>
-
 
         <!-- receivers -->
-        <receiver android:name="com.qihoo360.replugin.sample.demo3.receivers.PluginDemo1Receiver">
+        <receiver android:name="com.qihoo360.replugin.sample.demo3.receivers.PluginDemo3Receiver">
             <intent-filter>
-                <action android:name="com.qihoo360.repluginapp.replugin.receiver.ACTION1" />
+                <action android:name="com.qihoo360.repluginapp.replugin.receiver.ACTION3" />
             </intent-filter>
         </receiver>
 
-        <!-- service -->
-        <service
-            android:name="com.qihoo360.replugin.sample.demo3.service.PluginDemoService1"
-            android:process=":bg" />
-
-        <!-- TaskAffinity -->
-        <activity
-            android:name="com.qihoo360.replugin.sample.demo3.activity.task_affinity.TAActivity1"
-            android:launchMode="singleTask"
-            android:taskAffinity=":ta_1"
-            android:theme="@android:style/Theme.Black.NoTitleBar" />
-        <activity
-            android:name="com.qihoo360.replugin.sample.demo3.activity.task_affinity.TAActivity2"
-            android:launchMode="singleTask"
-            android:taskAffinity=":ta_1"
-            android:theme="@android:style/Theme.Black.NoTitleBar" />
-        <activity
-            android:name="com.qihoo360.replugin.sample.demo3.activity.task_affinity.TAActivity3"
-            android:launchMode="singleTask"
-            android:taskAffinity=":ta_1"
-            android:theme="@android:style/Theme.Black.NoTitleBar" />
-        <activity
-            android:name="com.qihoo360.replugin.sample.demo3.activity.task_affinity.TAActivity4"
-            android:launchMode="singleTask"
-            android:taskAffinity=":ta_1"
-            android:theme="@android:style/Theme.Black.NoTitleBar" />
-
-        <!-- TaskAffinity-end -->
-
-        <activity
-            android:name="com.qihoo360.replugin.sample.demo3.activity.single_instance.TIActivity1"
-            android:launchMode="singleInstance"
-            android:theme="@android:style/Theme.Black.NoTitleBar" />
-
-        <!-- SingleTop -->
-        <activity
-            android:name="com.qihoo360.replugin.sample.demo3.activity.single_top.SingleTopActivity1"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Black.NoTitleBar" />
-
-        <!-- IntentFilter -->
-
-        <activity
-            android:name="com.qihoo360.replugin.sample.demo3.activity.intent_filter.IntentFilterDemoActivity1"
-            android:theme="@android:style/Theme.Black.NoTitleBar">
-            <intent-filter>
-                <action android:name="android.intent.action.demo1" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="category_demo" />
-            </intent-filter>
-        </activity>
-
-        <provider
-            android:name="com.qihoo360.replugin.sample.demo3.provider.Provider2"
-            android:authorities="com.qihoo360.replugin.sample.demo3.provider2" />
-
-        <activity android:name="com.qihoo360.replugin.sample.demo3.activity.for_result.ForResultActivity"/>
     </application>
 </manifest>

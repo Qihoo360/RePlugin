@@ -31,12 +31,7 @@ import android.widget.ListView
 import android.widget.Toast
 
 import com.qihoo360.replugin.RePlugin
-import com.qihoo360.replugin.sample.demo3.activity.single_instance.TIActivity1
-import com.qihoo360.replugin.sample.demo3.activity.single_top.SingleTopActivity1
-import com.qihoo360.replugin.sample.demo3.activity.task_affinity.TAActivity1
 import com.qihoo360.replugin.sample.demo3.activity.theme.ThemeBlackNoTitleBarActivity
-import com.qihoo360.replugin.sample.demo3.activity.theme.ThemeBlackNoTitleBarFullscreenActivity
-import com.qihoo360.replugin.sample.demo3.activity.theme.ThemeDialogActivity
 
 import java.util.ArrayList
 
@@ -70,16 +65,6 @@ class MainActivity : Activity() {
             v.context.startActivity(intent)
         }))
 
-        mItems.add(TestItem("Kotlin Activity: By Action", View.OnClickListener { v ->
-            val intent = Intent()
-            intent.action = "com.qihoo360.replugin.sample.demo1.action.theme_fullscreen"
-            /*
-                    若 Intent 中声明 category, manifest 中未声明，则无法找到 Activity;
-                    若 manifest 中声明 category, Intent 中未声明，则可以找到 Activity;
-                */
-            intent.addCategory("com.qihoo360.repluginapp.replugin.demo1.CATEGORY1")
-            v.context.startActivity(intent)
-        }))
 
 
         // =========
@@ -87,26 +72,11 @@ class MainActivity : Activity() {
         // =========
         mItems.add(TestItem("Kotlin Broadcast: Send (to All)", View.OnClickListener { v ->
             val intent = Intent()
-            intent.action = "com.qihoo360.repluginapp.replugin.receiver.ACTION1"
+            intent.action = "com.qihoo360.repluginapp.replugin.receiver.ACTION3"
             intent.putExtra("name", "jerry")
             v.context.sendBroadcast(intent)
         }))
 
-        mItems.add(TestItem("Kotlin Provider: Query (at UI process)", View.OnClickListener { v ->
-            val uri = Uri.parse("content://com.qihoo360.replugin.sample.demo1.provider2/" + "test")
-
-            val cv = ContentValues()
-            cv.put("name", "RePlugin Team")
-            cv.put("address", "beijing")
-
-            val urii = v.context.contentResolver.insert(uri, cv)
-            Log.d("a4", "result=" + urii!!)
-            if (urii != null) {
-                Toast.makeText(v.context, urii.toString(), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(v.context, "null", Toast.LENGTH_SHORT).show()
-            }
-        }))
 
         // =========
         // Communication
@@ -123,7 +93,7 @@ class MainActivity : Activity() {
             try {
                 val clz = cl.loadClass("com.qihoo360.replugin.sample.demo2.MainApp")
                 val m = clz.getDeclaredMethod("helloFromDemo1", Context::class.java, String::class.java)
-                m.invoke(null, v.context, "Demo1")
+                m.invoke(null, v.context, "Demo3")
             } catch (e: Exception) {
                 // 有可能Demo2根本没有这个类，也有可能没有相应方法（通常出现在"插件版本升级"的情况）
                 Toast.makeText(v.context, "", Toast.LENGTH_SHORT).show()
