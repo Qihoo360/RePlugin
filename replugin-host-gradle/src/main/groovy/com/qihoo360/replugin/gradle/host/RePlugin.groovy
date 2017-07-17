@@ -98,9 +98,27 @@ public class Replugin implements Plugin<Project> {
 
                 variant.outputs.each { output ->
                     output.processManifest.doLast {
-                        def manifestPath = output.processManifest.outputFile.absolutePath
-                        def updatedContent = new File(manifestPath).getText("UTF-8").replaceAll("</application>", newManifest + "</application>")
-                        new File(manifestPath).write(updatedContent, 'UTF-8')
+                        output.processManifest.outputs.files.each { File file ->
+                            def manifestFile = null;
+                            //在gradle plugin 3.0.0之前，file是文件，且文件名为AndroidManifest.xml
+                            //在gradle plugin 3.0.0之后，file是目录，且不包含AndroidManifest.xml，需要自己拼接
+                            //除了目录和AndroidManifest.xml之外，还可能会包含manifest-merger-debug-report.txt等不相干的文件，过滤它
+                            if ((file.name.equalsIgnoreCase("AndroidManifest.xml") && !file.isDirectory()) || file.isDirectory()) {
+                                if (file.isDirectory()) {
+                                    //3.0.0之后，自己拼接AndroidManifest.xml
+                                    manifestFile = new File(file, "AndroidManifest.xml")
+                                } else {
+                                    //3.0.0之前，直接使用
+                                    manifestFile = file
+                                }
+                                //检测文件是否存在
+                                if (manifestFile != null && manifestFile.exists()) {
+                                    println "${AppConstant.TAG} handle manifest: ${manifestFile}"
+                                    def updatedContent = manifestFile.getText("UTF-8").replaceAll("</application>", newManifest + "</application>")
+                                    manifestFile.write(updatedContent, 'UTF-8')
+                                }
+                            }
+                        }
                     }
                 }
             }
