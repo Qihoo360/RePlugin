@@ -25,20 +25,20 @@ import android.widget.Toast
 /**
  * @author RePlugin Team
  */
-class PluginDemo1Receiver : BroadcastReceiver() {
+class PluginDemo3Receiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action
         if (!TextUtils.isEmpty(action)) {
             if (action == ACTION) {
                 val name = intent.getStringExtra("name")
-                Toast.makeText(context, "Plugin1-action: $action, name = $name", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Plugin3-action: $action, name = $name", Toast.LENGTH_LONG).show()
             }
         }
     }
 
     companion object {
 
-        val ACTION = "com.qihoo360.repluginapp.replugin.receiver.ACTION1"
+        val ACTION = "com.qihoo360.repluginapp.replugin.receiver.ACTION3"
     }
 }
