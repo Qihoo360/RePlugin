@@ -14,46 +14,40 @@
  * the License.
  */
 
-/**
- * 插件编译脚本
- *
- * @author RePlugin Team
- */
 apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
+        applicationId "com.qihoo360.replugin.common.utils"
+        minSdkVersion 9
+        targetSdkVersion 22
+        versionCode 1
         versionName "1.0"
-        versionCode 103
-        targetSdkVersion 21
-        applicationId "com.qihoo360.replugin.sample.demo1"
-        minSdkVersion 15
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    lintOptions {
-        abortOnError false
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
 }
 
-// 这个plugin需要放在android配置之后，因为需要读取android中的配置项
-apply plugin: 'replugin-plugin-gradle'
 dependencies {
-    compile 'com.qihoo360.replugin:replugin-plugin-lib:2.1.5'
-    provided files('libs/fragment.jar')//这个jar就是从Support-fragment中提取出来的并非特制包目的是为了骗过编译期
-    provided files('libs/common-utils-lib-1.0.0.jar')//这个jar就是从Host的utils中编译生成的，其目的是为了骗过编译期
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:support-v4:25.3.1'
+}
+
+task makeJar(type: Jar, dependsOn: ['build']) {
+    destinationDir = file('build/outputs/jar/')
+    baseName = "common-utils-lib"
+    version = "1.0.0"
+    from('build/intermediates/classes/debug')
+    exclude('**/BuildConfig.class')
+    exclude('**/BuildConfig\$*.class')
+    exclude('**/R.class')
+    exclude('**/R\$*.class')
+    include('**/*.class')
 }

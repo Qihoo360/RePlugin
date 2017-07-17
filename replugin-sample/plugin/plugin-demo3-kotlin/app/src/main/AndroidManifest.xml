@@ -1,0 +1,67 @@
+<!--
+  ~ Copyright (C) 2005-2017 Qihoo 360 Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed To in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.qihoo360.replugin.sample.demo3">
+
+    <application
+        android:name="com.qihoo360.replugin.sample.demo3.MainApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/app_icon"
+        android:label="@string/app_name">
+
+        <meta-data
+            android:name="process_map"
+            android:value="[
+            {'from':'com.qihoo360.replugin.sample.demo1:bg','to':'$p0'}
+            ]" />
+
+        <meta-data
+            android:name="com.qihoo360.plugin.name"
+            android:value="demo3" />
+        <meta-data
+            android:name="com.qihoo360.plugin.version.ver"
+            android:value="100" />
+
+        <activity
+            android:name="com.qihoo360.replugin.sample.demo3.MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- theme 测试 -->
+        <activity
+            android:name="com.qihoo360.replugin.sample.demo3.activity.theme.ThemeBlackNoTitleBarActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Black.NoTitleBar" />
+
+
+        <!-- receivers -->
+        <receiver android:name="com.qihoo360.replugin.sample.demo3.receivers.PluginDemo3Receiver">
+            <intent-filter>
+                <action android:name="com.qihoo360.repluginapp.replugin.receiver.ACTION3" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>
