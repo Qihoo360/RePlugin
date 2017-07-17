@@ -18,6 +18,7 @@ package com.qihoo360.replugin.packages;
 
 import android.text.TextUtils;
 
+import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.mobilesafe.utils.basic.SecurityUtil;
 
 import com.qihoo360.replugin.ext.io.FileUtils;
@@ -77,9 +78,9 @@ class PluginPublishFileGenerator {
         } catch (Throwable e) {
             e.printStackTrace();
         } finally {
-            IOUtils.closeQuietly(dis);
-            IOUtils.closeQuietly(os);
-            IOUtils.closeQuietly(is);
+            CloseableUtils.closeQuietly(dis);
+            CloseableUtils.closeQuietly(os);
+            CloseableUtils.closeQuietly(is);
         }
         return false;
     }

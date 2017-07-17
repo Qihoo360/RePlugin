@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.loader.utils.PackageUtils;
 import com.qihoo360.loader.utils.StringUtils;
 import com.qihoo360.mobilesafe.utils.basic.SecurityUtil;
@@ -30,7 +31,6 @@ import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 
 import com.qihoo360.replugin.ext.io.FileUtils;
-import com.qihoo360.replugin.ext.io.IOUtils;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -425,8 +425,8 @@ public class V5FileInfo {
                 LogDebug.d(PLUGIN_TAG, e.getMessage(), e);
             }
         } finally {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(dis);
+            CloseableUtils.closeQuietly(is);
+            CloseableUtils.closeQuietly(dis);
         }
 
         return null;

@@ -14,10 +14,12 @@
  * the License.
  */
 
-package com.qihoo360.loader.utils;
+package com.qihoo360.replugin.utils;
 
 import android.database.Cursor;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.zip.ZipFile;
 
 /**
@@ -27,6 +29,20 @@ import java.util.zip.ZipFile;
  */
 
 public class CloseableUtils {
+
+    /**
+     * 大部分Close关闭流功能可使用此方法
+     * @param c Closeable对象，包括Stream等
+     */
+    public static void closeQuietly(Closeable c) {
+        try {
+            if (c != null) {
+                c.close();
+            }
+        } catch (final IOException ioe) {
+            // ignore
+        }
+    }
 
     /**
      * 解决API 15及以下的Cursor都没有实现Closeable接口，因此调用Closeable参数会出现转换异常的问题

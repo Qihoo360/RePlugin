@@ -19,12 +19,11 @@ package com.qihoo360.loader2;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.qihoo360.loader.utils.CloseableUtils;
+import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.helper.LogDebug;
 
 import com.qihoo360.replugin.ext.io.FileUtils;
-import com.qihoo360.replugin.ext.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -147,7 +146,7 @@ public class PluginNativeLibsHelper {
                 Log.i(TAG, "extractFile(): Success! fn=" + outFile.getName());
             }
         } finally {
-            IOUtils.closeQuietly(in);
+            CloseableUtils.closeQuietly(in);
         }
     }
 

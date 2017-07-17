@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import com.qihoo360.replugin.helper.LogRelease;
 
 import com.qihoo360.replugin.ext.io.IOUtils;
+import com.qihoo360.replugin.utils.CloseableUtils;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -59,7 +60,7 @@ public final class SysUtils {
                 LogRelease.e(TAG, e.getMessage(), e);
             }
         } finally {
-            IOUtils.closeQuietly(in);
+            CloseableUtils.closeQuietly(in);
         }
         return null;
     }
@@ -87,7 +88,7 @@ public final class SysUtils {
                             LogRelease.e(TAG, e.getMessage(), e);
                         }
                     }
-                    IOUtils.closeQuietly(in);
+                    CloseableUtils.closeQuietly(in);
                 }
                 pr.destroy();
             } catch (Throwable e) {

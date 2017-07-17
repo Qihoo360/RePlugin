@@ -16,8 +16,8 @@
 
 package com.qihoo360.mobilesafe.utils.basic;
 
+import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.replugin.ext.io.FileUtils;
-import com.qihoo360.replugin.ext.io.IOUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -140,7 +140,7 @@ public class SecurityUtil {
         } catch (Exception e) {
             //ignore
         } finally {
-            IOUtils.closeQuietly(in);
+            CloseableUtils.closeQuietly(in);
         }
 
         return null;

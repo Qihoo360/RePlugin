@@ -25,7 +25,7 @@ import android.os.IBinder.DeathRecipient;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import com.qihoo360.loader.utils.CloseableUtils;
+import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.loader2.sp.IPref;
 import com.qihoo360.loader2.sp.PrefImpl;
 import com.qihoo360.replugin.base.IPC;

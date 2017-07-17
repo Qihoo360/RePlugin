@@ -26,6 +26,7 @@ import com.qihoo360.replugin.model.PluginInfo;
 
 import com.qihoo360.replugin.ext.io.Charsets;
 import com.qihoo360.replugin.ext.io.IOUtils;
+import com.qihoo360.replugin.utils.CloseableUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -58,7 +59,7 @@ public class AssetsUtils {
                 LogRelease.e(TAG, e.getMessage(), e);
             }
         } finally {
-            IOUtils.closeQuietly(is);
+            CloseableUtils.closeQuietly(is);
         }
         return null;
     }
@@ -90,8 +91,8 @@ public class AssetsUtils {
                 LogRelease.e(PLUGIN_TAG, e.getMessage(), e);
             }
         } finally {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(os);
+            CloseableUtils.closeQuietly(is);
+            CloseableUtils.closeQuietly(os);
         }
 
         return false;
