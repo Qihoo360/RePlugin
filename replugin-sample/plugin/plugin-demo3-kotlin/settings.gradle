@@ -14,4 +14,4 @@
  * the License.
  */
 
-include ':app', ':utils'
+include ':app'

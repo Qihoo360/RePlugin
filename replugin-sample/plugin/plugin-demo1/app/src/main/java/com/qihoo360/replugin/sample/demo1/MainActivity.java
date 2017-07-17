@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.qihoo360.replugin.RePlugin;
+import com.qihoo360.replugin.common.utils.TimeUtils;
 import com.qihoo360.replugin.sample.demo1.activity.single_instance.TIActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.single_top.SingleTopActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.task_affinity.TAActivity1;
@@ -254,6 +256,21 @@ public class MainActivity extends Activity {
                     demo2.hello("helloooooooooooo");
                 } catch (RemoteException e) {
                     e.printStackTrace();
+                }
+            }
+        }));
+
+        // =========
+        // 使用Host公共库
+        // =========
+        mItems.add(new TestItem("Current time (Use common-lib from host)", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String curTime = TimeUtils.getNowString();
+                if (!TextUtils.isEmpty(curTime)) {
+                    Toast.makeText(v.getContext(), "current time: " + TimeUtils.getNowString(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(v.getContext(), "Failed to obtain current time(from host)", Toast.LENGTH_SHORT).show();
                 }
             }
         }));
