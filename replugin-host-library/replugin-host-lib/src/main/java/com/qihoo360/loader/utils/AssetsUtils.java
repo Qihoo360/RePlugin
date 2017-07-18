@@ -25,8 +25,8 @@ import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 
 import com.qihoo360.replugin.ext.io.Charsets;
-import com.qihoo360.replugin.ext.io.IOUtils;
 import com.qihoo360.replugin.utils.CloseableUtils;
+import com.qihoo360.replugin.utils.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

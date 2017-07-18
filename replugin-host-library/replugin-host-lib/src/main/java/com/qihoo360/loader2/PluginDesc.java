@@ -29,7 +29,8 @@ import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.RePlugin;
 
 import com.qihoo360.replugin.ext.io.Charsets;
-import com.qihoo360.replugin.ext.io.IOUtils;
+import com.qihoo360.replugin.utils.IOUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

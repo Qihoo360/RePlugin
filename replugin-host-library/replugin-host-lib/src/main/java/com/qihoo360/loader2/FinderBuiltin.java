@@ -25,7 +25,8 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.model.PluginInfo;
 
 import com.qihoo360.replugin.ext.io.Charsets;
-import com.qihoo360.replugin.ext.io.IOUtils;
+import com.qihoo360.replugin.utils.IOUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
