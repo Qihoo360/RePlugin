@@ -45,26 +45,6 @@ public class AssetsUtils {
     private static final String TAG = LogDebug.PLUGIN_TAG;
 
     /**
-     * @param context
-     * @param name
-     * @return
-     */
-    public static final String readUTF8(Context context, String name) {
-        InputStream is = null;
-        try {
-            is = context.getAssets().open(name);
-            return IOUtils.toString(is, Charsets.UTF_8);
-        } catch (Throwable e) {
-            if (LOGR) {
-                LogRelease.e(TAG, e.getMessage(), e);
-            }
-        } finally {
-            CloseableUtils.closeQuietly(is);
-        }
-        return null;
-    }
-
-    /**
      * 提取文件到目标位置
      * @param context
      * @param name asset名称（asset的相对路径，可包含子路径）

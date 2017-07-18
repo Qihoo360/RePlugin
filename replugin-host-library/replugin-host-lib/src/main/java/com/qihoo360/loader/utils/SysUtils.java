@@ -16,17 +16,11 @@
 
 package com.qihoo360.loader.utils;
 
-import android.text.TextUtils;
-
 import com.qihoo360.replugin.helper.LogRelease;
-
 import com.qihoo360.replugin.utils.CloseableUtils;
-import com.qihoo360.replugin.utils.IOUtils;
 
 import java.io.FileInputStream;
-import java.io.InputStream;
 
-import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
 
 /**
@@ -38,6 +32,7 @@ public final class SysUtils {
 
     /**
      * 返回当前的进程名
+     *
      * @return
      */
     public static String getCurrentProcessName() {
@@ -63,40 +58,5 @@ public final class SysUtils {
             CloseableUtils.closeQuietly(in);
         }
         return null;
-    }
-
-    /**
-     * 检测是否模拟器（Release版本不做任何处理，总是返回false）
-     * @return
-     */
-    public static boolean isEmulator() {
-        if (LOG) {
-            try {
-                Process pr = Runtime.getRuntime().exec("getprop ro.hardware");
-                int code = pr.waitFor();
-                if (code == 0) {
-                    InputStream in = pr.getInputStream();
-                    byte buffer[] = new byte[1024];
-                    try {
-                        int rc = IOUtils.read(in, buffer, 0, buffer.length);
-                        String str = new String(buffer, 0, rc, "UTF-8");
-                        if (!TextUtils.isEmpty(str) && str.contains("goldfish")) {
-                            return true;
-                        }
-                    } catch (Throwable e) {
-                        if (LOGR) {
-                            LogRelease.e(TAG, e.getMessage(), e);
-                        }
-                    }
-                    CloseableUtils.closeQuietly(in);
-                }
-                pr.destroy();
-            } catch (Throwable e) {
-                if (LOGR) {
-                    LogRelease.e(TAG, e.getMessage(), e);
-                }
-            }
-        }
-        return false;
     }
 }

@@ -269,34 +269,4 @@ public class IOUtils {
         }
         return count;
     }
-
-    /**
-     * Reads bytes from an input stream.
-     * This implementation guarantees that it will read as many bytes
-     * as possible before giving up; this may not always be the case for
-     * subclasses of {@link InputStream}.
-     *
-     * @param input where to read input from
-     * @param buffer destination
-     * @param offset initial offset into buffer
-     * @param length length to read, must be &gt;= 0
-     * @return actual length read; may be less than requested if EOF was reached
-     * @throws IOException if a read error occurs
-     */
-    public static int read(final InputStream input, final byte[] buffer, final int offset, final int length)
-            throws IOException {
-        if (length < 0) {
-            throw new IllegalArgumentException("Length must not be negative: " + length);
-        }
-        int remaining = length;
-        while (remaining > 0) {
-            final int location = length - remaining;
-            final int count = input.read(buffer, offset + location, remaining);
-            if (EOF == count) { // EOF
-                break;
-            }
-            remaining -= count;
-        }
-        return length - remaining;
-    }
 }
