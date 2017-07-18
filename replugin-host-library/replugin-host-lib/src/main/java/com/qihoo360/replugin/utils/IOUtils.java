@@ -33,8 +33,6 @@
 
 package com.qihoo360.replugin.utils;
 
-import com.qihoo360.replugin.ext.io.Charsets;
-import com.qihoo360.replugin.ext.io.output.StringBuilderWriter;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.qihoo360.replugin.ext.io.output;
+package com.qihoo360.replugin.utils;
 
 import java.io.Serializable;
 import java.io.Writer;
