@@ -19,6 +19,7 @@ package com.qihoo360.loader2;
 import android.content.pm.ActivityInfo;
 
 import com.qihoo360.loader2.PluginContainers.ActivityState;
+import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.helper.LogDebug;
 
 import java.util.HashMap;
@@ -73,7 +74,8 @@ class LaunchModeStates {
         for (int i = 0; i < count; i++) {
             String key = prefix + infix + i;
 
-            if (LOG) {
+            // 只有开启“详细日志”时才输出每一个坑位的信息，防止刷屏
+            if (RePlugin.getConfig().isPrintDetailLog()) {
                 LogDebug.d(TAG, "LaunchModeStates.add(" + key + ")");
             }
 

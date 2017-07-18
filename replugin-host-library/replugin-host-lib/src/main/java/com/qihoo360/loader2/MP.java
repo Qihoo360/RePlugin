@@ -119,8 +119,8 @@ public class MP {
             LogDebug.d(PLUGIN_TAG, "MP.fetchPluginBinder ... plugin=" + plugin + " binder.name=" + binder);
         }
 
-        // 记录调用栈，便于观察：增加
-        if (LOG) {
+        // 若开启了“打印详情”则打印调用栈，便于观察
+        if (RePlugin.getConfig().isPrintDetailLog()) {
             String reason = "";
             StackTraceElement elements[] = Thread.currentThread().getStackTrace();
             for (StackTraceElement item : elements) {
