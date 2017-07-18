@@ -21,7 +21,7 @@ import android.content.Context;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 
-import com.qihoo360.replugin.ext.io.FileUtils;
+import com.qihoo360.replugin.utils.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

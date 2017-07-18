@@ -30,7 +30,7 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 
-import com.qihoo360.replugin.ext.io.FileUtils;
+import com.qihoo360.replugin.utils.FileUtils;
 
 import java.io.DataInputStream;
 import java.io.File;
