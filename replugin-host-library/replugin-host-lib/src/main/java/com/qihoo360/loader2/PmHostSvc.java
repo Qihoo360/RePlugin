@@ -318,10 +318,12 @@ class PmHostSvc extends IPluginHost.Stub {
             LogDebug.d(PLUGIN_TAG, "pluginDownloaded： path=" + path);
         }
 
-        // 先尝试用旧插件（p-n开头的）的形式安装
-        PluginInfo pi = pluginDownloadedForPn(path);
-        if (pi == null) {
-            // 若失败，则用的是新的插件形式，用此来安装（推荐）
+        // 通过路径来判断是采用新方案，还是旧的P-N（即将废弃，有多种）方案
+        PluginInfo pi;
+        String fn = new File(path).getName();
+        if (fn.startsWith("p-n-") || fn.startsWith("v-plugin-") || fn.startsWith("plugin-s-") || fn.startsWith("p-m-")) {
+            pi = pluginDownloadedForPn(path);
+        } else {
             pi = mManager.getService().install(path);
         }
 
