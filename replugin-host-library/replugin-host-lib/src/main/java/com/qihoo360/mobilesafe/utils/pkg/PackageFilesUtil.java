@@ -30,6 +30,7 @@ import com.qihoo360.replugin.utils.FileUtils;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -75,7 +76,10 @@ public class PackageFilesUtil {
                 if (BuildConfig.DEBUG) {
                     Log.i(TAG, "Opening in assets: " + filename);
                 }
-            } catch (Exception e) {
+            } catch (FileNotFoundException e) {
+                // 找不到文件？很正常，不做任何处理
+                // Ignore
+            } catch (IOException e) {
                 if (BuildConfig.DEBUG) {
                     Log.w(TAG, filename, e);
                 }
