@@ -32,6 +32,9 @@
  */
 package com.qihoo360.replugin.utils;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -95,6 +98,26 @@ public class FileUtils {
             throw new FileNotFoundException("File '" + file + "' does not exist");
         }
         return new FileInputStream(file);
+    }
+
+    /**
+     * 不抛出任何异常，直接尝试打开一个Assets下的文件。若无法打开则直接返回Null
+     * @param context Context对象
+     * @param fileName Assets文件所在路径
+     * @return Assets文件的输入流
+     */
+    public static InputStream openInputStreamFromAssetsQuietly(final Context context, final String fileName) {
+        AssetManager a = context.getAssets();
+        if (a == null) {
+            // Never be here
+            return null;
+        }
+        try {
+            return a.open(fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     //-----------------------------------------------------------------------
