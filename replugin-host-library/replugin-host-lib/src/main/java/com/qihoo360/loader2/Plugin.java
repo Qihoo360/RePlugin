@@ -565,8 +565,8 @@ class Plugin {
         }
         mInitialized = true;
 
-        // 打印调用栈，便于观察
-        if (LOG) {
+        // 若开启了“打印详情”则打印调用栈，便于观察
+        if (RePlugin.getConfig().isPrintDetailLog()) {
             String reason = "";
             reason += "--- plugin: " + mInfo.getName() + " ---\n";
             reason += "load=" + load + "\n";

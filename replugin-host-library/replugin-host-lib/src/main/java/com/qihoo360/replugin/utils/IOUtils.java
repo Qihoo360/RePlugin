@@ -102,7 +102,6 @@ public class IOUtils {
      * @return the number of bytes copied, or -1 if &gt; Integer.MAX_VALUE
      * @throws NullPointerException if the input or output is null
      * @throws IOException          if an I/O error occurs
-     * @since 1.1
      */
     public static int copy(final InputStream input, final OutputStream output) throws IOException {
         final long count = copyLarge(input, output);
@@ -282,7 +281,6 @@ public class IOUtils {
      * @param encoding the encoding to use, null means platform default
      * @throws NullPointerException if output is null
      * @throws IOException          if an I/O error occurs
-     * @since 2.3
      */
     public static void write(final String data, final OutputStream output, final Charset encoding) throws IOException {
         if (data != null) {
