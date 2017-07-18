@@ -24,11 +24,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.qihoo360.replugin.utils.Charsets;
+import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.RePlugin;
 
-import com.qihoo360.replugin.ext.io.Charsets;
-import com.qihoo360.replugin.ext.io.IOUtils;
+import com.qihoo360.replugin.utils.IOUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -167,7 +169,7 @@ public class PluginDesc {
                 Log.e(TAG, e.getMessage(), e);
             }
         } finally {
-            IOUtils.closeQuietly(in);
+            CloseableUtils.closeQuietly(in);
         }
 
         return null;

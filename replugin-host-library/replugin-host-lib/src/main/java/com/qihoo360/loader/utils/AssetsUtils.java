@@ -24,8 +24,7 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 
-import com.qihoo360.replugin.ext.io.Charsets;
-import com.qihoo360.replugin.ext.io.IOUtils;
+import com.qihoo360.replugin.utils.CloseableUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,26 +41,6 @@ import static com.qihoo360.replugin.helper.LogRelease.LOGR;
 public class AssetsUtils {
 
     private static final String TAG = LogDebug.PLUGIN_TAG;
-
-    /**
-     * @param context
-     * @param name
-     * @return
-     */
-    public static final String readUTF8(Context context, String name) {
-        InputStream is = null;
-        try {
-            is = context.getAssets().open(name);
-            return IOUtils.toString(is, Charsets.UTF_8);
-        } catch (Throwable e) {
-            if (LOGR) {
-                LogRelease.e(TAG, e.getMessage(), e);
-            }
-        } finally {
-            IOUtils.closeQuietly(is);
-        }
-        return null;
-    }
 
     /**
      * 提取文件到目标位置
@@ -90,8 +69,8 @@ public class AssetsUtils {
                 LogRelease.e(PLUGIN_TAG, e.getMessage(), e);
             }
         } finally {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(os);
+            CloseableUtils.closeQuietly(is);
+            CloseableUtils.closeQuietly(os);
         }
 
         return false;

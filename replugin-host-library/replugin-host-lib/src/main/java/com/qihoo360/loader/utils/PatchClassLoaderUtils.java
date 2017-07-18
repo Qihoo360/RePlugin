@@ -22,8 +22,7 @@ import android.util.Log;
 
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.helper.LogRelease;
-
-import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
+import com.qihoo360.replugin.utils.ReflectUtils;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
@@ -53,7 +52,7 @@ public class PatchClassLoaderUtils {
             // 1. ApplicationContext - Android 2.1
             // 2. ContextImpl - Android 2.2 and higher
             // 3. AppContextImpl - Android 2.2 and higher
-            Object oPackageInfo = FieldUtils.readField(oBase, "mPackageInfo", true);
+            Object oPackageInfo = ReflectUtils.readField(oBase, "mPackageInfo");
             if (oPackageInfo == null) {
                 if (LOGR) {
                     LogRelease.e(PLUGIN_TAG, "pclu.p: nf mpi. mb cl=" + oBase.getClass());
@@ -69,7 +68,7 @@ public class PatchClassLoaderUtils {
             }
 
             // 获取mPackageInfo.mClassLoader
-            ClassLoader oClassLoader = (ClassLoader) FieldUtils.readField(oPackageInfo, "mClassLoader", true);
+            ClassLoader oClassLoader = (ClassLoader) ReflectUtils.readField(oPackageInfo, "mClassLoader");
             if (oClassLoader == null) {
                 if (LOGR) {
                     LogRelease.e(PLUGIN_TAG, "pclu.p: nf mpi. mb cl=" + oBase.getClass() + "; mpi cl=" + oPackageInfo.getClass());
@@ -81,7 +80,7 @@ public class PatchClassLoaderUtils {
             ClassLoader cl = RePlugin.getConfig().getCallbacks().createClassLoader(oClassLoader.getParent(), oClassLoader);
 
             // 将新的ClassLoader写入mPackageInfo.mClassLoader
-            FieldUtils.writeField(oPackageInfo, "mClassLoader", cl, true);
+            ReflectUtils.writeField(oPackageInfo, "mClassLoader", cl);
 
             if (LOG) {
                 Log.d(TAG, "patch: patch mClassLoader ok");

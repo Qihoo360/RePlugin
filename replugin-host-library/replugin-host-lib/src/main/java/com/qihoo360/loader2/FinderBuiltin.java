@@ -19,12 +19,14 @@ package com.qihoo360.loader2;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.qihoo360.replugin.utils.Charsets;
+import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.loader2.Builder.PxAll;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.model.PluginInfo;
 
-import com.qihoo360.replugin.ext.io.Charsets;
-import com.qihoo360.replugin.ext.io.IOUtils;
+import com.qihoo360.replugin.utils.IOUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +61,7 @@ public class FinderBuiltin {
                 LogDebug.d(PLUGIN_TAG, e.getMessage(), e);
             }
         }
-        IOUtils.closeQuietly(in);
+        CloseableUtils.closeQuietly(in);
     }
 
     private static final void readConfig(InputStream in, PxAll all) throws IOException, JSONException {

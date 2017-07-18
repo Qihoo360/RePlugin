@@ -29,12 +29,10 @@ import com.qihoo360.i.Factory;
 import com.qihoo360.i.Factory2;
 import com.qihoo360.i.IPluginActivityManager;
 import com.qihoo360.i.IPluginManager;
-import com.qihoo360.loader.utils.ReflectUtils;
+import com.qihoo360.replugin.utils.ReflectUtils;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.component.activity.ActivityInjector;
-import com.qihoo360.replugin.ext.lang3.ClassUtils;
-import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
 import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
@@ -680,11 +678,13 @@ class PmInternalImpl implements IPluginActivityManager {
     private static int getDefaultThemeId() {
         if (HostConfigHelper.ACTIVITY_PIT_USE_APPCOMPAT) {
             try {
-                Class clazz = ClassUtils.getClass("android.support.v7.appcompat.R$style");
-                return (int) FieldUtils.readStaticField(clazz, "Theme_AppCompat", true);
+                Class clazz = ReflectUtils.getClass("android.support.v7.appcompat.R$style");
+                return (int) ReflectUtils.readStaticField(clazz, "Theme_AppCompat");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             }
         }

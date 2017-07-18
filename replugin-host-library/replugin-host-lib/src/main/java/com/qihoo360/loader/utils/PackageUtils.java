@@ -23,11 +23,7 @@ import android.os.Build;
 import android.util.DisplayMetrics;
 
 import com.qihoo360.replugin.helper.LogDebug;
-
-import com.qihoo360.replugin.ext.lang3.ClassUtils;
-import com.qihoo360.replugin.ext.lang3.reflect.ConstructorUtils;
-import com.qihoo360.replugin.ext.lang3.reflect.FieldUtils;
-import com.qihoo360.replugin.ext.lang3.reflect.MethodUtils;
+import com.qihoo360.replugin.utils.ReflectUtils;
 
 import java.io.File;
 
@@ -47,13 +43,15 @@ public class PackageUtils {
         //
         try {
             // 1. 新建PackageParser的实例
-            Object packageParser = ConstructorUtils.invokeConstructor(ClassUtils.getClass("android.content.pm.PackageParser"), archiveFilePath);
+            Object packageParser = ReflectUtils.invokeConstructor(ReflectUtils.getClass("android.content.pm.PackageParser"),
+                    new Class[]{String.class}, archiveFilePath);
 
             // 2. 调用PackageParser.parsePackage()方法，返回值为Package对象
             DisplayMetrics metrics = new DisplayMetrics();
             metrics.setToDefaults();
 
-            Object pkg = MethodUtils.invokeMethod(packageParser, true, "parsePackage", new File(archiveFilePath), archiveFilePath, metrics, 0);
+            Object pkg = ReflectUtils.invokeMethod(packageParser, "parsePackage", new Class[]{File.class, String.class, DisplayMetrics.class, int.class},
+                    new File(archiveFilePath), archiveFilePath, metrics, 0);
             if (pkg == null) {
                 if (LOG) {
                     LogDebug.d(MISC_TAG, "failed to parsePackage: f=" + archiveFilePath);
@@ -62,13 +60,14 @@ public class PackageUtils {
             }
 
             // 3. 调用PackageParser.collectCertificates方法
-            boolean rc = (Boolean) MethodUtils.invokeMethod(packageParser, "collectCertificates", pkg, 0);
+            boolean rc = (Boolean) ReflectUtils.invokeMethod(packageParser, "collectCertificates", new Class[]{pkg.getClass(), int.class},
+                    pkg, 0);
             if (!rc) {
                 return null;
             }
 
             // 4. 获取Package.mSignatures
-            Object signatures[] = (Object[]) FieldUtils.readField(pkg, "mSignatures");
+            Object signatures[] = (Object[]) ReflectUtils.readField(pkg, "mSignatures");
             int n = signatures.length;
             if (n <= 0) {
                 if (LOG) {

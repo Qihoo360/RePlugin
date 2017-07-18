@@ -16,8 +16,7 @@
 
 package com.qihoo360.loader.utils2;
 
-import com.qihoo360.replugin.ext.lang3.ClassUtils;
-import com.qihoo360.replugin.ext.lang3.reflect.MethodUtils;
+import com.qihoo360.replugin.utils.ReflectUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -58,7 +57,7 @@ public class FilePermissionUtils {
         try {
             initClass();
             if (sSetPermissionMethod == null) {
-                sSetPermissionMethod = MethodUtils.getMatchingMethod(sFileUtilsClass, "setPermissions",
+                sSetPermissionMethod = ReflectUtils.getMethod(sFileUtilsClass, "setPermissions",
                         String.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
             }
             Object retObj = sSetPermissionMethod.invoke(null, filePath, mode, uid, gid);
@@ -85,7 +84,7 @@ public class FilePermissionUtils {
         try {
             initClass();
             if (sGetPermissionMethod == null) {
-                sGetPermissionMethod = MethodUtils.getMatchingMethod(sFileUtilsClass, "getPermissions",
+                sGetPermissionMethod = ReflectUtils.getMethod(sFileUtilsClass, "getPermissions",
                         String.class, int[].class);
             }
             Object retObj = sGetPermissionMethod.invoke(null, filePath, outPermissions);
@@ -104,7 +103,7 @@ public class FilePermissionUtils {
 
     private static void initClass() throws ClassNotFoundException {
         if (sFileUtilsClass == null) {
-            sFileUtilsClass = ClassUtils.getClass("android.os.FileUtils");
+            sFileUtilsClass = ReflectUtils.getClass("android.os.FileUtils");
         }
     }
 }
