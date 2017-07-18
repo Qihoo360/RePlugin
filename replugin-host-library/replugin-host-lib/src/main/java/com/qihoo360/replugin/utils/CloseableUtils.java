@@ -31,7 +31,8 @@ import java.util.zip.ZipFile;
 public class CloseableUtils {
 
     /**
-     * 大部分Close关闭流功能可使用此方法
+     * 大部分Close关闭流，以及实现Closeable的功能可使用此方法
+     *
      * @param c Closeable对象，包括Stream等
      */
     public static void closeQuietly(Closeable c) {
@@ -41,6 +42,20 @@ public class CloseableUtils {
             }
         } catch (final IOException ioe) {
             // ignore
+        }
+    }
+
+    /**
+     * 允许“一口气”关闭多个Closeable的方法
+     *
+     * @param closeables 多个Closeable对象
+     */
+    public static void closeQuietly(final Closeable... closeables) {
+        if (closeables == null) {
+            return;
+        }
+        for (final Closeable closeable : closeables) {
+            closeQuietly(closeable);
         }
     }
 
