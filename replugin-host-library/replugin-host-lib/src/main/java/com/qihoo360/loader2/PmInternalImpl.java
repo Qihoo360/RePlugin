@@ -84,7 +84,8 @@ class PmInternalImpl implements IPluginActivityManager {
         String plugin = intent.getStringExtra(IPluginManager.KEY_PLUGIN);
 
         /* 检查是否是动态注册的类 */
-        // 如果要启动的 Activity 是动态注册的类，则直接启动，不经过 SDK。
+        // 如果要启动的 Activity 是动态注册的类，则不使用坑位机制，而是直接动态类。
+        // 原因：宿主的某些动态注册的类不能运行在坑位中（如'桌面'插件的入口Activity）
         ComponentName componentName = intent.getComponent();
         if (componentName != null) {
             if (LogDebug.LOG) {
@@ -184,7 +185,9 @@ class PmInternalImpl implements IPluginActivityManager {
             }
         }
 
-        // 如果是 activity 是动态注册的类，则直接打开
+        /* 检查是否是动态注册的类 */
+        // 如果要启动的 Activity 是动态注册的类，则不使用坑位机制，而是直接动态类。
+        // 原因：宿主的某些动态注册的类不能运行在坑位中（如'桌面'插件的入口Activity）
         if (LOG) {
             LogDebug.d("loadClass", "isHookingClass(" + plugin + " , " + activity + ") = "
                     + Factory2.isDynamicClass(plugin, activity));
