@@ -471,14 +471,18 @@ public class PluginContext extends ContextThemeWrapper {
 
     @Override
     public void startActivity(Intent intent, Bundle options) {
-        if (mContextInjector != null) {
-            mContextInjector.startActivityBefore(intent, options);
-        }
+        // HINT 保险起见，startActivity写两套相似逻辑
+        // 具体见startActivity(intent)的描述（上面）
+        if (!Factory2.startActivity(this, intent)) {
+            if (mContextInjector != null) {
+                mContextInjector.startActivityBefore(intent, options);
+            }
 
-        super.startActivity(intent, options);
+            super.startActivity(intent, options);
 
-        if (mContextInjector != null) {
-            mContextInjector.startActivityAfter(intent, options);
+            if (mContextInjector != null) {
+                mContextInjector.startActivityAfter(intent, options);
+            }
         }
     }
 
