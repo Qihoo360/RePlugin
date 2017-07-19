@@ -178,7 +178,15 @@ public class MainActivity extends Activity {
                 RePlugin.startActivity(v.getContext(), intent, "demo2", null);
             }
         }));
-
+        mItems.add(new TestItem("Activity: start Host activity(Main)", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(RePlugin.getHostContext().getPackageName(), "com.qihoo360.replugin.sample.host.MainActivity"));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                MainActivity.this.startActivity(intent);
+            }
+        }));
 
         // =========
         // Other Components
