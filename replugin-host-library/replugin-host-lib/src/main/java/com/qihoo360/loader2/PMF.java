@@ -26,7 +26,6 @@ import android.text.TextUtils;
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.Factory2;
 import com.qihoo360.i.IModule;
-import com.qihoo360.i.IPluginActivityManager;
 import com.qihoo360.i.IPluginManager;
 import com.qihoo360.loader.utils.PatchClassLoaderUtils;
 import com.qihoo360.replugin.helper.LogRelease;
@@ -74,7 +73,7 @@ public class PMF {
         sPluginMgr.init();
 
         Factory.sPluginManager = PMF.getLocal();
-        Factory2.sPluginManager = PMF.getInternal();
+        Factory2.sPLProxy = PMF.getInternal();
 
         PatchClassLoaderUtils.patch(application);
     }
@@ -112,7 +111,7 @@ public class PMF {
     /**
      * @return
      */
-    public static final IPluginActivityManager getInternal() {
+    public static final PluginLibraryInternalProxy getInternal() {
         return sPluginMgr.mInternal;
     }
 

@@ -22,10 +22,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.qihoo360.loader2.PluginLibraryInternalProxy;
+
 import org.json.JSONArray;
 
 /**
- * @hide 内部框架使用
+ * plugin-library中，通过“反射”调用的内部逻辑（如PluginActivity类的调用等）均在此处 <p>
+ * 注意：务必要Keep住此类，否则插件调用将失败
  *
  * @author RePlugin Team
  */
@@ -34,7 +37,7 @@ public final class Factory2 {
     /**
      * @hide 内部框架使用
      */
-    public static IPluginActivityManager sPluginManager;
+    public static PluginLibraryInternalProxy sPLProxy;
 
     /**
      * @hide 内部方法，插件框架使用
@@ -44,7 +47,7 @@ public final class Factory2 {
      * @return 为Activity构造一个base Context
      */
     public static final Context createActivityContext(Activity activity, Context newBase) {
-        return sPluginManager.createActivityContext(activity, newBase);
+        return sPLProxy.createActivityContext(activity, newBase);
     }
 
     /**
@@ -54,7 +57,7 @@ public final class Factory2 {
      * @param savedInstanceState
      */
     public static final void handleActivityCreateBefore(Activity activity, Bundle savedInstanceState) {
-        sPluginManager.handleActivityCreateBefore(activity, savedInstanceState);
+        sPLProxy.handleActivityCreateBefore(activity, savedInstanceState);
     }
 
     /**
@@ -64,7 +67,7 @@ public final class Factory2 {
      * @param savedInstanceState
      */
     public static final void handleActivityCreate(Activity activity, Bundle savedInstanceState) {
-        sPluginManager.handleActivityCreate(activity, savedInstanceState);
+        sPLProxy.handleActivityCreate(activity, savedInstanceState);
     }
 
     /**
@@ -73,7 +76,7 @@ public final class Factory2 {
      * @param activity
      */
     public static final void handleActivityDestroy(Activity activity) {
-        sPluginManager.handleActivityDestroy(activity);
+        sPLProxy.handleActivityDestroy(activity);
     }
 
     /**
@@ -83,7 +86,7 @@ public final class Factory2 {
      * @param savedInstanceState
      */
     public static final void handleRestoreInstanceState(Activity activity, Bundle savedInstanceState) {
-        sPluginManager.handleRestoreInstanceState(activity, savedInstanceState);
+        sPLProxy.handleRestoreInstanceState(activity, savedInstanceState);
     }
 
     /**
@@ -92,7 +95,7 @@ public final class Factory2 {
      * @param service
      */
     public static final void handleServiceCreate(Service service) {
-        sPluginManager.handleServiceCreate(service);
+        sPLProxy.handleServiceCreate(service);
     }
 
     /**
@@ -101,7 +104,7 @@ public final class Factory2 {
      * @param service
      */
     public static final void handleServiceDestroy(Service service) {
-        sPluginManager.handleServiceDestroy(service);
+        sPLProxy.handleServiceDestroy(service);
     }
 
     /**
@@ -113,7 +116,7 @@ public final class Factory2 {
      * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
      */
     public static final boolean startActivity(Activity activity, Intent intent) {
-        return sPluginManager.startActivity(activity, intent);
+        return sPLProxy.startActivity(activity, intent);
     }
 
     /**
@@ -128,7 +131,7 @@ public final class Factory2 {
      * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
      */
     public static final boolean startActivity(Context context, Intent intent, String plugin, String activity, int process, boolean download) {
-        return sPluginManager.startActivity(context, intent, plugin, activity, process, download);
+        return sPLProxy.startActivity(context, intent, plugin, activity, process, download);
     }
 
     /**
@@ -141,7 +144,7 @@ public final class Factory2 {
      * @see #startActivityForResult(Activity, Intent, int, Bundle)
      */
     public static final boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
-        return sPluginManager.startActivityForResult(activity, intent, requestCode, options);
+        return sPLProxy.startActivityForResult(activity, intent, requestCode, options);
     }
 
     /**
@@ -151,7 +154,7 @@ public final class Factory2 {
      * @return
      */
     public static final JSONArray fetchPlugins(String name) {
-        return sPluginManager.fetchPlugins(name);
+        return sPLProxy.fetchPlugins(name);
     }
 
     /**
@@ -164,7 +167,7 @@ public final class Factory2 {
      * @return
      */
     public static final boolean registerDynamicClass(String className, String plugin, String type, String target) {
-        return sPluginManager.registerDynamicClass(className, plugin, type, target);
+        return sPLProxy.registerDynamicClass(className, plugin, type, target);
     }
 
     /**
@@ -176,7 +179,7 @@ public final class Factory2 {
      * @return
      */
     public static final boolean registerDynamicClass(String className, String plugin, String target, Class defClass) {
-        return sPluginManager.registerDynamicClass(className, plugin, target, defClass);
+        return sPLProxy.registerDynamicClass(className, plugin, target, defClass);
     }
 
     /**
@@ -187,7 +190,7 @@ public final class Factory2 {
      * @return
      */
     public static final boolean isDynamicClass(String plugin, String className) {
-        return sPluginManager.isDynamicClass(plugin, className);
+        return sPLProxy.isDynamicClass(plugin, className);
     }
 
     /**
@@ -198,6 +201,6 @@ public final class Factory2 {
      * @return 插件名称
      */
     public static final String getPluginByDynamicClass(String className) {
-        return sPluginManager.getPluginByDynamicClass(className);
+        return sPLProxy.getPluginByDynamicClass(className);
     }
 }

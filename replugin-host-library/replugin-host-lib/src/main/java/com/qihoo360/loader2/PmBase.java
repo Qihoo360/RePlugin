@@ -31,7 +31,6 @@ import android.text.TextUtils;
 
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.IModule;
-import com.qihoo360.i.IPluginActivityManager;
 import com.qihoo360.i.IPluginManager;
 import com.qihoo360.replugin.utils.ReflectUtils;
 import com.qihoo360.mobilesafe.api.Tasks;
@@ -165,7 +164,7 @@ class PmBase {
     /**
      *
      */
-    IPluginActivityManager mInternal;
+    PluginLibraryInternalProxy mInternal;
 
     /**
      * insertNewPlugin 时使用的线程锁
@@ -225,7 +224,7 @@ class PmBase {
         mLocal = new PmLocalImpl(context, this);
 
         //
-        mInternal = new PmInternalImpl(this);
+        mInternal = new PluginLibraryInternalProxy(this);
     }
 
     void init() {

@@ -27,7 +27,6 @@ import android.text.TextUtils;
 
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.Factory2;
-import com.qihoo360.i.IPluginActivityManager;
 import com.qihoo360.i.IPluginManager;
 import com.qihoo360.replugin.utils.ReflectUtils;
 import com.qihoo360.replugin.RePlugin;
@@ -50,20 +49,29 @@ import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
 
 /**
+ * plugin-library中，通过“反射”调用的内部逻辑（如PluginActivity类的调用、Factory2等）均在此处
+ *
  * @author RePlugin Team
  */
-class PmInternalImpl implements IPluginActivityManager {
+public class PluginLibraryInternalProxy {
 
     /**
      *
      */
     PmBase mPluginMgr;
 
-    PmInternalImpl(PmBase pm) {
+    PluginLibraryInternalProxy(PmBase pm) {
         mPluginMgr = pm;
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 启动一个插件中的activity
+     * 通过Extra参数IPluginManager.KEY_COMPATIBLE，IPluginManager.KEY_PLUGIN，IPluginManager.KEY_ACTIVITY，IPluginManager.KEY_PROCESS控制
+     * @param activity Activity上下文
+     * @param intent
+     * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
+     */
     public boolean startActivity(Activity activity, Intent intent) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "start activity: intent=" + intent);
@@ -157,7 +165,17 @@ class PmInternalImpl implements IPluginActivityManager {
     }
 
     // FIXME 建议去掉plugin和activity参数，直接用intent代替
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 启动一个插件中的activity，如果插件不存在会触发下载界面
+     * @param context 应用上下文或者Activity上下文
+     * @param intent
+     * @param plugin 插件名
+     * @param activity 待启动的activity类名
+     * @param process 是否在指定进程中启动
+     * @param download 下载
+     * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
+     */
     public boolean startActivity(Context context, Intent intent, String plugin, String activity, int process, boolean download) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "start activity: intent=" + intent + " plugin=" + plugin + " activity=" + activity + " process=" + process + " download=" + download);
@@ -198,7 +216,7 @@ class PmInternalImpl implements IPluginActivityManager {
         // Added by Jiongxuan Zhang
         if (PluginStatusController.getStatus(plugin) < PluginStatusController.STATUS_OK) {
             if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "PmInternalImpl.startActivity(): Plugin Disabled. pn=" + plugin);
+                LogDebug.d(PLUGIN_TAG, "PluginLibraryInternalProxy.startActivity(): Plugin Disabled. pn=" + plugin);
             }
             return RePlugin.getConfig().getCallbacks().onPluginNotExistsForActivity(context, plugin, intent, process);
         }
@@ -273,7 +291,6 @@ class PmInternalImpl implements IPluginActivityManager {
      * @param requestCode 请求码
      * @param options     附加的数据
      */
-    @Override
     public boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
         String plugin = getPluginName(activity, intent);
 
@@ -353,7 +370,13 @@ class PmInternalImpl implements IPluginActivityManager {
         return false;
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 插件的Activity创建成功后通过此方法获取其base context
+     * @param activity
+     * @param newBase
+     * @return 为Activity构造一个base Context
+     */
     public Context createActivityContext(Activity activity, Context newBase) {
 //        PluginContainers.ActivityState state = mPluginMgr.mClient.mACM.lookupLastLoading(activity.getClass().getName());
 //        if (state == null) {
@@ -376,7 +399,12 @@ class PmInternalImpl implements IPluginActivityManager {
         return plugin.mLoader.createBaseContext(newBase);
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 插件的Activity的onCreate调用前调用此方法
+     * @param activity
+     * @param savedInstanceState
+     */
     public void handleActivityCreateBefore(Activity activity, Bundle savedInstanceState) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "activity create before: " + activity.getClass().getName() + " this=" + activity.hashCode() + " taskid=" + activity.getTaskId());
@@ -404,7 +432,12 @@ class PmInternalImpl implements IPluginActivityManager {
         }
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 插件的Activity的onCreate调用后调用此方法
+     * @param activity
+     * @param savedInstanceState
+     */
     public void handleActivityCreate(Activity activity, Bundle savedInstanceState) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "activity create: " + activity.getClass().getName() + " this=" + activity.hashCode() + " taskid=" + activity.getTaskId());
@@ -490,7 +523,12 @@ class PmInternalImpl implements IPluginActivityManager {
         ActivityInjector.inject(activity, state.plugin, state.activity);
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 插件的Activity的onRestoreInstanceState调用后调用此方法
+     * @param activity
+     * @param savedInstanceState
+     */
     public void handleRestoreInstanceState(Activity activity, Bundle savedInstanceState) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "activity restore instance state: " + activity.getClass().getName());
@@ -512,7 +550,11 @@ class PmInternalImpl implements IPluginActivityManager {
         }
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 插件的Activity的onDestroy调用后调用此方法
+     * @param activity
+     */
     public void handleActivityDestroy(Activity activity) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "activity destroy: " + activity.getClass().getName() + " this=" + activity.hashCode() + " taskid=" + activity.getTaskId());
@@ -550,17 +592,30 @@ class PmInternalImpl implements IPluginActivityManager {
         RePlugin.getConfig().getEventCallbacks().onActivityDestroyed(activity);
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 插件的Service的onCreate调用后调用此方法
+     * @param service
+     */
     public void handleServiceCreate(Service service) {
         mPluginMgr.handleServiceCreated(service);
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 插件的Service的onDestroy调用后调用此方法
+     * @param service
+     */
     public void handleServiceDestroy(Service service) {
         mPluginMgr.handleServiceDestroyed(service);
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 返回所有插件的json串，格式见plugins-builtin.json文件
+     * @param name 插件名，传null或者空串表示获取全部
+     * @return
+     */
     public JSONArray fetchPlugins(String name) {
         JSONArray ja = new JSONArray();
         synchronized (PluginTable.PLUGINS) {
@@ -574,22 +629,39 @@ class PmInternalImpl implements IPluginActivityManager {
         return ja;
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 登记动态映射的类(6.5.0 later)
+     * @param className 壳类名
+     * @param plugin 目标插件名
+     * @param type 目标类的类型: activity, service, provider
+     * @param target 目标类名
+     * @return
+     */
     public boolean registerDynamicClass(String className, String plugin, String type, String target) {
         return mPluginMgr.addDynamicClass(className, plugin, type, target, null);
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 登记动态映射的类(7.7.0 later)
+     */
     public boolean registerDynamicClass(String className, String plugin, String target, Class defClass) {
         return mPluginMgr.addDynamicClass(className, plugin, "", target, defClass);
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 查询某个类是否是动态映射的类(7.7.0 later)
+     */
     public boolean isDynamicClass(String plugin, String className) {
         return mPluginMgr.isDynamicClass(plugin, className);
     }
 
-    @Override
+    /**
+     * @hide 内部方法，插件框架使用
+     * 查询某个动态映射的类对应的插件(7.7.0 later)
+     */
     public String getPluginByDynamicClass(String className) {
         return mPluginMgr.getPluginByDynamicClass(className);
     }
