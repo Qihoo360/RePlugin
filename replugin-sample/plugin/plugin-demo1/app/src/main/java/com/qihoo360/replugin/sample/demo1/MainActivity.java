@@ -41,6 +41,7 @@ import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.common.utils.TimeUtils;
 import com.qihoo360.replugin.sample.demo1.activity.single_instance.TIActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.single_top.SingleTopActivity1;
+import com.qihoo360.replugin.sample.demo1.activity.standard.StandardActivity;
 import com.qihoo360.replugin.sample.demo1.activity.task_affinity.TAActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarActivity;
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarFullscreenActivity;
@@ -76,6 +77,13 @@ public class MainActivity extends Activity {
         // =========
         // Activity
         // =========
+        mItems.add(new TestItem("Activity: Standard", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), StandardActivity.class);
+                v.getContext().startActivity(intent);
+            }
+        }));
         mItems.add(new TestItem("Activity: Theme BlackNoTitleBar", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
