@@ -126,6 +126,15 @@ public class MainActivity extends Activity {
                 v.getContext().startActivity(intent);
             }
         }));
+        mItems.add(new TestItem("Activity: Open in Application", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context app = v.getContext().getApplicationContext();
+                Intent intent = new Intent(app, ThemeDialogActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                app.startActivity(intent);
+            }
+        }));
         mItems.add(new TestItem("Activity: By Intent Filter", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
