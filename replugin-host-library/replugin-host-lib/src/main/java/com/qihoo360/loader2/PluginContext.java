@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewStub;
 
+import com.qihoo360.i.Factory2;
 import com.qihoo360.loader.utils2.FilePermissionUtils;
 import com.qihoo360.replugin.ContextInjector;
 import com.qihoo360.replugin.RePlugin;
@@ -448,14 +449,23 @@ public class PluginContext extends ContextThemeWrapper {
 
     @Override
     public void startActivity(Intent intent) {
-        if (mContextInjector != null) {
-            mContextInjector.startActivityBefore(intent);
-        }
+        // HINT 只有插件Application才会走这里
+        // 而Activity.startActivity系统最终会走startActivityForResult，不会走这儿
 
-        super.startActivity(intent);
+        // 这里会被调用两次：
+        // 第一次：获取各种信息，最终确认坑位，并走startActivity，再次回到这里
+        // 第二次：判断要打开的是“坑位Activity”，则返回False，直接走super，后面的事情你们都懂的
+        // 当然，如果在获取坑位信息时遇到任何情况（例如要打开的是宿主的Activity），则直接返回false，走super
+        if (!Factory2.startActivity(this, intent)) {
+            if (mContextInjector != null) {
+                mContextInjector.startActivityBefore(intent);
+            }
 
-        if (mContextInjector != null) {
-            mContextInjector.startActivityAfter(intent);
+            super.startActivity(intent);
+
+            if (mContextInjector != null) {
+                mContextInjector.startActivityAfter(intent);
+            }
         }
     }
 

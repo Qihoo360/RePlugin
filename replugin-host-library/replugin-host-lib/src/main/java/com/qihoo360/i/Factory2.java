@@ -111,6 +111,18 @@ public final class Factory2 {
      * @hide 内部方法，插件框架使用
      * 启动一个插件中的activity
      * 通过Extra参数IPluginManager.KEY_COMPATIBLE，IPluginManager.KEY_PLUGIN，IPluginManager.KEY_ACTIVITY，IPluginManager.KEY_PROCESS控制
+     * @param context Context上下文
+     * @param intent
+     * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
+     */
+    public static final boolean startActivity(Context context, Intent intent) {
+        return sPLProxy.startActivity(context, intent);
+    }
+
+    /**
+     * @hide 内部方法，插件框架使用
+     * 启动一个插件中的activity
+     * 通过Extra参数IPluginManager.KEY_COMPATIBLE，IPluginManager.KEY_PLUGIN，IPluginManager.KEY_ACTIVITY，IPluginManager.KEY_PROCESS控制
      * @param activity Activity上下文
      * @param intent
      * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑

@@ -68,89 +68,86 @@ public class PluginLibraryInternalProxy {
      * @hide 内部方法，插件框架使用
      * 启动一个插件中的activity
      * 通过Extra参数IPluginManager.KEY_COMPATIBLE，IPluginManager.KEY_PLUGIN，IPluginManager.KEY_ACTIVITY，IPluginManager.KEY_PROCESS控制
-     * @param activity Activity上下文
+     * @param context Context上下文
      * @param intent
      * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
      */
-    public boolean startActivity(Activity activity, Intent intent) {
+    public boolean startActivity(Context context, Intent intent) {
         if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "start activity: intent=" + intent);
+            LogDebug.d(PLUGIN_TAG, "start context: intent=" + intent);
         }
 
         // 兼容模式，直接使用标准方式启动
         if (intent.getBooleanExtra(IPluginManager.KEY_COMPATIBLE, false)) {
             PmBase.cleanIntentPluginParams(intent);
             if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "start activity: COMPATIBLE is true, direct start");
+                LogDebug.d(PLUGIN_TAG, "start context: COMPATIBLE is true, direct start");
             }
             return false;
         }
 
-        // 获取插件名，有两种途径：
-        // 1. 从Intent里取。通常是明确知道要打开的插件时会用
-        // 2. 根据当前Activity的坑位名来“反查”其插件名。通常是插件内开启自己的Activity时用到
-        String plugin = intent.getStringExtra(IPluginManager.KEY_PLUGIN);
-
-        /* 检查是否是动态注册的类 */
-        // 如果要启动的 Activity 是动态注册的类，则直接启动，不经过 SDK。
-        ComponentName componentName = activity.getComponentName();
-        if (LogDebug.LOG) {
-            LogDebug.d("loadClass", "isHookingClass(" + plugin + "," + componentName.getClassName() + ") = "
-                    + isDynamicClass(plugin, componentName.getClassName()));
-        }
-        if (isDynamicClass(plugin, componentName.getClassName())) {
-            intent.setComponent(new ComponentName(IPC.getPackageName(), componentName.getClassName()));
-            activity.startActivity(intent);
-            return true;
-        }
-
-        if (TextUtils.isEmpty(plugin)) {
-            //
-            PluginContainers.ActivityState state = null;
-            if (activity.getComponentName() != null) {
-                state = mPluginMgr.mClient.mACM.lookupByContainer(activity.getComponentName().getClassName());
-            }
-            if (state != null) {
-                plugin = state.plugin;
-            }
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "start activity: custom plugin is empty, query plugin=" + plugin);
-            }
-        }
-
-        // 从 ClassLoader 获取插件名称
-        if (TextUtils.isEmpty(plugin)) {
-            plugin = Factory.fetchPluginName(activity.getClassLoader());
-        }
-
         // 获取Activity的名字，有两种途径：
         // 1. 从Intent里取。通常是明确知道要打开的插件的Activity时会用
-        // 2. 从Intent的ComponentName中获取，同上
+        // 2. 从Intent的ComponentName中获取
         String name = intent.getStringExtra(IPluginManager.KEY_ACTIVITY);
         if (TextUtils.isEmpty(name)) {
             ComponentName cn = intent.getComponent();
             if (cn != null) {
                 name = cn.getClassName();
                 if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "start activity: custom activity=" + activity);
+                    LogDebug.d(PLUGIN_TAG, "start context: custom context=" + context);
                 }
             }
         }
 
-        // 插件名和Activity名，只要缺少一样，就表示打开的Activity可能是宿主的。直接打开即可
-        if (TextUtils.isEmpty(plugin)) {
+        // 已经是标准坑了（例如N1ST1这样的），则无需再过“坑位分配”逻辑，直接使用标准方式启动
+        if (mPluginMgr.isActivity(name)) {
             PmBase.cleanIntentPluginParams(intent);
             if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "start activity: plugin and activity is empty, direct start");
+                LogDebug.d(PLUGIN_TAG, "start context: context is container, direct start");
             }
             return false;
         }
 
-        // 已经是标准坑了，直接使用标准方式启动
-        if (mPluginMgr.isActivity(name)) {
+        // 获取插件名，有三种途径：
+        // 1. 从Intent里取。通常是明确知道要打开的插件时会用
+        // 2. 根据当前Activity的坑位名来“反查”其插件名。通常是插件内开启自己的Activity时用到
+        // 3. 通过获得Context的类加载器来判断其插件名
+        String plugin = intent.getStringExtra(IPluginManager.KEY_PLUGIN);
+
+        /* 检查是否是动态注册的类 */
+        // 如果要启动的 Activity 是动态注册的类，则直接启动，不经过 SDK。
+        ComponentName componentName = intent.getComponent();
+        if (LogDebug.LOG) {
+            LogDebug.d("loadClass", "isHookingClass(" + plugin + "," + componentName.getClassName() + ") = "
+                    + isDynamicClass(plugin, componentName.getClassName()));
+        }
+        if (isDynamicClass(plugin, componentName.getClassName())) {
+            intent.setComponent(new ComponentName(IPC.getPackageName(), componentName.getClassName()));
+            context.startActivity(intent);
+            return false;
+        }
+
+        if (TextUtils.isEmpty(plugin)) {
+            // 看下Context是否为Activity，如是则直接从坑位中获取插件名（最准确）
+            if (context instanceof Activity) {
+                plugin = fetchPluginByPitActivity((Activity) context);
+            }
+            if (LOG) {
+                LogDebug.d(PLUGIN_TAG, "start context: custom plugin is empty, query plugin=" + plugin);
+            }
+        }
+
+        // 没拿到插件名？再从 ClassLoader 获取插件名称（兜底）
+        if (TextUtils.isEmpty(plugin)) {
+            plugin = RePlugin.fetchPluginNameByClassLoader(context.getClassLoader());
+        }
+
+        // 仍然拿不到插件名？（例如从宿主中调用），则打开的Activity可能是宿主的。直接使用标准方式启动
+        if (TextUtils.isEmpty(plugin)) {
             PmBase.cleanIntentPluginParams(intent);
             if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "start activity: activity is container, direct start");
+                LogDebug.d(PLUGIN_TAG, "start context: plugin and context is empty, direct start");
             }
             return false;
         }
@@ -161,7 +158,21 @@ public class PluginLibraryInternalProxy {
         PmBase.cleanIntentPluginParams(intent);
 
         // 调用“特殊版”的startActivity，不让自动填写ComponentName，防止外界再用时出错
-        return Factory.startActivityWithNoInjectCN(activity, intent, plugin, name, process);
+        return Factory.startActivityWithNoInjectCN(context, intent, plugin, name, process);
+    }
+
+    // 通过Activity坑位来获取插件名
+    private String fetchPluginByPitActivity(Activity a) {
+        PluginContainers.ActivityState state = null;
+        if (a.getComponentName() != null) {
+            state = mPluginMgr.mClient.mACM.lookupByContainer(a.getComponentName().getClassName());
+        }
+
+        if (state != null) {
+            return state.plugin;
+        } else {
+            return null;
+        }
     }
 
     // FIXME 建议去掉plugin和activity参数，直接用intent代替
