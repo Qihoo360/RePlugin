@@ -230,7 +230,22 @@ public class MainActivity extends Activity {
         // =========
         // Communication
         // =========
-        mItems.add(new TestItem("ClassLoader: Reflection (to Demo2, Recommend)", new View.OnClickListener() {
+        mItems.add(new TestItem("Use Host Method: Direct use (Ex. TimeUtils)", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 此为RePlugin的另一种做法，可直接调用宿主的Utils
+                // 虽然不是很推荐（版本控制问题，见FAQ），但毕竟需求较大，且我们是“相对安全的共享代码”方案，故可以使用
+                final String curTime = TimeUtils.getNowString();
+                if (!TextUtils.isEmpty(curTime)) {
+                    Toast.makeText(v.getContext(), "current time: " + TimeUtils.getNowString(), Toast.LENGTH_SHORT).show();
+                    // 打印其ClassLoader
+                    Log.d("MainActivity", "Use Host Method: cl=" + TimeUtils.class.getClassLoader());
+                } else {
+                    Toast.makeText(v.getContext(), "Failed to obtain current time(from host)", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }));
+        mItems.add(new TestItem("Use Demo2 Method: Reflection (Recommend)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 这是RePlugin的推荐玩法：反射调用Demo2，这样"天然的"做好了"版本控制"
@@ -281,21 +296,6 @@ public class MainActivity extends Activity {
                     demo2.hello("helloooooooooooo");
                 } catch (RemoteException e) {
                     e.printStackTrace();
-                }
-            }
-        }));
-
-        // =========
-        // 使用Host公共库
-        // =========
-        mItems.add(new TestItem("Current time (Use common-lib from host)", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String curTime = TimeUtils.getNowString();
-                if (!TextUtils.isEmpty(curTime)) {
-                    Toast.makeText(v.getContext(), "current time: " + TimeUtils.getNowString(), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(v.getContext(), "Failed to obtain current time(from host)", Toast.LENGTH_SHORT).show();
                 }
             }
         }));

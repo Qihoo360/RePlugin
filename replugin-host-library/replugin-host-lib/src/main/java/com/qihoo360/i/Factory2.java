@@ -205,6 +205,10 @@ public final class Factory2 {
         return sPLProxy.isDynamicClass(plugin, className);
     }
 
+    public static void unregisterDynamicClass(String source) {
+        sPLProxy.unregisterDynamicClass(source);
+    }
+
     /**
      * @hide 内部方法，插件框架调用
      * 根据动态注册的类，反查此类对应的插件名称

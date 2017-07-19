@@ -997,6 +997,22 @@ public class RePlugin {
     }
 
     /**
+     * 取消对某个“跳转”类的注册，恢复原状。<p>
+     * 请参见 registerHookingClass 的详细说明
+     *
+     * @param source   要替换的类的全名
+     * @see #registerHookingClass(String, ComponentName, Class)
+     * @since 2.1.6
+     */
+    public static void unregisterHookingClass(String source) {
+        if (!RePluginFramework.mHostInitialized) {
+            return;
+        }
+
+        ProxyRePluginVar.unregisterHookingClass.call(null, source);
+    }
+
+    /**
      * 注册一个可供其他模块调用的IBinder，供IPlugin.query使用
      *
      * @param name 注册的IBinder名
@@ -1108,6 +1124,8 @@ public class RePlugin {
 
         private static MethodInvoker isHookingClass;
 
+        private static MethodInvoker unregisterHookingClass;
+
         static void initLocked(final ClassLoader classLoader) {
 
             // 初始化Replugin的相关方法
@@ -1163,6 +1181,7 @@ public class RePlugin {
             getGlobalBinder = new MethodInvoker(classLoader, rePlugin, "getGlobalBinder", new Class<?>[]{String.class});
             registerHookingClass = new MethodInvoker(classLoader, rePlugin, "registerHookingClass", new Class<?>[]{String.class, ComponentName.class, Class.class});
             isHookingClass = new MethodInvoker(classLoader, rePlugin, "isHookingClass", new Class<?>[]{ComponentName.class});
+            unregisterHookingClass = new MethodInvoker(classLoader, rePlugin, "unregisterHookingClass", new Class<?>[]{String.class});
         }
     }
 }

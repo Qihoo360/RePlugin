@@ -450,6 +450,10 @@ class PmBase {
         return false;
     }
 
+    final void removeDynamicClass(String className) {
+        mDynamicClasses.remove(className);
+    }
+
     /**
      * 返回 className 对应的 插件名称
      *

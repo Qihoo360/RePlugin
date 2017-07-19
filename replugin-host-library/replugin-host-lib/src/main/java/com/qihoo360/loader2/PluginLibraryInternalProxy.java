@@ -671,6 +671,14 @@ public class PluginLibraryInternalProxy {
 
     /**
      * @hide 内部方法，插件框架使用
+     * 取消动态映射类的注册
+     */
+    public void unregisterDynamicClass(String className) {
+        mPluginMgr.removeDynamicClass(className);
+    }
+
+    /**
+     * @hide 内部方法，插件框架使用
      * 查询某个动态映射的类对应的插件(7.7.0 later)
      */
     public String getPluginByDynamicClass(String className) {
