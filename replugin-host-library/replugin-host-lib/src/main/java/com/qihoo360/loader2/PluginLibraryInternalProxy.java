@@ -689,7 +689,7 @@ public class PluginLibraryInternalProxy {
         int dynamicThemeId = getDynamicThemeId(activity);
 
         // 插件 manifest 中设置的 ThemeId
-        int manifestThemeId = intent.getIntExtra(PmLocalImpl.INTENT_KEY_THEME_ID, 0);
+        int manifestThemeId = intent.getIntExtra(PluginCommImpl.INTENT_KEY_THEME_ID, 0);
         //如果插件上没有主题则使用Application节点的Theme
         if (manifestThemeId == 0) {
             manifestThemeId = activity.getApplicationInfo().theme;

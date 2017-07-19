@@ -26,7 +26,6 @@ import android.text.TextUtils;
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.Factory2;
 import com.qihoo360.i.IModule;
-import com.qihoo360.i.IPluginManager;
 import com.qihoo360.loader.utils.PatchClassLoaderUtils;
 import com.qihoo360.replugin.helper.LogRelease;
 
@@ -104,7 +103,7 @@ public class PMF {
     /**
      * @return
      */
-    public static final IPluginManager getLocal() {
+    public static final PluginCommImpl getLocal() {
         return sPluginMgr.mLocal;
     }
 

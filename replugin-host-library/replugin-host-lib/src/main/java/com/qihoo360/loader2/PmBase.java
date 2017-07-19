@@ -159,7 +159,7 @@ class PmBase {
     /**
      *
      */
-    IPluginManager mLocal;
+    PluginCommImpl mLocal;
 
     /**
      *
@@ -221,7 +221,7 @@ class PmBase {
         mClient = new PluginProcessPer(context, this, PluginManager.sPluginProcessIndex, mContainerActivities);
 
         //
-        mLocal = new PmLocalImpl(context, this);
+        mLocal = new PluginCommImpl(context, this);
 
         //
         mInternal = new PluginLibraryInternalProxy(this);
@@ -997,17 +997,17 @@ class PmBase {
                 (info.getPendingUpdate() != null && !RePlugin.isPluginRunning(info.getName()));
     }
 
-    final Plugin loadPackageInfoPlugin(String plugin, IPluginManager pm) {
+    final Plugin loadPackageInfoPlugin(String plugin, PluginCommImpl pm) {
         Plugin p = Plugin.cloneAndReattach(mContext, mPlugins.get(plugin), mClassLoader, pm);
         return loadPlugin(p, Plugin.LOAD_INFO, true);
     }
 
-    final Plugin loadResourcePlugin(String plugin, IPluginManager pm) {
+    final Plugin loadResourcePlugin(String plugin, PluginCommImpl pm) {
         Plugin p = Plugin.cloneAndReattach(mContext, mPlugins.get(plugin), mClassLoader, pm);
         return loadPlugin(p, Plugin.LOAD_RESOURCES, true);
     }
 
-    final Plugin loadDexPlugin(String plugin, IPluginManager pm) {
+    final Plugin loadDexPlugin(String plugin, PluginCommImpl pm) {
         Plugin p = Plugin.cloneAndReattach(mContext, mPlugins.get(plugin), mClassLoader, pm);
         return loadPlugin(p, Plugin.LOAD_DEX, true);
     }
@@ -1017,7 +1017,7 @@ class PmBase {
     }
 
     // 底层接口
-    final Plugin loadPlugin(PluginInfo pi, IPluginManager pm, int loadType, boolean useCache) {
+    final Plugin loadPlugin(PluginInfo pi, PluginCommImpl pm, int loadType, boolean useCache) {
         Plugin p = Plugin.build(pi);
         p.attach(mContext, mClassLoader, pm);
         return loadPlugin(p, loadType, useCache);
