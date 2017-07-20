@@ -52,6 +52,12 @@ android {
 
 // 这个plugin需要放在android配置之后，因为需要读取android中的配置项
 apply plugin: 'replugin-plugin-gradle'
+repluginPluginConfig {
+    pluginName = "demo1"
+    hostApplicationId = "com.qihoo360.replugin.sample.host"
+    hostAppLauncherActivity = "com.qihoo360.replugin.sample.host.MainActivity"
+}
+
 dependencies {
     compile 'com.qihoo360.replugin:replugin-plugin-lib:2.1.5'
     provided files('libs/fragment.jar')//这个jar就是从Support-fragment中提取出来的并非特制包目的是为了骗过编译期
