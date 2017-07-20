@@ -63,7 +63,7 @@ public class MethodInvoker {
                 mAvailable = true;
             } catch (Exception e) {
                 if (LogDebug.LOG) {
-                    LogDebug.d(TAG, "get method error !!!", e);
+                    LogDebug.d(TAG, "get method error !!! (Maybe the version of replugin-host-lib is too low)", e);
                 }
             }
         }
@@ -73,7 +73,7 @@ public class MethodInvoker {
                 return ReflectUtils.invokeMethod(mMethod, methodReceiver, methodParamValues);
             } catch (Exception e) {
                 if (LogDebug.LOG) {
-                    LogDebug.d(TAG, "invoker method error !!!", e);
+                    LogDebug.d(TAG, "invoker method error !!! (Maybe the version of replugin-host-lib is too low)", e);
                 }
             }
         }

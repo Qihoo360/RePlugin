@@ -84,6 +84,7 @@ public class RePluginCallbacks {
      * @param plugin  要打开Activity的插件名，这样可知道要“下载”哪个插件
      * @param intent  要打开的Activity的Intent信息
      * @param process 要打开的Activity所在进程
+     * @return 若为true，则表示“我们已弹出下载界面”，则不会走后面的逻辑。若返回false则直接抛出ActivityNotFoundException
      */
     public boolean onPluginNotExistsForActivity(Context context, String plugin, Intent intent, int process) {
         // Nothing

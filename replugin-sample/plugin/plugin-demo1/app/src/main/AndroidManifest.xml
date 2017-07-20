@@ -47,6 +47,12 @@
             </intent-filter>
         </activity>
 
+        <!-- 最简Activity -->
+        <activity
+            android:name=".activity.standard.StandardActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- theme 测试 -->
         <activity
             android:name=".activity.theme.ThemeBlackNoTitleBarActivity"
