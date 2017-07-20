@@ -352,7 +352,17 @@ class PmBase {
             return;
         }
         for (PluginInfo info : plugins) {
-            mPlugins.put(info.getName(), Plugin.build(info));
+            Plugin plugin = Plugin.build(info);
+            putPluginObject(info, plugin);
+        }
+    }
+
+    private void putPluginObject(PluginInfo info, Plugin plugin) {
+        // 同时加入PackageName和Alias（如有）
+        mPlugins.put(info.getPackageName(), plugin);
+        if (!TextUtils.isEmpty(info.getAlias())) {
+            // 即便Alias和包名相同也可以再Put一次，反正只是覆盖了相同Value而已
+            mPlugins.put(info.getAlias(), plugin);
         }
     }
 
@@ -1087,7 +1097,9 @@ class PmBase {
             }
             Plugin plugin = Plugin.build(info);
             plugin.attach(mContext, mClassLoader, mLocal);
-            mPlugins.put(info.getName(), plugin);
+
+            // 同时加入PackageName和Alias（如有）
+            putPluginObject(info, plugin);
         }
     }
 

@@ -37,13 +37,15 @@ public class MainActivity extends Activity {
         findViewById(R.id.btn_start_demo1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RePlugin.startActivity(MainActivity.this, RePlugin.createIntent("demo1", "com.qihoo360.replugin.sample.demo1.MainActivity"));
+                // 刻意以“包名”来打开
+                RePlugin.startActivity(MainActivity.this, RePlugin.createIntent("com.qihoo360.replugin.sample.demo1", "com.qihoo360.replugin.sample.demo1.MainActivity"));
             }
         });
 
         findViewById(R.id.btn_start_plugin_for_result).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 刻意以“Alias（别名）”来打开
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName("demo1", "com.qihoo360.replugin.sample.demo1.activity.for_result.ForResultActivity"));
                 RePlugin.startActivityForResult(MainActivity.this, intent, REQUEST_CODE_DEMO1, null);

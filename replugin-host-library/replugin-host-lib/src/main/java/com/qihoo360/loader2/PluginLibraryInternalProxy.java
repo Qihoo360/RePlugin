@@ -41,6 +41,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import static com.qihoo360.i.Factory.loadPluginActivity;
@@ -634,9 +635,11 @@ public class PluginLibraryInternalProxy {
      * @return
      */
     public JSONArray fetchPlugins(String name) {
+        // 先获取List，然后再逐步搞JSON
+        List<PluginInfo> l = MP.getPlugins(false);
         JSONArray ja = new JSONArray();
         synchronized (PluginTable.PLUGINS) {
-            for (PluginInfo info : PluginTable.PLUGINS.values()) {
+            for (PluginInfo info : l) {
                 if (TextUtils.isEmpty(name) || TextUtils.equals(info.getName(), name)) {
                     JSONObject jo = info.getJSON();
                     ja.put(jo);
