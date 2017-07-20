@@ -29,13 +29,6 @@
             {'from':'com.qihoo360.replugin.sample.demo1:bg','to':'$p0'}
             ]" />
 
-        <meta-data
-            android:name="com.qihoo360.plugin.name"
-            android:value="demo1" />
-        <meta-data
-            android:name="com.qihoo360.plugin.version.ver"
-            android:value="100" />
-
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
