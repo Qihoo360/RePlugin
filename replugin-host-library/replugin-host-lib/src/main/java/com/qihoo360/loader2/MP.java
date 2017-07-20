@@ -327,7 +327,11 @@ public class MP {
                 } else {
                     addTo = info;
                 }
-                array.add(addTo);
+
+                // 避免加了两次，毕竟包名和别名都会加进来
+                if (!array.contains(addTo)) {
+                    array.add(addTo);
+                }
             }
         }
         return array;

@@ -16,13 +16,14 @@
 
 package com.qihoo360.loader2;
 
+import android.text.TextUtils;
+
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.model.PluginInfo;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,8 @@ class PluginTable {
     static final void dump(FileDescriptor fd, PrintWriter writer, String[] args) {
         if (LogDebug.DUMP_ENABLED) {
             writer.println("--- PluginTable.size = " + PLUGINS.size() + " ---");
-            for (PluginInfo r : PLUGINS.values()) {
+            List<PluginInfo> l = MP.getPlugins(false);
+            for (PluginInfo r : l) {
                 writer.println(r);
             }
             writer.println();
@@ -53,7 +55,7 @@ class PluginTable {
     static final void initPlugins(Map<String, Plugin> plugins) {
         synchronized (PLUGINS) {
             for (Plugin plugin : plugins.values()) {
-                PLUGINS.put(plugin.mInfo.getName(), plugin.mInfo);
+                putPluginInfo(plugin.mInfo);
             }
         }
     }
@@ -73,7 +75,7 @@ class PluginTable {
             }
 
             // 此处直接使用该插件，没有考虑是否只采用最新版
-            PLUGINS.put(info.getName(), info);
+            putPluginInfo(info);
         }
     }
 
@@ -84,7 +86,7 @@ class PluginTable {
             pi = PLUGINS.get(info.getName());
             if (pi != null) {
                 if (pi.canReplaceForPn(info)) {
-                    PLUGINS.put(info.getName(), info);
+                    putPluginInfo(info);
                     rc = true;
                 }
             }
@@ -100,7 +102,7 @@ class PluginTable {
         synchronized (PLUGINS) {
             pi = PLUGINS.get(info.getName());
             if (pi != null) {
-                PLUGINS.remove(info.getName());
+                removePluginInfo(info);
                 rc = true;
             }
         }
@@ -120,16 +122,25 @@ class PluginTable {
             LogDebug.d(PLUGIN_TAG, "build plugins");
         }
 
-        synchronized (PLUGINS) {
-            ArrayList<PluginInfo> lst = new ArrayList<PluginInfo>(PLUGINS.size());
-            for (PluginInfo p : PLUGINS.values()) {
-                lst.add(p);
-            }
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "build " + lst.size() + " plugins");
-            }
-            return lst;
+        List<PluginInfo> lst = MP.getPlugins(false);
+        if (LOG) {
+            LogDebug.d(PLUGIN_TAG, "build " + lst.size() + " plugins");
         }
+        return lst;
+    }
+
+    private static void putPluginInfo(PluginInfo info) {
+        // 同时加入PackageName和Alias（如有）
+        PLUGINS.put(info.getPackageName(), info);
+        if (!TextUtils.isEmpty(info.getAlias())) {
+            // 即便Alias和包名相同也可以再Put一次，反正只是覆盖了相同Value而已
+            PLUGINS.put(info.getAlias(), info);
+        }
+    }
+
+    private static void removePluginInfo(PluginInfo info) {
+        PLUGINS.remove(info.getPackageName());
+        PLUGINS.remove(info.getAlias());
     }
 
 //    /**
