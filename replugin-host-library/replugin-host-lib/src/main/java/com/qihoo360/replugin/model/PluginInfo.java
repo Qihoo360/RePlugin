@@ -79,9 +79,7 @@ public class PluginInfo implements Parcelable, Cloneable {
     public static final int TYPE_PN_INSTALLED = 1;
 
     /**
-     * 内建插件
-     *
-     * @deprecated 只用于旧的P-n插件，可能会废弃
+     * 内置插件
      */
     public static final int TYPE_BUILTIN = 2;
 

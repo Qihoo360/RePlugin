@@ -34,6 +34,7 @@ import com.qihoo360.replugin.component.utils.ApkCommentReader;
 import com.qihoo360.replugin.component.utils.IntentMatcherHelper;
 import com.qihoo360.replugin.ext.parser.ApkParser;
 import com.qihoo360.replugin.helper.LogDebug;
+import com.qihoo360.replugin.model.PluginInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +93,7 @@ public class ComponentList {
      * 初始化ComponentList对象 <p>
      * 注意：仅框架内部使用
      */
-    public ComponentList(PackageInfo pi, String path, String plugin) {
+    public ComponentList(PackageInfo pi, String path, PluginInfo pli) {
         if (pi.activities != null) {
             for (ActivityInfo ai : pi.activities) {
                 if (LOG) {
@@ -157,11 +158,11 @@ public class ComponentList {
         String manifest = getManifestFromApk(path);
 
         if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "\n解析插件 " + plugin + " : " + path + "\nAndroidManifest: \n" + manifest);
+            LogDebug.d(PLUGIN_TAG, "\n解析插件 " + pli.getName() + " : " + path + "\nAndroidManifest: \n" + manifest);
         }
 
         // 生成组件与 IntentFilter 的对应关系
-        ManifestParser.INS.parse(plugin, manifest);
+        ManifestParser.INS.parse(pli, manifest);
 
         mApplication = pi.applicationInfo;
 

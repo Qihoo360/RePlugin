@@ -739,11 +739,11 @@ class Plugin {
                     return false;
                 }
                 File file = new File(dir, dstName);
-                info = PluginInfo.build(file);
-                if (info == null) {
-                    return false;
-                }
-                // 不会改变
+                info = (PluginInfo) mInfo.clone();
+                info.setPath(file.getPath());
+
+                // FIXME 不应该是P-N，即便目录相同，未来会优化这里
+                info.setType(PluginInfo.TYPE_PN_INSTALLED);
 
             } else if (mInfo.getType() == PluginInfo.TYPE_PN_JAR) {
                 //

@@ -21,6 +21,7 @@ import android.os.PatternMatcher;
 
 import com.qihoo360.mobilesafe.parser.manifest.bean.ComponentBean;
 import com.qihoo360.replugin.helper.LogDebug;
+import com.qihoo360.replugin.model.PluginInfo;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -67,28 +68,33 @@ public enum ManifestParser {
     /**
      * 解析 AndroidManifest
      *
-     * @param plugin      插件名称
+     * @param pli      插件信息
      * @param manifestStr AndroidManifest.xml 字符串
      */
-    public void parse(String plugin, String manifestStr) {
+    public void parse(PluginInfo pli, String manifestStr) {
         XmlHandler handler = parseManifest(manifestStr);
 
         Map<String, List<IntentFilter>> activityFilterMap = new HashMap<>();
-        mPluginActivityInfoMap.put(plugin, activityFilterMap);
-        parseComponent(plugin, activityFilterMap, handler.getActivities(), mActivityActionPluginsMap);
+        putToMap(mPluginActivityInfoMap, activityFilterMap, pli);
+        parseComponent(pli.getName(), activityFilterMap, handler.getActivities(), mActivityActionPluginsMap);
 
         Map<String, List<IntentFilter>> serviceFilterMap = new HashMap<>();
-        mPluginServiceInfoMap.put(plugin, serviceFilterMap);
-        parseComponent(plugin, serviceFilterMap, handler.getServices(), mServiceActionPluginsMap);
+        putToMap(mPluginServiceInfoMap, serviceFilterMap, pli);
+        parseComponent(pli.getName(), serviceFilterMap, handler.getServices(), mServiceActionPluginsMap);
 
         Map<String, List<IntentFilter>> receiverFilterMap = new HashMap<>();
-        mPluginReceiverInfoMap.put(plugin, receiverFilterMap);
-        parseComponent(plugin, receiverFilterMap, handler.getReceivers(), null);
+        putToMap(mPluginReceiverInfoMap, receiverFilterMap, pli);
+        parseComponent(pli.getName(), receiverFilterMap, handler.getReceivers(), null);
 
         /* 打印日志 */
         if (LOG) {
             printFilters(activityFilterMap, serviceFilterMap, receiverFilterMap);
         }
+    }
+
+    private void putToMap(Map<String, Map<String, List<IntentFilter>>> infoMap, Map<String, List<IntentFilter>> filterMap, PluginInfo pi) {
+        infoMap.put(pi.getPackageName(), filterMap);
+        infoMap.put(pi.getAlias(), filterMap);
     }
 
     /**
