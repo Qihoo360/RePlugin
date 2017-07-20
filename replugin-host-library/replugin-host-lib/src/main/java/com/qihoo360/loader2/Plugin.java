@@ -27,7 +27,6 @@ import android.text.TextUtils;
 
 import com.qihoo360.i.IModule;
 import com.qihoo360.i.IPlugin;
-import com.qihoo360.i.IPluginManager;
 import com.qihoo360.loader.utils.AssetsUtils;
 import com.qihoo360.loader.utils.ProcessLocker;
 import com.qihoo360.mobilesafe.api.Tasks;
@@ -133,7 +132,7 @@ class Plugin {
     /**
      *
      */
-    IPluginManager mPluginManager;
+    PluginCommImpl mPluginManager;
 
     /**
      *
@@ -179,7 +178,7 @@ class Plugin {
         return new Plugin(info);
     }
 
-    static final Plugin cloneAndReattach(Context c, Plugin p, ClassLoader parent, IPluginManager pm) {
+    static final Plugin cloneAndReattach(Context c, Plugin p, ClassLoader parent, PluginCommImpl pm) {
         if (p == null) {
             return null;
         }
@@ -381,7 +380,7 @@ class Plugin {
         return super.toString();
     }
 
-    final void attach(Context context, ClassLoader parent, IPluginManager manager) {
+    final void attach(Context context, ClassLoader parent, PluginCommImpl manager) {
         mContext = context;
         mParent = parent;
         mPluginManager = manager;
@@ -601,7 +600,7 @@ class Plugin {
 
         Context context = mContext;
         ClassLoader parent = mParent;
-        IPluginManager manager = mPluginManager;
+        PluginCommImpl manager = mPluginManager;
 
         //
         String logTag = "try1";
@@ -722,7 +721,7 @@ class Plugin {
         return null;
     }
 
-    private final boolean doLoad(String tag, Context context, ClassLoader parent, IPluginManager manager, int load) {
+    private final boolean doLoad(String tag, Context context, ClassLoader parent, PluginCommImpl manager, int load) {
         if (mLoader == null) {
             // 试图释放文件
             PluginInfo info = null;
@@ -839,7 +838,7 @@ class Plugin {
         }
     }
 
-    private boolean loadEntryLocked(IPluginManager manager) {
+    private boolean loadEntryLocked(PluginCommImpl manager) {
         if (mDummyPlugin) {
             if (LOGR) {
                 LogRelease.w(PLUGIN_TAG, "p.lel dm " + mInfo.getName());

@@ -32,7 +32,6 @@ import android.util.Log;
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.IModule;
 import com.qihoo360.i.IPlugin;
-import com.qihoo360.i.IPluginManager;
 import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.mobilesafe.parser.manifest.ManifestParser;
 import com.qihoo360.replugin.RePlugin;
@@ -397,7 +396,7 @@ class Loader {
         return mCreateMethod != null;
     }
 
-    final boolean invoke(IPluginManager manager) {
+    final boolean invoke(PluginCommImpl manager) {
         try {
             mPlugin = (IPlugin) mCreateMethod.invoke(null, mPkgContext, manager);
             if (LOG) {
@@ -447,7 +446,7 @@ class Loader {
         return mCreateMethod2 != null;
     }
 
-    final boolean invoke2(IPluginManager x) {
+    final boolean invoke2(PluginCommImpl x) {
         try {
             IBinder manager = null; // TODO
             IBinder b = (IBinder) mCreateMethod2.invoke(null, mPkgContext, getClass().getClassLoader(), manager);

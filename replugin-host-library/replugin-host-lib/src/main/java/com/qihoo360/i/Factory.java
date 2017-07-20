@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
 
+import com.qihoo360.loader2.PluginCommImpl;
 import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.component.ComponentList;
@@ -118,7 +119,7 @@ public final class Factory {
     /**
      * 参数1：插件上下文，可通过它获取应用上下文
      * 参数2：HOST的类加载器
-     * 参数3：插件管理器 IPluginManager.aidl
+     * 参数3：已废弃
      * 返回：插件 IPlugin.aidl
      * @hide 内部框架使用
      */
@@ -129,7 +130,7 @@ public final class Factory {
     /**
      * @hide 内部框架使用
      */
-    public static IPluginManager sPluginManager;
+    public static PluginCommImpl sPluginManager;
 
     /**
      * @deprecated 新插件框架不再用i接口依赖，此接口已废弃

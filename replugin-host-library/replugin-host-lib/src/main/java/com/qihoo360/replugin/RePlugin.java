@@ -776,6 +776,18 @@ public class RePlugin {
     }
 
     /**
+     * 取消对某个“跳转”类的注册，恢复原状。<p>
+     * 请参见 registerHookingClass 的详细说明
+     *
+     * @param source   要替换的类的全名
+     * @see #registerHookingClass(String, ComponentName, Class)
+     * @since 2.1.6
+     */
+    public static void unregisterHookingClass(String source) {
+        Factory2.unregisterDynamicClass(source);
+    }
+
+    /**
      * 支持将APK转化成p-n-开头的插件（已经在360手机卫士80+个插件验证通过的方案），放入files目录，并返回其路径 <p>
      * 注：由于目前卫士绝大多数插件还是p-n开头的，"纯APK"方案还没有经过大量测试，故这里将加入此接口。 <p>
      * 具体做法： <p>

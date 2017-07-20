@@ -41,6 +41,7 @@ import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.common.utils.TimeUtils;
 import com.qihoo360.replugin.sample.demo1.activity.single_instance.TIActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.single_top.SingleTopActivity1;
+import com.qihoo360.replugin.sample.demo1.activity.standard.StandardActivity;
 import com.qihoo360.replugin.sample.demo1.activity.task_affinity.TAActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarActivity;
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarFullscreenActivity;
@@ -76,6 +77,13 @@ public class MainActivity extends Activity {
         // =========
         // Activity
         // =========
+        mItems.add(new TestItem("Activity: Standard", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), StandardActivity.class);
+                v.getContext().startActivity(intent);
+            }
+        }));
         mItems.add(new TestItem("Activity: Theme BlackNoTitleBar", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +124,15 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), TAActivity1.class);
                 v.getContext().startActivity(intent);
+            }
+        }));
+        mItems.add(new TestItem("Activity: Open in Application", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context app = v.getContext().getApplicationContext();
+                Intent intent = new Intent(app, ThemeDialogActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                app.startActivity(intent);
             }
         }));
         mItems.add(new TestItem("Activity: By Intent Filter", new View.OnClickListener() {
@@ -161,7 +178,15 @@ public class MainActivity extends Activity {
                 RePlugin.startActivity(v.getContext(), intent, "demo2", null);
             }
         }));
-
+        mItems.add(new TestItem("Activity: start Host activity(Main)", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(RePlugin.getHostContext().getPackageName(), "com.qihoo360.replugin.sample.host.MainActivity"));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                MainActivity.this.startActivity(intent);
+            }
+        }));
 
         // =========
         // Other Components
@@ -205,7 +230,22 @@ public class MainActivity extends Activity {
         // =========
         // Communication
         // =========
-        mItems.add(new TestItem("ClassLoader: Reflection (to Demo2, Recommend)", new View.OnClickListener() {
+        mItems.add(new TestItem("Use Host Method: Direct use (Ex. TimeUtils)", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 此为RePlugin的另一种做法，可直接调用宿主的Utils
+                // 虽然不是很推荐（版本控制问题，见FAQ），但毕竟需求较大，且我们是“相对安全的共享代码”方案，故可以使用
+                final String curTime = TimeUtils.getNowString();
+                if (!TextUtils.isEmpty(curTime)) {
+                    Toast.makeText(v.getContext(), "current time: " + TimeUtils.getNowString(), Toast.LENGTH_SHORT).show();
+                    // 打印其ClassLoader
+                    Log.d("MainActivity", "Use Host Method: cl=" + TimeUtils.class.getClassLoader());
+                } else {
+                    Toast.makeText(v.getContext(), "Failed to obtain current time(from host)", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }));
+        mItems.add(new TestItem("Use Demo2 Method: Reflection (Recommend)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 这是RePlugin的推荐玩法：反射调用Demo2，这样"天然的"做好了"版本控制"
@@ -256,21 +296,6 @@ public class MainActivity extends Activity {
                     demo2.hello("helloooooooooooo");
                 } catch (RemoteException e) {
                     e.printStackTrace();
-                }
-            }
-        }));
-
-        // =========
-        // 使用Host公共库
-        // =========
-        mItems.add(new TestItem("Current time (Use common-lib from host)", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String curTime = TimeUtils.getNowString();
-                if (!TextUtils.isEmpty(curTime)) {
-                    Toast.makeText(v.getContext(), "current time: " + TimeUtils.getNowString(), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(v.getContext(), "Failed to obtain current time(from host)", Toast.LENGTH_SHORT).show();
                 }
             }
         }));

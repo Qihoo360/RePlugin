@@ -50,9 +50,12 @@ import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
 
 /**
+ * 负责宿主与插件、插件间的互通，可通过插件的Factory直接调用，也可通过RePlugin来跳转 <p>
+ * TODO 原名为PmLocalImpl。新名字也不太好，待重构后会去掉
+ *
  * @author RePlugin Team
  */
-class PmLocalImpl implements IPluginManager {
+public class PluginCommImpl {
 
     private static final String CONTAINER_PROVIDER_AUTHORITY_PART = ".loader.p.pr";
     static final String INTENT_KEY_THEME_ID = "__themeId";
@@ -67,12 +70,15 @@ class PmLocalImpl implements IPluginManager {
      */
     PmBase mPluginMgr;
 
-    PmLocalImpl(Context context, PmBase pm) {
+    PluginCommImpl(Context context, PmBase pm) {
         mContext = context;
         mPluginMgr = pm;
     }
 
-    @Override
+    /**
+     * @param name 插件名
+     * @return
+     */
     public boolean isPluginLoaded(String name) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "isPluginLoaded: name=" + name);
@@ -84,7 +90,12 @@ class PmLocalImpl implements IPluginManager {
         return plugin.isLoaded();
     }
 
-    @Override
+    /**
+     * 此方法调用主程序或特定插件的IPlugin.query，当插件未加载时会尝试加载
+     * @param name 插件名
+     * @param c 需要查询的interface的类
+     * @return
+     */
     public IModule query(String name, Class<? extends IModule> c) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "query: name=" + name + " class=" + c.getName());
@@ -106,7 +117,11 @@ class PmLocalImpl implements IPluginManager {
         return p.query(c);
     }
 
-    @Override
+    /**
+     * @param name 插件名
+     * @param binder 需要查询的binder的类
+     * @return
+     */
     public IBinder query(String name, String binder) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "query: name=" + name + " binder=" + binder);
@@ -134,7 +149,12 @@ class PmLocalImpl implements IPluginManager {
         return p.query(binder);
     }
 
-    @Override
+    /**
+     * @param name 插件名
+     * @param binder 需要查询的binder的类
+     * @param process 是否在指定进程中启动
+     * @return
+     */
     public IBinder query(String name, String binder, int process) {
         // 自己进程
         if (IPC.isPersistentProcess() && process == IPluginManager.PROCESS_PERSIST) {
@@ -166,7 +186,12 @@ class PmLocalImpl implements IPluginManager {
         return QihooServiceManager.getPluginService(mContext, name, binder);
     }
 
-    @Override
+    /**
+     * 警告：低层接口
+     * 当插件升级之后，通过adapter.jar标准接口，甚至invoke接口都无法完成任务时，可通过此接口反射来完成任务
+     * @param name 插件名
+     * @return 插件的context，可通过此context得到插件的ClassLoader
+     */
     public Context queryPluginContext(String name) {
         Plugin p = mPluginMgr.loadAppPlugin(name);
         if (p != null) {
@@ -180,7 +205,12 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 警告：低层接口
+     * 调用此接口会在当前进程加载插件（不加载代码，只加载资源）
+     * @param name 插件名
+     * @return 插件的Resources
+     */
     public Resources queryPluginResouces(String name) {
         // 先从缓存获取
         Resources resources = Plugin.queryCachedResources(Plugin.queryCachedFilename(name));
@@ -200,7 +230,12 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 警告：低层接口
+     * 调用此接口会在当前进程加载插件（不加载代码，只加载资源）
+     * @param name 插件名
+     * @return 插件的PackageInfo
+     */
     public PackageInfo queryPluginPackageInfo(String name) {
         // 先从缓存获取
         PackageInfo packageInfo = Plugin.queryCachedPackageInfo(Plugin.queryCachedFilename(name));
@@ -220,7 +255,14 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 警告：低层接口
+     * 调用此接口会在当前进程加载插件（不加载代码和资源，只获取PackageInfo）
+     *
+     * @param pkgName 插件包名
+     * @param flags   Flags
+     * @return 插件的PackageInfo
+     */
     public PackageInfo queryPluginPackageInfo(String pkgName, int flags) {
         // 根据 pkgName 取得 pluginName
         String pluginName = Plugin.queryPluginNameByPkgName(pkgName);
@@ -230,7 +272,12 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 警告：低层接口
+     * 调用此接口会在当前进程加载插件（不加载代码和资源，只获取ComponentList）
+     * @param name 插件名
+     * @return 插件的ComponentList
+     */
     public ComponentList queryPluginComponentList(String name) {
         // 先从缓存获取
         ComponentList cl = Plugin.queryCachedComponentList(Plugin.queryCachedFilename(name));
@@ -250,7 +297,12 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 警告：低层接口
+     * 调用此接口会在当前进程加载插件（不启动App）
+     * @param name 插件名
+     * @return 插件的Resources
+     */
     public ClassLoader queryPluginClassLoader(String name) {
         // 先从缓存获取
         ClassLoader cl = Plugin.queryCachedClassLoader(Plugin.queryCachedFilename(name));
@@ -270,7 +322,14 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 警告：低层接口
+     * 调用此接口会“依据PluginInfo中指定的插件信息”，在当前进程加载插件（不启动App）。通常用于“指定路径来直接安装”的情况
+     * 注意：调用此接口将不会“通知插件更新”
+     * Added by Jiongxuan Zhang
+     * @param pi 插件信息
+     * @return 插件的Resources
+     */
     public ClassLoader loadPluginClassLoader(PluginInfo pi) {
         // 不从缓存中获取，而是直接初始化ClassLoader
         Plugin p = mPluginMgr.loadPlugin(pi, this, Plugin.LOAD_DEX, false);
@@ -285,7 +344,11 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 警告：低层接口
+     * 调用此接口会在当前进程加载插件（不加载代码和资源，只获取Collection<ReceiverInfo>）
+     * @return 符合 action 的所有 ReceiverInfo
+     */
     public List<ActivityInfo> queryPluginsReceiverList(Intent intent) {
         IPluginHost pluginHost = PluginProcessMain.getPluginHost();
         if (pluginHost != null) {
@@ -300,7 +363,15 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 启动一个插件中的activity，如果插件不存在会触发下载界面
+     * @param context 应用上下文或者Activity上下文
+     * @param intent
+     * @param plugin 插件名
+     * @param activity 待启动的activity类名
+     * @param process 是否在指定进程中启动
+     * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
+     */
     public boolean startActivity(Context context, Intent intent, String plugin, String activity, int process) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "start activity: intent=" + intent + " plugin=" + plugin + " activity=" + activity + " process=" + process);
@@ -309,7 +380,10 @@ class PmLocalImpl implements IPluginManager {
         return mPluginMgr.mInternal.startActivity(context, intent, plugin, activity, process, true);
     }
 
-    @Override
+    /**
+     * 启动一个插件中的 activity 'forResult'
+     * @return 插件机制层是否成功，例如没有插件存在、没有合适的Activity坑
+     */
     public boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "startActivityForResult: intent=" + intent + " requestCode=" + requestCode+ " options=" + options);
@@ -318,7 +392,14 @@ class PmLocalImpl implements IPluginManager {
         return mPluginMgr.mInternal.startActivityForResult(activity, intent, requestCode, options);
     }
 
-    @Override
+    /**
+     * 加载插件Activity，在startActivity之前调用
+     * @param intent
+     * @param plugin 插件名
+     * @param target 目标Service名，如果传null，则取获取到的第一个
+     * @param process 是否在指定进程中启动
+     * @return
+     */
     public ComponentName loadPluginActivity(Intent intent, String plugin, String activity, int process) {
 
         ActivityInfo ai = null;
@@ -386,7 +467,13 @@ class PmLocalImpl implements IPluginManager {
         return new ComponentName(IPC.getPackageName(), container);
     }
 
-    @Override
+    /**
+     * 启动插件Service，在startService、bindService之前调用
+     * @param plugin 插件名
+     * @param target 目标Service名，如果传null，则取获取到的第一个
+     * @param process 是否在指定进程中启动
+     * @return
+     */
     public ComponentName loadPluginService(String plugin, String target, int process) {
         String container = null;
 
@@ -411,7 +498,14 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 启动插件的Provider
+     * @param plugin 插件名
+     * @param target 目标Provider名，如果传null，则取获取到的第一个
+     * @param process 是否在指定进程中启动
+     * @return
+     * @deprecated 已废弃该方法，请使用PluginProviderClient里面的方法
+     */
     public Uri loadPluginProvider(String plugin, String target, int process) {
         PluginBinderInfo info = new PluginBinderInfo(PluginBinderInfo.PROVIDER_REQUEST);
         try {
@@ -434,7 +528,13 @@ class PmLocalImpl implements IPluginManager {
         return null;
     }
 
-    @Override
+    /**
+     * 通过ClassLoader来获取插件名
+     *
+     * @param cl ClassLoader对象
+     * @return 插件名，若和主程序一致，则返回IModule.PLUGIN_NAME_MAIN（“main”）
+     * Added by Jiongxuan Zhang
+     */
     public String fetchPluginName(ClassLoader cl) {
         if (cl == mContext.getClassLoader()) {
             // Main工程的ClassLoader
@@ -448,7 +548,14 @@ class PmLocalImpl implements IPluginManager {
         return p.mInfo.getName();
     }
 
-    @Override
+    /**
+     * 根据条件，查找 ActivityInfo 对象
+     *
+     * @param plugin   插件名称
+     * @param activity Activity 名称
+     * @param intent   调用者传递过来的 Intent
+     * @return 插件中 Activity 的 ActivityInfo
+     */
     public ActivityInfo getActivityInfo(String plugin, String activity, Intent intent) {
         // 获取插件对象
         Plugin p = mPluginMgr.loadAppPlugin(plugin);
