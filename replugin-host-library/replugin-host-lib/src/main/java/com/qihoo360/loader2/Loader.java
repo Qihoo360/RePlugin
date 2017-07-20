@@ -229,7 +229,7 @@ class Loader {
             mComponents = Plugin.queryCachedComponentList(mPath);
             if (mComponents == null) {
                 // ComponentList
-                mComponents = new ComponentList(mPackageInfo, mPath, mPluginName);
+                mComponents = new ComponentList(mPackageInfo, mPath, mPluginObj.mInfo);
 
                 // 动态注册插件中声明的 receiver
                 regReceivers();
