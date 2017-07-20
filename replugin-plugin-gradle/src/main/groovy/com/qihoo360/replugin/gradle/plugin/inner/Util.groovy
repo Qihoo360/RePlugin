@@ -29,6 +29,8 @@ import org.gradle.api.Project
 
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.zip.ZipFile
+
 import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES;
 
 /**
@@ -83,13 +85,14 @@ public class Util {
                     String jarZipDir = project.getBuildDir().path +
                             File.separator + FD_INTERMEDIATES + File.separator + "exploded-aar" +
                             File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class";
-                    unzip(jarPath, jarZipDir)
-                    def jarZip = jarZipDir + ".jar"
-                    includeJars << jarZip
-                    classPath << jarZipDir
-                    visitor.setBaseDir(jarZipDir)
-                    Files.walkFileTree(Paths.get(jarZipDir), visitor)
-                    map.put(jarPath, jarZip)
+                    if (unzip(jarPath, jarZipDir)) {
+                        def jarZip = jarZipDir + ".jar"
+                        includeJars << jarZip
+                        classPath << jarZipDir
+                        visitor.setBaseDir(jarZipDir)
+                        Files.walkFileTree(Paths.get(jarZipDir), visitor)
+                        map.put(jarPath, jarZip)
+                    }
 
                 } else {
 
@@ -98,12 +101,12 @@ public class Util {
                     /* 将 jar 包解压，并将解压后的目录加入 classpath */
                     // println ">>> 解压Jar${jarPath}"
                     String jarZipDir = jar.getParent() + File.separatorChar + jar.getName().replace('.jar', '')
-                    unzip(jarPath, jarZipDir)
+                    if (unzip(jarPath, jarZipDir)) {
+                        classPath << jarZipDir
 
-                    classPath << jarZipDir
-
-                    visitor.setBaseDir(jarZipDir)
-                    Files.walkFileTree(Paths.get(jarZipDir), visitor)
+                        visitor.setBaseDir(jarZipDir)
+                        Files.walkFileTree(Paths.get(jarZipDir), visitor)
+                    }
 
                     // 删除 jar
                     FileUtils.forceDelete(jar)
@@ -130,8 +133,15 @@ public class Util {
     /**
      * 解压 zipFilePath 到 目录 dirPath
      */
-    def private static unzip(String zipFilePath, String dirPath) {
+    def private static boolean unzip(String zipFilePath, String dirPath) {
+        // 若这个Zip包是空内容的（如引入了Bugly就会出现），则直接忽略
+        if (isZipEmpty(zipFilePath)) {
+            println ">>> Zip file is empty! Ignore";
+            return false;
+        }
+
         new AntBuilder().unzip(src: zipFilePath, dest: dirPath, overwrite: 'true')
+        return true;
     }
 
     /**
@@ -181,5 +191,15 @@ public class Util {
             print '--'
         }
         println()
+    }
+
+    def static boolean isZipEmpty(String zipFilePath) {
+        ZipFile z;
+        try {
+            z = new ZipFile(zipFilePath)
+            return z.size() == 0
+        } finally {
+            z.close();
+        }
     }
 }
