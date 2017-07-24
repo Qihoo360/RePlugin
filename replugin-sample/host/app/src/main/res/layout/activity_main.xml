@@ -41,4 +41,11 @@
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:text="@string/startDemo1LoadFragment" />
+
+    <Button
+        android:id="@+id/btn_install_apk_from_assets"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:text="@string/installPluginFromAssets" />
 </LinearLayout>
