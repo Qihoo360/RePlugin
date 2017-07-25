@@ -39,6 +39,7 @@ import android.widget.Toast;
 
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.common.utils.TimeUtils;
+import com.qihoo360.replugin.sample.demo1.activity.appcompat.AppCompatActivityDemo;
 import com.qihoo360.replugin.sample.demo1.activity.single_instance.TIActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.single_top.SingleTopActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.standard.StandardActivity;
@@ -103,6 +104,13 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), ThemeDialogActivity.class);
                 v.getContext().startActivity(intent);
+            }
+        }));
+        mItems.add(new TestItem("Activity: AppCompat", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), AppCompatActivityDemo.class);
+                startActivity(intent);
             }
         }));
         mItems.add(new TestItem("Activity: SingleTop", new View.OnClickListener() {

@@ -16,8 +16,6 @@
 
 apply plugin: 'com.android.application'
 
-apply plugin: 'replugin-host-gradle'
-
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -36,8 +34,13 @@ android {
     }
 }
 
+apply plugin: 'replugin-host-gradle'
+repluginHostConfig {
+    useAppCompat = true
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.qihoo360.replugin:replugin-host-lib:2.1.6'
 }

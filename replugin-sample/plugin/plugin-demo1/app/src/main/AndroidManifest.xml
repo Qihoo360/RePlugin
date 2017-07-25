@@ -59,7 +59,7 @@
             android:name=".activity.theme.ThemeDialogActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" />
+            android:theme="@android:style/Theme.Dialog" />
 
         <!-- NoTitleBarFullScreen -->
         <activity
@@ -73,6 +73,12 @@
             </intent-filter>
         </activity>
 
+        <!-- AppCompat -->
+        <activity
+            android:name=".activity.appcompat.AppCompatActivityDemo"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat"
+            android:screenOrientation="portrait" />
 
         <!-- receivers -->
         <receiver android:name=".receivers.PluginDemo1Receiver">
