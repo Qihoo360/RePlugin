@@ -1,4 +1,4 @@
-package com.qihoo360.replugin.sample.demo1.activity.appcompat;
+package com.qihoo360.replugin.sample.demo2.activity.appcompat;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
