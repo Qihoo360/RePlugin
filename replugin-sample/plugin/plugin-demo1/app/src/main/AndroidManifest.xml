@@ -73,13 +73,6 @@
             </intent-filter>
         </activity>
 
-        <!-- AppCompat -->
-        <activity
-            android:name=".activity.appcompat.AppCompatActivityDemo"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat"
-            android:screenOrientation="portrait" />
-
         <!-- receivers -->
         <receiver android:name=".receivers.PluginDemo1Receiver">
             <intent-filter>
