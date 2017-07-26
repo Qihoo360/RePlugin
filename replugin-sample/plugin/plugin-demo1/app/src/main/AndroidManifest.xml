@@ -59,7 +59,7 @@
             android:name=".activity.theme.ThemeDialogActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" />
+            android:theme="@android:style/Theme.Dialog" />
 
         <!-- NoTitleBarFullScreen -->
         <activity
@@ -72,7 +72,6 @@
                 <category android:name="com.qihoo360.repluginapp.replugin.demo1.CATEGORY1" />
             </intent-filter>
         </activity>
-
 
         <!-- receivers -->
         <receiver android:name=".receivers.PluginDemo1Receiver">

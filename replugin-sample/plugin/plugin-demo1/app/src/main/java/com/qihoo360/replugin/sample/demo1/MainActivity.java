@@ -105,6 +105,12 @@ public class MainActivity extends Activity {
                 v.getContext().startActivity(intent);
             }
         }));
+        mItems.add(new TestItem("Activity: AppCompat (to Demo2)", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RePlugin.startActivity(v.getContext(), new Intent(), "demo2", "com.qihoo360.replugin.sample.demo2.activity.appcompat.AppCompatActivityDemo");
+            }
+        }));
         mItems.add(new TestItem("Activity: SingleTop", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
