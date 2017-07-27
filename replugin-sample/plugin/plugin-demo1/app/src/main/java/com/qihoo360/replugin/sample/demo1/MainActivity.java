@@ -310,7 +310,7 @@ public class MainActivity extends Activity {
         // =========
         // aar
         // =========
-        mItems.add(new TestItem("AAR Activity: default theme", new View.OnClickListener() {
+        mItems.add(new TestItem("AAR Activity: Standard", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), LibMainActivity.class);
