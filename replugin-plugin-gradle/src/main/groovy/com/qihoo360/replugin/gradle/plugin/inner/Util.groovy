@@ -87,7 +87,7 @@ public class Util {
                             File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class";
                     if (unzip(jarPath, jarZipDir)) {
                         def jarZip = jarZipDir + ".jar"
-                        includeJars << jarZip
+                        includeJars << jarPath
                         classPath << jarZipDir
                         visitor.setBaseDir(jarZipDir)
                         Files.walkFileTree(Paths.get(jarZipDir), visitor)
