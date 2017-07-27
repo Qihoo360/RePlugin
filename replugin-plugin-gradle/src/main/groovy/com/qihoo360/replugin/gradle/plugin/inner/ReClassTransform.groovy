@@ -174,13 +174,14 @@ public class ReClassTransform extends Transform {
         println '>>> Repackage...'
         includeJars.each {
             File jar = new File(it)
-            String dir = jar.getParent() + '/' + jar.getName().replace('.jar', '')
+            String JarAfterzip = map.get(jar.getParent() + File.separatorChar + jar.getName())
+            String dirAfterUnzip = JarAfterzip.replace('.jar', '')
+            // println ">>> 压缩目录 $dirAfterUnzip"
+            
+            Util.zipDir(dirAfterUnzip, JarAfterzip)
 
-            // println ">>> 压缩目录 $dir"
-            Util.zipDir(dir, jar.absolutePath)
-
-            // println ">>> 删除目录 $dir"
-            FileUtils.deleteDirectory(new File(dir))
+            // println ">>> 删除目录 $dirAfterUnzip"
+            FileUtils.deleteDirectory(new File(dirAfterUnzip))
         }
     }
 
@@ -224,7 +225,7 @@ public class ReClassTransform extends Transform {
         File jar = input.file
         if (jar.absolutePath in includeJars) {
             println ">>> Handle Jar: ${jar.absolutePath}"
-            String dirAfterUnzip = jar.getParent() + File.separatorChar + jar.getName().replace('.jar', '')
+            String dirAfterUnzip = map.get(jar.getParent() + File.separatorChar + jar.getName()).replace('.jar', '')
             injector.injectClass(pool, dirAfterUnzip, config)
         }
     }
