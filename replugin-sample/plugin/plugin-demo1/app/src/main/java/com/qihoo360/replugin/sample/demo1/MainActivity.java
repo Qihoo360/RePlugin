@@ -37,6 +37,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.osan.replugin.sample.library.librarysample.LibMainActivity;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.common.utils.TimeUtils;
 import com.qihoo360.replugin.sample.demo1.activity.single_instance.TIActivity1;
@@ -303,6 +304,17 @@ public class MainActivity extends Activity {
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
+            }
+        }));
+
+        // =========
+        // aar
+        // =========
+        mItems.add(new TestItem("AAR Activity: default theme", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), LibMainActivity.class);
+                v.getContext().startActivity(intent);
             }
         }));
     }

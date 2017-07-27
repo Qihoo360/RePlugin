@@ -50,6 +50,12 @@ android {
     }
 }
 
+repositories{
+    flatDir{
+        dirs 'libs'
+    }
+}
+
 // 这个plugin需要放在android配置之后，因为需要读取android中的配置项
 apply plugin: 'replugin-plugin-gradle'
 repluginPluginConfig {
@@ -62,4 +68,6 @@ dependencies {
     compile 'com.qihoo360.replugin:replugin-plugin-lib:2.1.6'
     provided files('libs/fragment.jar')//这个jar就是从Support-fragment中提取出来的并非特制包目的是为了骗过编译期
     provided files('libs/common-utils-lib-1.0.0.jar')//这个jar就是从Host的utils中编译生成的，其目的是为了骗过编译期
+    compile(name:'plugin-demo-library1',ext:'aar')//sample:compile aar
+
 }
