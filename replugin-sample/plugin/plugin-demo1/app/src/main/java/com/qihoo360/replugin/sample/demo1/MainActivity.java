@@ -48,6 +48,7 @@ import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarFul
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeDialogActivity;
 import com.qihoo360.replugin.sample.demo1.service.PluginDemoService1;
 import com.qihoo360.replugin.sample.demo2.IDemo2;
+import com.qihoo360.replugin.sample.library.LibMainActivity;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -303,6 +304,17 @@ public class MainActivity extends Activity {
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
+            }
+        }));
+
+        // =========
+        // aar
+        // =========
+        mItems.add(new TestItem("AAR Activity: Standard", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), LibMainActivity.class);
+                v.getContext().startActivity(intent);
             }
         }));
     }

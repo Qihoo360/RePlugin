@@ -87,7 +87,7 @@ public class Util {
                             File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class";
                     if (unzip(jarPath, jarZipDir)) {
                         def jarZip = jarZipDir + ".jar"
-                        includeJars << jarZip
+                        includeJars << jarPath
                         classPath << jarZipDir
                         visitor.setBaseDir(jarZipDir)
                         Files.walkFileTree(Paths.get(jarZipDir), visitor)
@@ -97,6 +97,7 @@ public class Util {
                 } else {
 
                     includeJars << jarPath
+                    map.put(jarPath, jarPath)
 
                     /* 将 jar 包解压，并将解压后的目录加入 classpath */
                     // println ">>> 解压Jar${jarPath}"
