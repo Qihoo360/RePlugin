@@ -18,6 +18,7 @@
  * @author RePlugin Team
  */
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 version = "2.1.6"
 group = 'com.qihoo360.replugin'  // 组名
@@ -51,6 +52,14 @@ dependencies {
     // 以“占位符”（Provided）的方式来引用support-v4，不会编入AAR
     // 但宿主需要支持Support-v4（至少应支持LocalBroadcastManager）
     provided 'com.android.support:support-v4:25.2.0'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact "./build/outputs/aar/replugin-host-lib-debug.aar"
+        }
+    }
 }
 
 apply from: 'bintray.gradle'

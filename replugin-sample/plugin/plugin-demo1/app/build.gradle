@@ -31,6 +31,7 @@ android {
         targetSdkVersion 21
         applicationId "com.qihoo360.replugin.sample.demo1"
         minSdkVersion 15
+        multiDexEnabled false
     }
 
     buildTypes {
@@ -70,4 +71,8 @@ dependencies {
     provided files('libs/common-utils-lib-1.0.0.jar')//这个jar就是从Host的utils中编译生成的，其目的是为了骗过编译期
     compile(name:'plugin-library',ext:'aar')//sample:compile aar
 
+}
+
+if (android.defaultConfig.multiDexEnabled) {
+    apply from: 'case.gradle'
 }

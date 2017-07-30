@@ -47,6 +47,7 @@ import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarAct
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarFullscreenActivity;
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeDialogActivity;
 import com.qihoo360.replugin.sample.demo1.service.PluginDemoService1;
+import com.qihoo360.replugin.sample.demo1.testcase.TestCaseActivity;
 import com.qihoo360.replugin.sample.demo2.IDemo2;
 import com.qihoo360.replugin.sample.library.LibMainActivity;
 
@@ -314,6 +315,17 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), LibMainActivity.class);
+                v.getContext().startActivity(intent);
+            }
+        }));
+
+        // =========
+        // test case
+        // =========
+        mItems.add(new TestItem("TEST CASE For RePlugin", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), TestCaseActivity.class);
                 v.getContext().startActivity(intent);
             }
         }));
