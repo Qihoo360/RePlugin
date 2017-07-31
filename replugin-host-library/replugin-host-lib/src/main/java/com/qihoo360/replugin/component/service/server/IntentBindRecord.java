@@ -20,8 +20,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.qihoo360.mobilesafe.utils.basic.ArrayMap;
-import com.qihoo360.mobilesafe.utils.basic.ArraySet;
+import com.qihoo360.replugin.utils.basic.ArrayMap;
+import com.qihoo360.replugin.utils.basic.ArraySet;
 
 /**
  * 用来表示每个Intent所代表的绑定信息

@@ -21,7 +21,7 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.util.Log;
 
-import com.qihoo360.mobilesafe.utils.basic.ArrayMap;
+import com.qihoo360.replugin.utils.basic.ArrayMap;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 
