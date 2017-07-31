@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.IBinder;
 
-import com.qihoo360.mobilesafe.utils.basic.ArrayMap;
+import com.qihoo360.replugin.utils.basic.ArrayMap;
 
 import java.util.ArrayList;
 

@@ -19,7 +19,7 @@ package com.qihoo360.replugin.packages;
 import android.text.TextUtils;
 
 import com.qihoo360.replugin.utils.CloseableUtils;
-import com.qihoo360.mobilesafe.utils.basic.SecurityUtil;
+import com.qihoo360.replugin.utils.basic.SecurityUtil;
 
 import com.qihoo360.replugin.utils.FileUtils;
 import com.qihoo360.replugin.utils.IOUtils;

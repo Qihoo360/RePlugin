@@ -16,7 +16,7 @@
 
 package com.qihoo360.replugin.component.service.server;
 
-import com.qihoo360.mobilesafe.utils.basic.ArraySet;
+import com.qihoo360.replugin.utils.basic.ArraySet;
 
 /**
  * 用来表示每个进程（Client端）与Service的绑定关系

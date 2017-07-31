@@ -25,7 +25,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.qihoo360.mobilesafe.core.BuildConfig;
-import com.qihoo360.mobilesafe.utils.basic.ArrayMap;
+import com.qihoo360.replugin.utils.basic.ArrayMap;
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.component.ComponentList;
 import com.qihoo360.replugin.helper.LogDebug;

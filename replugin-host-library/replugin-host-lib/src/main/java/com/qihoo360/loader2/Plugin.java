@@ -27,7 +27,7 @@ import android.text.TextUtils;
 
 import com.qihoo360.i.IModule;
 import com.qihoo360.i.IPlugin;
-import com.qihoo360.loader.utils.AssetsUtils;
+import com.qihoo360.replugin.utils.AssetsUtils;
 import com.qihoo360.loader.utils.ProcessLocker;
 import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.replugin.RePlugin;

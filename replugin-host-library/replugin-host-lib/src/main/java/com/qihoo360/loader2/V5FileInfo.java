@@ -23,7 +23,7 @@ import android.content.pm.PackageManager;
 import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.loader.utils.PackageUtils;
 import com.qihoo360.loader.utils.StringUtils;
-import com.qihoo360.mobilesafe.utils.basic.SecurityUtil;
+import com.qihoo360.replugin.utils.basic.SecurityUtil;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.helper.LogDebug;
