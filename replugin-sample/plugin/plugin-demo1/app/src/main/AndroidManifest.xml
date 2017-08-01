@@ -82,6 +82,8 @@
 
         <!-- service -->
         <service
+            android:name=".service.PluginDemoAppService" />
+        <service
             android:name=".service.PluginDemoService1"
             android:process=":bg" />
 
