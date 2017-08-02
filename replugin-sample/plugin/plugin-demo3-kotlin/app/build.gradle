@@ -31,7 +31,7 @@ android {
         versionName "1.0"
         versionCode 100
         targetSdkVersion 21
-        applicationId "com.qihoo360.replugin.sample.demo1"
+        applicationId "com.qihoo360.replugin.sample.demo3"
         minSdkVersion 15
     }
 
@@ -54,7 +54,7 @@ android {
 
 
 dependencies {
-    compile 'com.qihoo360.replugin:replugin-plugin-lib:2.1.6'
+    compile 'com.qihoo360.replugin:replugin-plugin-lib:2.1.7'
     provided files('libs/fragment.jar')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     //这个jar就是从Support-fragment中提取出来的并非特制包目的是为了骗过编译期
