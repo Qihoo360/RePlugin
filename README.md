@@ -5,7 +5,7 @@
 </p>
 
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
-[![Release Version](https://img.shields.io/badge/release-2.1.6-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/wiki/%E5%8F%91%E8%A1%8C%E6%B3%A8%E8%AE%B0)
+[![Release Version](https://img.shields.io/badge/release-2.1.7-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/wiki/%E5%8F%91%E8%A1%8C%E6%B3%A8%E8%AE%B0)
 
 
 ## RePlugin —— A flexible, stable, easy-to-use Android Plug-in Framework
