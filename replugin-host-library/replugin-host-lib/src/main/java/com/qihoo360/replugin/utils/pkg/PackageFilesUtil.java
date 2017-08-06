@@ -18,6 +18,7 @@
 package com.qihoo360.replugin.utils.pkg;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -280,7 +281,10 @@ public class PackageFilesUtil {
         }
         try {
             FileUtils.forceDelete(info.getApkFile());
-            FileUtils.forceDelete(info.getDexFile());
+            FileUtils.forceDelete(info.getDexParentDir());
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                FileUtils.forceDelete(info.getUnoptDexParentDir());
+            }
             FileUtils.forceDelete(info.getNativeLibsDir());
         } catch (IOException e) {
             if (LogRelease.LOGR) {

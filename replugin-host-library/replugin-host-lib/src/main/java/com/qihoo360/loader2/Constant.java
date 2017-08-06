@@ -78,6 +78,16 @@ public class Constant {
     public static final String LOCAL_PLUGIN_APK_COVER_DIR = "p_c";
 
     /**
+     * 插件Odex（优化前）释放的以插件名独立隔离的子目录
+     */
+    public static final String LOCAL_PLUGIN_MULTI_DEX_SUB_DIR = "_md";
+
+    /**
+     * 插件Odex（优化后）释放的以插件名独立隔离的子目录
+     */
+    public static final String LOCAL_PLUGIN_MULTI_ODEX_SUB_DIR = "_mod";
+
+    /**
      * 插件文件名，name-low-high-current.jar
      * 插件文件名规范：barcode-1-10-2.jar
      */

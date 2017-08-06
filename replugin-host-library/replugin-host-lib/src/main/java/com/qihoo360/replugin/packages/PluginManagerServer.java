@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -437,7 +438,10 @@ public class PluginManagerServer {
     private void delete(@NonNull PluginInfo pi) {
         try {
             FileUtils.forceDelete(new File(pi.getPath()));
-            FileUtils.forceDelete(pi.getDexFile());
+            FileUtils.forceDelete(pi.getDexParentDir());
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                FileUtils.forceDelete(pi.getUnoptDexParentDir());
+            }
             FileUtils.forceDelete(pi.getNativeLibsDir());
         } catch (IOException e) {
             if (LogRelease.LOGR) {

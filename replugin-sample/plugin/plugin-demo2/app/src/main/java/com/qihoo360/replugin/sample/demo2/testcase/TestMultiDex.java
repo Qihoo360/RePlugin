@@ -1,10 +1,8 @@
-package com.qihoo360.replugin.sample.demo1.testcase;
+package com.qihoo360.replugin.sample.demo2.testcase;
 
 /**
  * Created by osan on 2017/7/30.
  */
-
-import android.util.Log;
 
 /**
  * multidex测试用例类

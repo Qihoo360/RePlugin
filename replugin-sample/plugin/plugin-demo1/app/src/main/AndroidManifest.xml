@@ -139,6 +139,5 @@
             android:authorities="com.qihoo360.replugin.sample.demo1.provider2" />
 
         <activity android:name=".activity.for_result.ForResultActivity"/>
-        <activity android:name=".testcase.TestCaseActivity"/>
     </application>
 </manifest>

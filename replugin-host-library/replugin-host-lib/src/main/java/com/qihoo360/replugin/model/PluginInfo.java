@@ -22,6 +22,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -381,6 +382,34 @@ public class PluginInfo implements Parcelable, Cloneable {
     }
 
     /**
+     * 获取Dex（优化前）生成时所在的目录 <p>
+     * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
+     * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
+     * 注意：仅供框架内部使用
+     *
+     * @return 优化前Dex所在目录的File对象
+     */
+    public File getUnoptDexParentDir() {
+        File dir;
+        // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
+        Context context = RePluginInternal.getAppContext();
+        if (isPnPlugin()) {
+            dir = context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
+        } else if (getIsPendingCover()) {
+            dir = context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
+        } else {
+            dir = context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
+        }
+
+        File subDir = new File(dir + File.separator + makeInstalledFileName() + Constant.LOCAL_PLUGIN_MULTI_DEX_SUB_DIR);
+        if (!subDir.exists()) {
+            subDir.mkdir();
+        }
+
+        return subDir;
+    }
+
+    /**
      * 获取Dex（优化后）生成时所在的目录 <p>
      * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
      * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
@@ -389,15 +418,27 @@ public class PluginInfo implements Parcelable, Cloneable {
      * @return 优化后Dex所在目录的File对象
      */
     public File getDexParentDir() {
+        File dir;
         // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
         Context context = RePluginInternal.getAppContext();
         if (isPnPlugin()) {
-            return context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
+            dir = context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
         } else if (getIsPendingCover()) {
-            return context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
+            dir = context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
         } else {
-            return context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
+            dir = context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
         }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+
+            File subDir = new File(dir + File.separator + makeInstalledFileName() + Constant.LOCAL_PLUGIN_MULTI_ODEX_SUB_DIR);
+            if (!subDir.exists()) {
+                subDir.mkdir();
+            }
+            dir = subDir;
+        }
+
+        return dir;
     }
 
     /**

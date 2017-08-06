@@ -19,6 +19,7 @@ package com.qihoo360.replugin;
 import android.os.Build;
 
 import com.qihoo360.replugin.helper.LogDebug;
+import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.replugin.utils.FileUtils;
 import com.qihoo360.replugin.utils.ReflectUtils;
@@ -68,7 +69,7 @@ public class PluginDexClassLoader extends DexClassLoader {
     public PluginDexClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
         super(dexPath, optimizedDirectory, librarySearchPath, parent);
 
-        installExtraDexes(dexPath, optimizedDirectory, parent);
+        installMultiDexesBeforeLollipop(dexPath, optimizedDirectory, parent);
 
         mHostClassLoader = RePluginInternal.getAppClassLoader();
 
@@ -146,28 +147,34 @@ public class PluginDexClassLoader extends DexClassLoader {
      * @param dexPath
      * @param optimizedDirectory
      * @param parent
+     * @deprecated apply to ROM below Lollipop,may be deprecated
      */
-    private void installExtraDexes(String dexPath, String optimizedDirectory, ClassLoader parent) {
+    private void installMultiDexesBeforeLollipop(String dexPath, String optimizedDirectory, ClassLoader parent) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return;
         }
 
-        List<Object[]> allElements = new LinkedList<>();
-
         try {
-            // get dexElements of main dex
-            Class<?> clz = Class.forName("dalvik.system.BaseDexClassLoader");
-            Object pathList = ReflectUtils.readField(clz, this, "pathList");
-            Object[] mainElements = (Object[]) ReflectUtils.readField(pathList.getClass(), pathList, "dexElements");
-            allElements.add(mainElements);
 
             // get paths of dex
             List<File> dexFiles = getDexFiles(dexPath);
 
             // get dexElements of extra dex (need to load dex first)
             if (dexFiles != null && dexFiles.size() > 0) {
+
+                List<Object[]> allElements = new LinkedList<>();
+
+                // get dexElements of main dex
+                Class<?> clz = Class.forName("dalvik.system.BaseDexClassLoader");
+                Object pathList = ReflectUtils.readField(clz, this, "pathList");
+                Object[] mainElements = (Object[]) ReflectUtils.readField(pathList.getClass(), pathList, "dexElements");
+                allElements.add(mainElements);
+
                 for (File file : dexFiles) {
+                    if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
+                        LogDebug.d(TAG, "dex file:" + file.getName());
+                    }
                     DexClassLoader dexClassLoader = new DexClassLoader(file.getAbsolutePath(), optimizedDirectory, optimizedDirectory, parent);
 
                     Object obj = ReflectUtils.readField(clz, dexClassLoader, "pathList");
@@ -180,14 +187,14 @@ public class PluginDexClassLoader extends DexClassLoader {
 
                 // rewrite Elements combined to classLoader
                 ReflectUtils.writeField(pathList.getClass(), pathList, "dexElements", combineElements);
-            }
 
-            //Test whether the Extra Dex is installed
-            if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
+                //Test whether the Extra Dex is installed
+                if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
 
-                Object object = ReflectUtils.readField(pathList.getClass(), pathList, "dexElements");
-                int length = Array.getLength(object);
-                LogDebug.d(TAG, "dexElements length:" + length);
+                    Object object = ReflectUtils.readField(pathList.getClass(), pathList, "dexElements");
+                    int length = Array.getLength(object);
+                    LogDebug.d(TAG, "dexElements length:" + length);
+                }
             }
 
         } catch (Exception e) {
@@ -236,12 +243,29 @@ public class PluginDexClassLoader extends DexClassLoader {
      * @return the File list of the extra dexes
      */
     private List<File> getDexFiles(String dexPath) {
+
+        PluginInfo pi = null;
         ZipFile zipFile = null;
         List<File> files = null;
+
         try {
-            zipFile = new ZipFile(dexPath);
-            files = traverseZipFile(dexPath.substring(0, dexPath.lastIndexOf("/")), zipFile);
-        } catch (IOException e) {
+
+            String installedFileName = dexPath.substring(dexPath.lastIndexOf(File.separator) + 1).replace(".jar", "");
+            List<PluginInfo> piList = RePlugin.getPluginInfoList();
+
+            for (PluginInfo info : piList) {
+                if (info.makeInstalledFileName().equals(installedFileName)) {
+                    pi = info;
+                    break;
+                }
+            }
+
+            if (pi != null) {
+                zipFile = new ZipFile(dexPath);
+                files = traverseZipFile(pi.getUnoptDexParentDir().getAbsolutePath(), zipFile);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             CloseableUtils.closeQuietly(zipFile);
