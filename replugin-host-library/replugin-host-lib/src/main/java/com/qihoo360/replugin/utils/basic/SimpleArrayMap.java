@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.qihoo360.mobilesafe.utils.basic;
+package com.qihoo360.replugin.utils.basic;
 
 import android.util.Log;
 

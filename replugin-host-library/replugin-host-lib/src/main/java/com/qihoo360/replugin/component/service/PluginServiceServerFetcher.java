@@ -24,7 +24,7 @@ import com.qihoo360.loader2.IPluginHost;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PluginBinderInfo;
 import com.qihoo360.loader2.PluginProcessMain;
-import com.qihoo360.mobilesafe.utils.basic.ArrayMap;
+import com.qihoo360.replugin.utils.basic.ArrayMap;
 import com.qihoo360.replugin.component.service.server.IPluginServiceServer;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;

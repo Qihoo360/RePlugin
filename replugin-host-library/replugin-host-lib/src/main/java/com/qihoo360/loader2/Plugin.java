@@ -27,7 +27,7 @@ import android.text.TextUtils;
 
 import com.qihoo360.i.IModule;
 import com.qihoo360.i.IPlugin;
-import com.qihoo360.loader.utils.AssetsUtils;
+import com.qihoo360.replugin.utils.AssetsUtils;
 import com.qihoo360.loader.utils.ProcessLocker;
 import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.replugin.RePlugin;
@@ -896,11 +896,17 @@ class Plugin {
     private void callAppLocked() {
         // 获取并调用Application的几个核心方法
         if (!mDummyPlugin) {
-            // NOTE 不排除A的Application中调到了B，B又调回到A，这时需要isLoaded防止循环加载
+            // NOTE 不排除A的Application中调到了B，B又调回到A，或在同一插件内的onCreate开启Service/Activity，而内部逻辑又调用fetchContext并再次走到这里
+            // NOTE 因此需要对mApplicationClient做判断，确保永远只执行一次，无论是否成功
+            if (mApplicationClient != null) {
+                // 已经初始化过，无需再次处理
+                return;
+            }
+
             mApplicationClient = PluginApplicationClient.getOrCreate(
                     mInfo.getName(), mLoader.mClassLoader, mLoader.mComponents, mLoader.mPluginObj.mInfo);
 
-            if (mApplicationClient != null && !mApplicationClient.isLoaded()) {
+            if (mApplicationClient != null) {
                 mApplicationClient.callAttachBaseContext(mLoader.mPkgContext);
                 mApplicationClient.callOnCreate();
             }

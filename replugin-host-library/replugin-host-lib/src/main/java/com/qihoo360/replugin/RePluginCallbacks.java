@@ -21,7 +21,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.qihoo360.loader2.PluginContext;
-import com.qihoo360.mobilesafe.utils.pkg.PackageFilesUtil;
+import com.qihoo360.replugin.utils.pkg.PackageFilesUtil;
 import com.qihoo360.replugin.model.PluginInfo;
 
 import java.io.InputStream;

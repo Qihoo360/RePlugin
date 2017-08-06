@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.qihoo360.mobilesafe.utils.basic;
+package com.qihoo360.replugin.utils.basic;
 
 import java.util.Collection;
 import java.util.Map;
@@ -24,7 +24,7 @@ import java.util.Set;
  * ArrayMap is a generic key->value mapping data structure that is
  * designed to be more memory efficient than a traditional {@link java.util.HashMap},
  * this implementation is a version of the platform's
- * {@link com.qihoo360.mobilesafe.utils.basic.ArrayMap} that can be used on older versions of the platform.
+ * {@link ArrayMap} that can be used on older versions of the platform.
  * It keeps its mappings in an array data structure -- an integer array of hash
  * codes for each item, and an Object array of the key/value pairs.  This allows it to
  * avoid having to create an extra object for every entry put in to the map, and it

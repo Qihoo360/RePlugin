@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.qihoo360.mobilesafe.utils.basic;
+package com.qihoo360.replugin.utils.basic;
 
 import android.util.Log;
 
@@ -664,7 +664,7 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
     }
 
     /**
-     * Return an {@link java.util.Iterator} over all values in the set.
+     * Return an {@link Iterator} over all values in the set.
      * <p/>
      * <p><b>Note:</b> this is a fairly inefficient way to access the array contents, it
      * requires generating a number of temporary objects and allocates additional state

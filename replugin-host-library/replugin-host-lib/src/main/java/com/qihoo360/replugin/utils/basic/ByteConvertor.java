@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.qihoo360.mobilesafe.utils.basic;
+package com.qihoo360.replugin.utils.basic;
 
 /**
  * 在byte[] 和 int long 之间进行类型转换， 打印byte[]到string 里面

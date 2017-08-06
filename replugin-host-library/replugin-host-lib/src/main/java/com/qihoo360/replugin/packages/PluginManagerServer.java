@@ -28,7 +28,7 @@ import com.qihoo360.loader2.CertUtils;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
 import com.qihoo360.mobilesafe.api.Tasks;
-import com.qihoo360.mobilesafe.utils.pkg.PackageFilesUtil;
+import com.qihoo360.replugin.utils.pkg.PackageFilesUtil;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginEventCallbacks;
 import com.qihoo360.replugin.RePluginInternal;

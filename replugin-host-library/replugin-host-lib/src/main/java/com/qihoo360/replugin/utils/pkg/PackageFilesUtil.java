@@ -15,7 +15,7 @@
  * the License.
  */
 
-package com.qihoo360.mobilesafe.utils.pkg;
+package com.qihoo360.replugin.utils.pkg;
 
 import android.content.Context;
 import android.text.TextUtils;

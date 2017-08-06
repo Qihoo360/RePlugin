@@ -25,7 +25,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.qihoo360.mobilesafe.core.BuildConfig;
-import com.qihoo360.mobilesafe.utils.basic.ArrayMap;
+import com.qihoo360.replugin.utils.basic.ArrayMap;
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.component.ComponentList;
 import com.qihoo360.replugin.helper.LogDebug;
@@ -58,7 +58,6 @@ public class PluginApplicationClient {
     private Application mApplication;
 
     private static ArrayMap<String, WeakReference<PluginApplicationClient>> sRunningClients = new ArrayMap<>();
-    private boolean mLoaded;
 
     /**
      * 根据插件里的框架版本、Application等情况来创建PluginApplicationClient对象
@@ -223,7 +222,6 @@ public class PluginApplicationClient {
             LogDebug.d(PLUGIN_TAG, "PAC.callOnCreate(): Call onCreate(), cl=" + mPlgClassLoader);
         }
         mApplication.onCreate();
-        mLoaded = true;
     }
 
     public void callOnLowMemory() {
@@ -253,10 +251,6 @@ public class PluginApplicationClient {
 
     public Application getObj() {
         return mApplication;
-    }
-
-    public boolean isLoaded() {
-        return mLoaded;
     }
 
     private boolean initCustom() {
