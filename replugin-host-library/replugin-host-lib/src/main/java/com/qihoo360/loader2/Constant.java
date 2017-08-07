@@ -78,14 +78,15 @@ public class Constant {
     public static final String LOCAL_PLUGIN_APK_COVER_DIR = "p_c";
 
     /**
-     * 插件Odex（优化前）释放的以插件名独立隔离的子目录
+     * 插件extra dex（优化前）释放的以插件名独立隔离的子目录
+     * 适用于 android 5.0 以下，5.0以上不会用到该目录
      */
-    public static final String LOCAL_PLUGIN_MULTI_DEX_SUB_DIR = "_md";
+    public static final String LOCAL_PLUGIN_INDEPENDENT_EXTRA_DEX_SUB_DIR = "_ed";
 
     /**
      * 插件Odex（优化后）释放的以插件名独立隔离的子目录
      */
-    public static final String LOCAL_PLUGIN_MULTI_ODEX_SUB_DIR = "_mod";
+    public static final String LOCAL_PLUGIN_INDEPENDENT_ODEX_SUB_DIR = "_od";
 
     /**
      * 插件文件名，name-low-high-current.jar

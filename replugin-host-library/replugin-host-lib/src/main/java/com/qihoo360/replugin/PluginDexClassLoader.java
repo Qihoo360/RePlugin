@@ -56,6 +56,7 @@ public class PluginDexClassLoader extends DexClassLoader {
     /**
      * 初始化插件的DexClassLoader的构造函数。插件化框架会调用此函数。
      *
+     * @param pi                 the plugin's info,refer to {@link PluginInfo}
      * @param dexPath            the list of jar/apk files containing classes and
      *                           resources, delimited by {@code File.pathSeparator}, which
      *                           defaults to {@code ":"} on Android
@@ -66,10 +67,10 @@ public class PluginDexClassLoader extends DexClassLoader {
      *                           {@code null}
      * @param parent             the parent class loader
      */
-    public PluginDexClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
+    public PluginDexClassLoader(PluginInfo pi, String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
         super(dexPath, optimizedDirectory, librarySearchPath, parent);
 
-        installMultiDexesBeforeLollipop(dexPath, optimizedDirectory, parent);
+        installMultiDexesBeforeLollipop(pi, dexPath, optimizedDirectory, parent);
 
         mHostClassLoader = RePluginInternal.getAppClassLoader();
 
@@ -144,12 +145,13 @@ public class PluginDexClassLoader extends DexClassLoader {
     /**
      * install extra dexes
      *
+     * @param pi
      * @param dexPath
      * @param optimizedDirectory
      * @param parent
-     * @deprecated apply to ROM below Lollipop,may be deprecated
+     * @deprecated apply to ROM before Lollipop,may be deprecated
      */
-    private void installMultiDexesBeforeLollipop(String dexPath, String optimizedDirectory, ClassLoader parent) {
+    private void installMultiDexesBeforeLollipop(PluginInfo pi, String dexPath, String optimizedDirectory, ClassLoader parent) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return;
@@ -157,10 +159,9 @@ public class PluginDexClassLoader extends DexClassLoader {
 
         try {
 
-            // get paths of dex
-            List<File> dexFiles = getDexFiles(dexPath);
+            // get paths of extra dex
+            List<File> dexFiles = getExtraDexFiles(pi, dexPath);
 
-            // get dexElements of extra dex (need to load dex first)
             if (dexFiles != null && dexFiles.size() > 0) {
 
                 List<Object[]> allElements = new LinkedList<>();
@@ -175,6 +176,8 @@ public class PluginDexClassLoader extends DexClassLoader {
                     if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
                         LogDebug.d(TAG, "dex file:" + file.getName());
                     }
+
+                    // get dexElements of extra dex (need to load dex first)
                     DexClassLoader dexClassLoader = new DexClassLoader(file.getAbsolutePath(), optimizedDirectory, optimizedDirectory, parent);
 
                     Object obj = ReflectUtils.readField(clz, dexClassLoader, "pathList");
@@ -237,32 +240,22 @@ public class PluginDexClassLoader extends DexClassLoader {
     }
 
     /**
-     * get paths of dex
+     * get paths of extra dex
      *
+     * @param pi
      * @param dexPath
      * @return the File list of the extra dexes
      */
-    private List<File> getDexFiles(String dexPath) {
+    private List<File> getExtraDexFiles(PluginInfo pi, String dexPath) {
 
-        PluginInfo pi = null;
         ZipFile zipFile = null;
         List<File> files = null;
 
         try {
 
-            String installedFileName = dexPath.substring(dexPath.lastIndexOf(File.separator) + 1).replace(".jar", "");
-            List<PluginInfo> piList = RePlugin.getPluginInfoList();
-
-            for (PluginInfo info : piList) {
-                if (info.makeInstalledFileName().equals(installedFileName)) {
-                    pi = info;
-                    break;
-                }
-            }
-
             if (pi != null) {
                 zipFile = new ZipFile(dexPath);
-                files = traverseZipFile(pi.getUnoptDexParentDir().getAbsolutePath(), zipFile);
+                files = traverseExtraDex(pi, zipFile);
             }
 
         } catch (Exception e) {
@@ -276,12 +269,15 @@ public class PluginDexClassLoader extends DexClassLoader {
     }
 
     /**
-     * traverse ZipFile
+     * traverse extra dex files
      *
+     * @param pi
      * @param zipFile
      * @return the File list of the extra dexes
      */
-    private static List<File> traverseZipFile(String dir, ZipFile zipFile) {
+    private static List<File> traverseExtraDex(PluginInfo pi, ZipFile zipFile) {
+
+        String dir = null;
         List<File> files = new LinkedList<>();
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
@@ -295,9 +291,14 @@ public class PluginDexClassLoader extends DexClassLoader {
             try {
                 if (name.contains(".dex") && !name.equals("classes.dex")) {
 
+                    if (dir == null) {
+                        dir = pi.getExtraDexParentDir().getAbsolutePath();
+                    }
+
                     File file = new File(dir, name);
                     extractFile(zipFile, entry, file);
                     files.add(file);
+
                     if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
                         LogDebug.d(TAG, "dex path:" + file.getAbsolutePath());
                     }

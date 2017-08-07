@@ -283,7 +283,7 @@ public class PackageFilesUtil {
             FileUtils.forceDelete(info.getApkFile());
             FileUtils.forceDelete(info.getDexParentDir());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                FileUtils.forceDelete(info.getUnoptDexParentDir());
+                FileUtils.forceDelete(info.getExtraDexParentDir());
             }
             FileUtils.forceDelete(info.getNativeLibsDir());
         } catch (IOException e) {

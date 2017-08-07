@@ -440,7 +440,7 @@ public class PluginManagerServer {
             FileUtils.forceDelete(new File(pi.getPath()));
             FileUtils.forceDelete(pi.getDexParentDir());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                FileUtils.forceDelete(pi.getUnoptDexParentDir());
+                FileUtils.forceDelete(pi.getExtraDexParentDir());
             }
             FileUtils.forceDelete(pi.getNativeLibsDir());
         } catch (IOException e) {
