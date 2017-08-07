@@ -344,12 +344,12 @@ public class RePlugin {
     }
 
     /**
-     * 获取SDK的版本信息
+     * 获取当前版本
      *
-     * @return SDK的版本，如2.0.0等
+     * @return 版本号，如2.0.0等
      * @since 2.0.0
      */
-    public static String getSDKVersion() {
+    public static String getVersion() {
         return BuildConfig.VERSION_NAME;
     }
 
