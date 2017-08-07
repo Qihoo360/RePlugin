@@ -23,6 +23,7 @@ import com.android.build.api.transform.TransformInput
 import com.android.build.gradle.internal.scope.GlobalScope
 import com.android.sdklib.IAndroidTarget
 import com.qihoo360.replugin.gradle.plugin.AppConstant
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
@@ -88,21 +89,17 @@ public class Util {
                             File.separator + FD_INTERMEDIATES + File.separator + "exploded-aar" +
                             File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class";
                     def jarZip = jarZipDir + ".jar"
-                    if (checkJarInjectorVersion(jarZip)) {
-                        if (unzip(jarPath, jarZipDir)) {
+                    if (unzip(jarPath, jarZipDir)) {
 
-                            includeJars << jarPath
-                            classPath << jarZipDir
-                            saveJarInjectorVersion(jarZipDir)
-                            visitor.setBaseDir(jarZipDir)
-                            Files.walkFileTree(Paths.get(jarZipDir), visitor)
-                            map.put(jarPath, jarZip)
-                        }
-                    }else{
-                        includeJars.remove(jarPath)
+                        includeJars << jarPath
+                        classPath << jarZipDir
+
+                        visitor.setBaseDir(jarZipDir)
+                        Files.walkFileTree(Paths.get(jarZipDir), visitor)
+                        map.put(jarPath, jarZip)
                     }
                 } else {
-                    if (checkJarInjectorVersion(jarPath)) {
+                    if (checkJarInjectorVersion(project, jarPath)) {
                         includeJars << jarPath
                         map.put(jarPath, jarPath)
 
@@ -111,7 +108,7 @@ public class Util {
                         String jarZipDir = jar.getParent() + File.separatorChar + jar.getName().replace('.jar', '')
                         if (unzip(jarPath, jarZipDir)) {
                             classPath << jarZipDir
-                            saveJarInjectorVersion(jarZipDir)
+                            saveJarInjectorVersion(project, jarPath)
                             visitor.setBaseDir(jarZipDir)
                             Files.walkFileTree(Paths.get(jarZipDir), visitor)
                         }
@@ -127,60 +124,62 @@ public class Util {
         return classPath
     }
 
+    def static getJarInjectorVersionFile(Project project, String jar){
+        File localVersionFile = new File(project.getBuildDir().path,
+                FD_INTERMEDIATES + File.separator + "replugin_reclass"
+                        + File.separator + DigestUtils.md5Hex(jar));
+        return localVersionFile
+    }
+
     /**
      * 通过META-INF/replugin_version.txt判断是否需要修改
      */
-    def static checkJarInjectorVersion(String jar){
+    def static checkJarInjectorVersion(Project project, String jar) {
+        File localVersionFile = getJarInjectorVersionFile(project, jar)
+        if(!localVersionFile.exists()){
+            return true
+        }
         boolean needInjector = true;
-        ZipFile zf = null;
-        ZipEntry ze = null;
         InputStream inputStream = null;
-        try{
-            zf = new ZipFile(jar);
-            ze = zf.getEntry("META-INF/replugin_version.txt");
-            if(ze != null){
-                byte[] data = new byte[jar.length()];
-                inputStream = zf.getInputStream(ze);
-                int len = inputStream.read(data, 0, data.length);
-                String ver = new String(data, "utf-8").trim();
-                needInjector = !AppConstant.VER.equals(ver);
-            }
-        }catch (Throwable e){
+        try {
+            byte[] data = new byte[jar.length()]
+            inputStream = new FileInputStream(localVersionFile)
+            int len = inputStream.read(data, 0, data.length)
+            String ver = new String(data, "utf-8").trim()
+            needInjector = !AppConstant.VER.equals(ver)
+        } catch (Throwable e) {
             //
-        }finally{
-            if(inputStream != null){
-                inputStream.close();
-            }
-            if(zf != null){
-                zf.close();
+        } finally {
+            if (inputStream != null) {
+                inputStream.close()
             }
         }
-        return needInjector;
+        return needInjector
     }
 
     /**
      * 记录版本号到META-INF/replugin_version.txt
      */
-    def static saveJarInjectorVersion(String jarZipDir){
-        File verFile = new File(jarZipDir, "META-INF/replugin_version.txt");
-        if(verFile.exists()){
-            verFile.delete();
-        }else{
-            File dir = verFile.getParentFile();
-            if(!dir.exists()){
+    def static saveJarInjectorVersion(Project project, String jar) {
+        File localVersionFile = getJarInjectorVersionFile(project, jar)
+        if (localVersionFile.exists()) {
+            localVersionFile.delete();
+        } else {
+            File dir = localVersionFile.getParentFile();
+            if (!dir.exists()) {
                 dir.mkdirs();
             }
         }
-        verFile.createNewFile();
+        localVersionFile.createNewFile();
         FileOutputStream fileOutputStream = null;
-        try{
-            fileOutputStream = new FileOutputStream(verFile);
+        try {
+            fileOutputStream = new FileOutputStream(localVersionFile);
             fileOutputStream.write(AppConstant.VER.getBytes("utf-8"));
             fileOutputStream.flush();
-        }catch (Throwable e){
+        } catch (Throwable e) {
             //
-        }finally{
-            if(fileOutputStream!=null){
+        } finally {
+            if (fileOutputStream != null) {
                 fileOutputStream.close();
             }
         }
