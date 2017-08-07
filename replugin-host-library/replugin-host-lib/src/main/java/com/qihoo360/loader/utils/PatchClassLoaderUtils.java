@@ -82,6 +82,10 @@ public class PatchClassLoaderUtils {
             // 将新的ClassLoader写入mPackageInfo.mClassLoader
             ReflectUtils.writeField(oPackageInfo, "mClassLoader", cl);
 
+            // 设置线程上下文中的ClassLoader为RePluginClassLoader
+            // 防止在个别Java库用到了Thread.currentThread().getContextClassLoader()时，“用了原来的PathClassLoader”，或为空指针
+            Thread.currentThread().setContextClassLoader(cl);
+
             if (LOG) {
                 Log.d(TAG, "patch: patch mClassLoader ok");
             }
