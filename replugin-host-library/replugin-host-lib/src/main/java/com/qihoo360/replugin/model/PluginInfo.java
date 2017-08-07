@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.qihoo360.loader2.Constant;
@@ -382,42 +383,30 @@ public class PluginInfo implements Parcelable, Cloneable {
     }
 
     /**
-     * 获取Dex（优化前）生成时所在的目录 <p>
-     * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
-     * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
-     * 注意：仅供框架内部使用
+     * 获取或创建（如果需要）某个插件的Dex目录，用于放置dex文件
      *
-     * @return 优化前Dex所在目录的File对象
+     * @param dirSuffix 目录后缀
+     * @return
      */
-    public File getUnoptDexParentDir() {
-        File dir;
-        // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
-        Context context = RePluginInternal.getAppContext();
-        if (isPnPlugin()) {
-            dir = context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
-        } else if (getIsPendingCover()) {
-            dir = context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
-        } else {
-            dir = context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
-        }
+    @NonNull
+    private File getDexDir(File dexDir, String dirSuffix) {
 
-        File subDir = new File(dir + File.separator + makeInstalledFileName() + Constant.LOCAL_PLUGIN_MULTI_DEX_SUB_DIR);
-        if (!subDir.exists()) {
-            subDir.mkdir();
-        }
+        File dir = new File(dexDir, makeInstalledFileName() + dirSuffix);
 
-        return subDir;
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return dir;
     }
 
     /**
-     * 获取Dex（优化后）生成时所在的目录 <p>
-     * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
-     * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
+     * 单纯的获取Dex目录 <p>
      * 注意：仅供框架内部使用
      *
-     * @return 优化后Dex所在目录的File对象
+     * @param dirSuffix 目录后缀
+     * @return Dex所在目录的File对象
      */
-    public File getDexParentDir() {
+    public File getPureDexParentDir(String dirSuffix) {
         File dir;
         // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
         Context context = RePluginInternal.getAppContext();
@@ -431,14 +420,35 @@ public class PluginInfo implements Parcelable, Cloneable {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
 
-            File subDir = new File(dir + File.separator + makeInstalledFileName() + Constant.LOCAL_PLUGIN_MULTI_ODEX_SUB_DIR);
-            if (!subDir.exists()) {
-                subDir.mkdir();
-            }
+            File subDir = getDexDir(dir, dirSuffix);
             dir = subDir;
         }
 
         return dir;
+    }
+
+    /**
+     * 获取Extra Dex（优化前）生成时所在的目录 <p>
+     * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
+     * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
+     * 注意：仅供框架内部使用
+     *
+     * @return 优化前Extra Dex所在目录的File对象
+     */
+    public File getExtraDexParentDir() {
+        return getPureDexParentDir(Constant.LOCAL_PLUGIN_INDEPENDENT_EXTRA_DEX_SUB_DIR);
+    }
+
+    /**
+     * 获取Dex（优化后）生成时所在的目录 <p>
+     * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
+     * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
+     * 注意：仅供框架内部使用
+     *
+     * @return 优化后Dex所在目录的File对象
+     */
+    public File getDexParentDir() {
+        return getPureDexParentDir(Constant.LOCAL_PLUGIN_INDEPENDENT_ODEX_SUB_DIR);
     }
 
     /**
