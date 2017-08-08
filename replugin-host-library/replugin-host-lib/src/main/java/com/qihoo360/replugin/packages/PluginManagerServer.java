@@ -239,6 +239,14 @@ public class PluginManagerServer {
     private boolean copyOrMoveApk(String path, PluginInfo instPli) {
         File srcFile = new File(path);
         File newFile = instPli.getApkFile();
+
+        // 插件已被释放过一次？通常“同版本覆盖安装”时，覆盖次数超过2次的会出现此问题
+        // 此时，直接删除安装路径下的文件即可，这样就可以直接Move/Copy了
+        if (newFile.exists()) {
+            FileUtils.deleteQuietly(newFile);
+        }
+
+        // 将源APK文件移动/复制到安装路径下
         try {
             if (RePlugin.getConfig().isMoveFileWhenInstalling()) {
                 FileUtils.moveFile(srcFile, newFile);

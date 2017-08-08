@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.model.PluginInfo;
+import com.qihoo360.replugin.utils.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,11 +39,6 @@ import java.io.InputStream;
  * @author RePlugin Team
  */
 public class MainActivity extends Activity {
-
-    // 外置插件相关
-    private final static String PLUGIN_NAME = "demo3";
-    private final static String PLUGIN_APK = PLUGIN_NAME + ".apk";
-    private final static String PLUGIN_PATH = "external" + File.separator + PLUGIN_APK;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +70,19 @@ public class MainActivity extends Activity {
             }
         });
 
+        findViewById(R.id.btn_start_demo3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 若没有安装，则直接提示“错误”
+                // TODO 将来把回调串联上
+                if (RePlugin.isPluginInstalled("demo3")) {
+                    RePlugin.startActivity(MainActivity.this, RePlugin.createIntent("demo3", "com.qihoo360.replugin.sample.demo3.MainActivity"));
+                } else {
+                    Toast.makeText(MainActivity.this, "You must install demo3 first!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         findViewById(R.id.btn_install_apk_from_assets).setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -83,7 +92,7 @@ public class MainActivity extends Activity {
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        simulateInstallExternalPlugin(PLUGIN_NAME);
+                        simulateInstallExternalPlugin();
                         pd.dismiss();
                     }
                 }, 1000);
@@ -102,22 +111,25 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * 模拟安装外置插件
+     * 模拟安装或升级（覆盖安装）外置插件
      * 注意：为方便演示，外置插件临时放置到Host的assets/external目录下，具体说明见README</p>
-     *
-     * @param pluginName 待安装的插件名
      */
-    private void simulateInstallExternalPlugin(String pluginName) {
-        PluginInfo info = RePlugin.getPluginInfo(pluginName);
-        if (info == null) {
-            String pluginFilePath = getFilesDir().getAbsolutePath() + File.separator + PLUGIN_APK;
-            File pluginFile = new File(pluginFilePath);
-            if (!pluginFile.exists()) {
-                copyAssetsFileToAppFiles(PLUGIN_PATH, PLUGIN_APK);
-                if (pluginFile.exists()) {
-                    info = RePlugin.install(pluginFilePath);
-                }
-            }
+    private void simulateInstallExternalPlugin() {
+        String demo3Apk= "demo3.apk";
+        String demo3apkPath = "external" + File.separator + demo3Apk;
+
+        // 文件是否已经存在？直接删除重来
+        String pluginFilePath = getFilesDir().getAbsolutePath() + File.separator + demo3Apk;
+        File pluginFile = new File(pluginFilePath);
+        if (pluginFile.exists()) {
+            FileUtils.deleteQuietly(pluginFile);
+        }
+
+        // 开始复制
+        copyAssetsFileToAppFiles(demo3apkPath, demo3Apk);
+        PluginInfo info = null;
+        if (pluginFile.exists()) {
+            info = RePlugin.install(pluginFilePath);
         }
 
         if (info != null) {
