@@ -32,7 +32,6 @@ import android.text.TextUtils;
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.IModule;
 import com.qihoo360.i.IPluginManager;
-import com.qihoo360.replugin.utils.ReflectUtils;
 import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.replugin.IHostBinderFetcher;
 import com.qihoo360.replugin.RePlugin;
@@ -49,6 +48,7 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.packages.PluginManagerProxy;
+import com.qihoo360.replugin.utils.ReflectUtils;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -995,20 +995,6 @@ class PmBase {
 
     final Plugin getPlugin(String plugin) {
         return mPlugins.get(plugin);
-    }
-
-    // 是否为新的，或已经更新过的插件
-    // 注意：若“插件正在运行”时触发更新，则这里应返回false，这样外界将不会发送“新插件”广播
-    final boolean isNewOrUpdatedPlugin(PluginInfo info) {
-        Plugin p = mPlugins.get(info.getName());
-
-        // 满足三个条件的其一就表示为"新插件"，可以做下一步处理
-        // 1. p为空，表示为全新插件
-        // 2. 要安装的版本比当前的要高，且未运行
-        // 3. "待定更新"插件（插件未运行）
-        return p == null ||
-                (p.mInfo.getVersionValue() < info.getVersionValue() && !RePlugin.isPluginRunning(info.getName())) ||
-                (info.getPendingUpdate() != null && !RePlugin.isPluginRunning(info.getName()));
     }
 
     final Plugin loadPackageInfoPlugin(String plugin, PluginCommImpl pm) {
