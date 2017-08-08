@@ -53,5 +53,4 @@ dependencies {
     provided 'com.android.support:support-v4:25.2.0'
 }
 
-
 apply from: 'bintray.gradle'

@@ -419,6 +419,19 @@ public class PluginManagerServer {
             FileUtils.copyFile(newPi.getApkFile(), curPi.getApkFile());
             FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
             FileUtils.copyFile(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                // avoid to break move flow by add try/catch here,
+                // when files length not equal.
+                try {
+                    File[] files = newPi.getExtraOdexDir().listFiles();
+
+                    for (int i = 0; i < files.length; i++) {
+                        FileUtils.copyFile(files[i], curPi.getExtraOdexDir().listFiles()[i]);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (IOException e) {
             if (LogRelease.LOGR) {
                 e.printStackTrace();
@@ -438,9 +451,9 @@ public class PluginManagerServer {
     private void delete(@NonNull PluginInfo pi) {
         try {
             FileUtils.forceDelete(new File(pi.getPath()));
-            FileUtils.forceDelete(pi.getDexParentDir());
+            FileUtils.forceDelete(pi.getDexFile());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                FileUtils.forceDelete(pi.getExtraDexParentDir());
+                FileUtils.forceDelete(pi.getExtraOdexDir());
             }
             FileUtils.forceDelete(pi.getNativeLibsDir());
         } catch (IOException e) {

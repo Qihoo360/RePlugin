@@ -281,9 +281,9 @@ public class PackageFilesUtil {
         }
         try {
             FileUtils.forceDelete(info.getApkFile());
-            FileUtils.forceDelete(info.getDexParentDir());
+            FileUtils.forceDelete(info.getDexFile());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                FileUtils.forceDelete(info.getExtraDexParentDir());
+                FileUtils.forceDelete(info.getExtraOdexDir());
             }
             FileUtils.forceDelete(info.getNativeLibsDir());
         } catch (IOException e) {

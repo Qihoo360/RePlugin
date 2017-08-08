@@ -84,9 +84,9 @@ public class Constant {
     public static final String LOCAL_PLUGIN_INDEPENDENT_EXTRA_DEX_SUB_DIR = "_ed";
 
     /**
-     * 插件Odex（优化后）释放的以插件名独立隔离的子目录
+     * 插件extra dex（优化后）释放的以插件名独立隔离的子目录
      */
-    public static final String LOCAL_PLUGIN_INDEPENDENT_ODEX_SUB_DIR = "_od";
+    public static final String LOCAL_PLUGIN_INDEPENDENT_EXTRA_ODEX_SUB_DIR = "_eod";
 
     /**
      * 插件文件名，name-low-high-current.jar

@@ -70,7 +70,7 @@ public class PluginDexClassLoader extends DexClassLoader {
     public PluginDexClassLoader(PluginInfo pi, String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
         super(dexPath, optimizedDirectory, librarySearchPath, parent);
 
-        installMultiDexesBeforeLollipop(pi, dexPath, optimizedDirectory, parent);
+        installMultiDexesBeforeLollipop(pi, dexPath, parent);
 
         mHostClassLoader = RePluginInternal.getAppClassLoader();
 
@@ -147,11 +147,10 @@ public class PluginDexClassLoader extends DexClassLoader {
      *
      * @param pi
      * @param dexPath
-     * @param optimizedDirectory
      * @param parent
      * @deprecated apply to ROM before Lollipop,may be deprecated
      */
-    private void installMultiDexesBeforeLollipop(PluginInfo pi, String dexPath, String optimizedDirectory, ClassLoader parent) {
+    private void installMultiDexesBeforeLollipop(PluginInfo pi, String dexPath, ClassLoader parent) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return;
@@ -178,7 +177,10 @@ public class PluginDexClassLoader extends DexClassLoader {
                     }
 
                     // get dexElements of extra dex (need to load dex first)
+                    String optimizedDirectory = pi.getExtraOdexDir().getAbsolutePath();
                     DexClassLoader dexClassLoader = new DexClassLoader(file.getAbsolutePath(), optimizedDirectory, optimizedDirectory, parent);
+                    // delete extra dex, after optimized
+                    FileUtils.forceDelete(pi.getExtraDexDir());
 
                     Object obj = ReflectUtils.readField(clz, dexClassLoader, "pathList");
                     Object[] dexElements = (Object[]) ReflectUtils.readField(obj.getClass(), obj, "dexElements");
@@ -292,7 +294,7 @@ public class PluginDexClassLoader extends DexClassLoader {
                 if (name.contains(".dex") && !name.equals("classes.dex")) {
 
                     if (dir == null) {
-                        dir = pi.getExtraDexParentDir().getAbsolutePath();
+                        dir = pi.getExtraDexDir().getAbsolutePath();
                     }
 
                     File file = new File(dir, name);
