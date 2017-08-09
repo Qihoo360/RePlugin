@@ -29,6 +29,8 @@ class ComponentsGenerator {
     def static final process = 'android:process'
     def static final task = 'android:taskAffinity'
     def static final launchMode = 'android:launchMode'
+    def static final authorities = 'android:authorities'
+    def static final multiprocess = 'android:multiprocess'
 
     def static final cfg = 'android:configChanges'
     def static final cfgV = 'keyboard|keyboardHidden|orientation|screenSize'
@@ -66,6 +68,34 @@ class ComponentsGenerator {
 
         /* UI 进程 */
         xml.application {
+
+            /* 需要编译期动态修改进程名的组件*/
+
+            // 常驻进程Provider
+            provider(
+                    "${name}":"com.qihoo360.replugin.component.process.ProcessPitProviderPersist",
+                    "${authorities}":"${applicationID}.loader.p.main",
+                    "${exp}":"false",
+                    "${process}":"${config.persistentName}")
+
+            provider(
+                    "${name}":"com.qihoo360.replugin.component.provider.PluginPitProviderPersist",
+                    "${authorities}":"${applicationID}.Plugin.NP.PSP",
+                    "${exp}":"false",
+                    "${process}":"${config.persistentName}")
+
+            // ServiceManager 服务框架
+            provider(
+                    "${name}":"com.qihoo360.mobilesafe.svcmanager.ServiceProvider",
+                    "${authorities}":"${applicationID}.svcmanager",
+                    "${exp}":"false",
+                    "${multiprocess}":"false",
+                    "${process}":"${config.persistentName}")
+
+            service(
+                    "${name}":"com.qihoo360.replugin.component.service.server.PluginPitServiceGuard",
+                    "${process}":"${config.persistentName}")
+            
             /* 透明坑 */
             config.countTranslucentStandard.times {
                 activity(
