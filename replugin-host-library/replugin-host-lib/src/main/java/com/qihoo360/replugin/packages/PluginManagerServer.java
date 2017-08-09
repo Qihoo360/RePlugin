@@ -417,8 +417,19 @@ public class PluginManagerServer {
     private void move(@NonNull PluginInfo curPi, @NonNull PluginInfo newPi) {
         try {
             FileUtils.copyFile(newPi.getApkFile(), curPi.getApkFile());
-            FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
-            FileUtils.copyFile(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+
+            if (newPi.getDexFile().exists()) {
+                FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
+            }
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                FileUtils.copyDir(newPi.getExtraOdexDir(), curPi.getDexParentDir());
+            }
+
+            if (newPi.getNativeLibsDir().exists()) {
+                FileUtils.copyDir(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+            }
+
         } catch (IOException e) {
             if (LogRelease.LOGR) {
                 e.printStackTrace();
