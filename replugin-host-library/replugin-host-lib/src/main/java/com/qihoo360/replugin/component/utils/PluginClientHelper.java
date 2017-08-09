@@ -24,9 +24,9 @@ import android.text.TextUtils;
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.IPluginManager;
 import com.qihoo360.replugin.RePlugin;
-import com.qihoo360.replugin.RePluginConstants;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.component.process.PluginProcessHost;
+import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 
@@ -99,7 +99,7 @@ public class PluginClientHelper {
 
             // 1. （推荐）":GuardService"。这样无论宿主的常驻进程名是什么，都会定向到"常驻进程"
             String pntl = processName.toLowerCase();
-            String ppdntl = RePluginConstants.PERSISTENT_NAME_DEFAULT.toLowerCase();
+            String ppdntl = HostConfigHelper.PERSISTENT_NAME.toLowerCase();
             if (pntl.contains(ppdntl)) {
                 return IPluginManager.PROCESS_PERSIST;
             }

@@ -28,12 +28,6 @@
         <!-- Activity坑中的screenSize属性 7.3.0以上才支持 -->
 
         <provider
-            android:name="com.qihoo360.replugin.component.process.ProcessPitProviderPersist"
-            android:authorities="${applicationId}.loader.p.main"
-            android:exported="false"
-            android:process=":GuardService" />
-
-        <provider
             android:name="com.qihoo360.replugin.component.process.ProcessPitProviderUI"
             android:authorities="${applicationId}.loader.p.mainN1"
             android:exported="false" />
@@ -204,30 +198,12 @@
             android:name="com.qihoo360.replugin.component.provider.PluginPitProviderUI"
             android:authorities="${applicationId}.Plugin.NP.UIP"
             android:exported="false" />
-        <provider
-            android:name="com.qihoo360.replugin.component.provider.PluginPitProviderPersist"
-            android:authorities="${applicationId}.Plugin.NP.PSP"
-            android:exported="false"
-            android:process=":GuardService" />
-
-        <service
-            android:name="com.qihoo360.replugin.component.service.server.PluginPitServiceGuard"
-            android:process=":GuardService" />
 
         <service
             android:name="com.qihoo360.replugin.component.service.server.PluginPitServiceUI" />
 
         <!-- 结束：插件stub -->
         <!-- ======================================================================== -->
-
-        <!-- 服务框架 begin -->
-        <provider
-            android:name="com.qihoo360.mobilesafe.svcmanager.ServiceProvider"
-            android:authorities="${applicationId}.svcmanager"
-            android:exported="false"
-            android:multiprocess="false"
-            android:process=":GuardService" />
-        <!-- 服务框架 end -->
 
         <!-- 在UI进程中安装插件。请参见类的说明 -->
         <provider

@@ -37,6 +37,9 @@ android {
 apply plugin: 'replugin-host-gradle'
 repluginHostConfig {
     useAppCompat = true
+
+    // 可以在这里自定义常驻进程的名字
+    // persistentName = ":XXXXService"
 }
 
 dependencies {
