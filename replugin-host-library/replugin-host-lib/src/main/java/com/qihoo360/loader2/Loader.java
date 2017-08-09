@@ -533,6 +533,11 @@ class Loader {
         List<String> pluginProcessList = getPluginProcessList();
 
         int hostProcessCount = hostProcessList != null ? hostProcessList.size() : 0;
+
+        if (hostProcessCount <= 0) {
+            return processMap;
+        }
+
         int pluginProcessCount = pluginProcessList != null ? pluginProcessList.size() : 0;
 
         for (int i = 0; i < pluginProcessCount; i++) {
@@ -613,6 +618,11 @@ class Loader {
     }
 
     private void doAdjust(HashMap<String, String> processMap, HashMap<String, ? extends ComponentInfo> infos) {
+
+        if (processMap == null || processMap.isEmpty()) {
+            return;
+        }
+
         for (HashMap.Entry<String, ? extends ComponentInfo> entry : infos.entrySet()) {
             ComponentInfo info = entry.getValue();
             if (info != null) {
