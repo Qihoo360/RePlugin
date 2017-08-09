@@ -423,7 +423,7 @@ public class PluginManagerServer {
             }
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                FileUtils.copyDir(newPi.getExtraOdexDir(), curPi.getDexParentDir());
+                FileUtils.copyDir(newPi.getExtraOdexDir(), curPi.getExtraOdexDir());
             }
 
             if (newPi.getNativeLibsDir().exists()) {

@@ -171,16 +171,15 @@ public class PluginDexClassLoader extends DexClassLoader {
                 Object[] mainElements = (Object[]) ReflectUtils.readField(pathList.getClass(), pathList, "dexElements");
                 allElements.add(mainElements);
 
+                // get dexElements of extra dex (need to load dex first)
+                String optimizedDirectory = pi.getExtraOdexDir().getAbsolutePath();
+
                 for (File file : dexFiles) {
                     if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
                         LogDebug.d(TAG, "dex file:" + file.getName());
                     }
 
-                    // get dexElements of extra dex (need to load dex first)
-                    String optimizedDirectory = pi.getExtraOdexDir().getAbsolutePath();
                     DexClassLoader dexClassLoader = new DexClassLoader(file.getAbsolutePath(), optimizedDirectory, optimizedDirectory, parent);
-                    // delete extra dex, after optimized
-                    FileUtils.forceDelete(pi.getExtraDexDir());
 
                     Object obj = ReflectUtils.readField(clz, dexClassLoader, "pathList");
                     Object[] dexElements = (Object[]) ReflectUtils.readField(obj.getClass(), obj, "dexElements");
@@ -192,6 +191,9 @@ public class PluginDexClassLoader extends DexClassLoader {
 
                 // rewrite Elements combined to classLoader
                 ReflectUtils.writeField(pathList.getClass(), pathList, "dexElements", combineElements);
+
+                // delete extra dex, after optimized
+                FileUtils.forceDelete(pi.getExtraDexDir());
 
                 //Test whether the Extra Dex is installed
                 if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
