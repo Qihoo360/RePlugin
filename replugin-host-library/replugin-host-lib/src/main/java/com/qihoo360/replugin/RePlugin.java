@@ -474,6 +474,44 @@ public class RePlugin {
     }
 
     /**
+     * 通过资源名（包括前缀和具体名字），来获取指定插件里的资源的ID
+     * <p>
+     * 性能消耗：等同于 fetchResources
+     *
+     * @param pluginName     插件名
+     * @param resTypeAndName 要获取的资源类型+插件名，格式为：“[type]/[name]”。例如： <p>
+     *                       layout/common_title → 从“布局”里获取common_title的ID <p>
+     *                       drawable/common_bg → 从“可绘制图片”里获取common_bg的ID <p>
+     *                       详细见Android官方的说明
+     * @return 资源的ID。若为0，则表示资源没有找到，无法使用
+     * @since 2.2.0
+     */
+    public static int fetchResourceIdByName(String pluginName, String resTypeAndName) {
+        PackageInfo pi = fetchPackageInfo(pluginName);
+        if (pi == null) {
+            // 插件没有找到
+            if (LogDebug.LOG) {
+                LogDebug.e(TAG, "fetchResourceIdByName: Plugin not found. pn=" + pluginName + "; resName=" + resTypeAndName);
+            }
+            return 0;
+        }
+        Resources res = fetchResources(pluginName);
+        if (res == null) {
+            // 不太可能出现此问题，同样为插件没有找到
+            if (LogDebug.LOG) {
+                LogDebug.e(TAG, "fetchResourceIdByName: Plugin not found (fetchResources). pn=" + pluginName + "; resName=" + resTypeAndName);
+            }
+            return 0;
+        }
+
+        // Identifier的第一个参数想要的是：
+        // [包名]:[类型名]/[资源名]。其中[类型名]/[资源名]就是 resTypeAndName 参数
+        // 例如：com.qihoo360.replugin.sample.demo2:layout/from_demo1
+        String idKey = pi.packageName + ":" + resTypeAndName;
+        return res.getIdentifier(idKey, null, null);
+    }
+
+    /**
      * 获取所有插件的列表（指已安装的）
      *
      * @return PluginInfo的表
