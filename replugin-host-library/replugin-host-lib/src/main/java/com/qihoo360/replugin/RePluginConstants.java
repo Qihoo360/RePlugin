@@ -100,8 +100,4 @@ public class RePluginConstants {
      * @deprecated 应废弃此Key，或换用更合适的
      */
     public static final String KEY_SELF_NEED_RESTART = "self_need_restart";
-    /**
-     * 默认常驻进程名
-     */
-    public static final String PERSISTENT_NAME_DEFAULT = ":GuardService";
 }

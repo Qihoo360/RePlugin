@@ -37,6 +37,9 @@ public class HostConfigHelper {
     // 注意:以下配置项必须和 replugin-host-gradle 插件中的配置相同
     //------------------------------------------------------------
 
+    // 常驻进程名
+    public static String PERSISTENT_NAME = ":GuardService";
+
     // 背景透明的坑的数量（每种 launchMode 不同）
     public static int ACTIVITY_PIT_COUNT_TS_STANDARD = 2;
     public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TOP = 2;
@@ -70,6 +73,12 @@ public class HostConfigHelper {
         try {
             HOST_CONFIG_CLASS = ReflectUtils.getClass(HOST_CONFIG_FILE_PATH + HOST_CONFIG_FILE_NAME);
         } catch (ClassNotFoundException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
+            PERSISTENT_NAME = readField("PERSISTENT_NAME");
+        } catch (NoSuchFieldException e) {
             // Ignore, Just use default value
         }
 

@@ -62,6 +62,9 @@ package com.qihoo360.replugin.gen;
  */
 public class RePluginHostConfig {
 
+    // 常驻进程名字
+    public static String PERSISTENT_NAME = "${config.persistentName}";
+
     // 背景透明的坑的数量（每种 launchMode 不同）
     public static int ACTIVITY_PIT_COUNT_TS_STANDARD = ${config.countTranslucentStandard};
     public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TOP = ${config.countTranslucentSingleTop};

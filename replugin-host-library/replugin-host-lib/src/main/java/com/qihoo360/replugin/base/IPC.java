@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import com.qihoo360.loader.utils.SysUtils;
 import com.qihoo360.loader2.PluginProcessMain;
 import com.qihoo360.replugin.RePlugin;
+import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
@@ -57,7 +58,7 @@ public class IPC {
         sPackageName = context.getApplicationInfo().packageName;
 
         // 设置最终的常驻进程名
-        String cppn = RePlugin.getConfig().getPersistentName();
+        String cppn = HostConfigHelper.PERSISTENT_NAME;
         if (!TextUtils.isEmpty(cppn)) {
             if (cppn.startsWith(":")) {
                 sPersistentProcessName = sPackageName + cppn;
