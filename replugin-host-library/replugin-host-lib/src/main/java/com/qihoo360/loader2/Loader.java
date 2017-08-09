@@ -51,9 +51,13 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
@@ -471,19 +475,86 @@ class Loader {
     }
 
     /**
-     * 调整插件中组件的进程名称
+     * 获取宿主中可分配的自定义进程列表
+     *
+     * @return
      */
-    private void adjustPluginProcess(ApplicationInfo appInfo) throws Exception {
-        if (appInfo == null) {
-            return;
+    private List<String> getHostProcessList() {
+        List<String> pluginProcessList = new ArrayList<>();
+        for (int i = 0; i < PluginProcessHost.PROCESS_COUNT; i++) {
+            pluginProcessList.add(IPC.getPackageName() + PluginProcessHost.PROCESS_PLUGIN_SUFFIX2 + i);
+        }
+        return pluginProcessList;
+    }
+
+    /**
+     * 读取插件中自定义进程列表
+     *
+     * @return
+     */
+    private List<String> getPluginProcessList() {
+        Set<String> processSet = new HashSet<>();
+
+        String pluginUIProcess = mComponents.getApplication().packageName;
+
+        getPluginProcess(processSet, mComponents.getProviders());
+        getPluginProcess(processSet, mComponents.getActivities());
+        getPluginProcess(processSet, mComponents.getServices());
+        getPluginProcess(processSet, mComponents.getReceivers());
+
+        processSet.remove(pluginUIProcess);
+
+        return Arrays.asList(processSet.toArray(new String[0]));
+    }
+
+    /**
+     * 把来自插件的进程去重
+     *
+     * @param processSet
+     * @param componentInfos
+     */
+    private void getPluginProcess(Set<String> processSet, ComponentInfo[] componentInfos) {
+        if (componentInfos != null) {
+            for (ComponentInfo componentInfo : componentInfos) {
+                processSet.add(componentInfo.processName);
+            }
+        }
+    }
+
+    /**
+     * 生成进程映射表，把插件中的自定义进程映射到宿主
+     *
+     * @return
+     */
+    private HashMap<String, String> genDynamicProcessMap() {
+        HashMap<String, String> processMap = new HashMap<>();
+
+        List<String> hostProcessList = getHostProcessList();
+        List<String> pluginProcessList = getPluginProcessList();
+
+        int hostProcessCount = hostProcessList != null ? hostProcessList.size() : 0;
+        int pluginProcessCount = pluginProcessList != null ? pluginProcessList.size() : 0;
+
+        for (int i = 0; i < pluginProcessCount; i++) {
+            int hostProcessIndex = i % hostProcessCount;
+            processMap.put(pluginProcessList.get(i), hostProcessList.get(hostProcessIndex));
         }
 
+        return processMap;
+    }
+
+    /**
+     * 获取插件AndroidMainfest中配置的静态进程映射表，meta-data："process_map"
+     *
+     * @param appInfo
+     * @return
+     */
+    private HashMap<String, String> getConfigProcessMap(ApplicationInfo appInfo) {
+        HashMap<String, String> processMap = new HashMap<>();
         Bundle bdl = appInfo.metaData;
         if (bdl == null || TextUtils.isEmpty(bdl.getString("process_map"))) {
-            return;
+            return processMap;
         }
-
-        HashMap<String, String> processMap = new HashMap<>();
         try {
             String processMapStr = bdl.getString("process_map");
             JSONArray ja = new JSONArray(processMapStr);
@@ -503,42 +574,56 @@ class Loader {
                 }
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return processMap;
+    }
+
+    /**
+     * 调整插件中组件的进程名称，用宿主中的进程坑位来接收插件中的自定义进程
+     *
+     * 注：
+     * 如果插件中没有配置静态的 “meta-data：process_map” 进行静态的进程映射，则自动为插件中组件分配进程
+     *
+     * @param appInfo
+     */
+    private void adjustPluginProcess(ApplicationInfo appInfo) {
+        HashMap<String, String> processMap = getConfigProcessMap(appInfo);
+        if (processMap == null || processMap.isEmpty()) {
+            processMap = genDynamicProcessMap();
         }
 
-        if (!processMap.isEmpty()) {
-
-            if (LOG) {
-                Log.d(PLUGIN_TAG, "--- 调整插件中组件的进程 BEGIN ---");
-                for (Map.Entry<String, String> entry : processMap.entrySet()) {
-                    Log.d(PLUGIN_TAG, entry.getKey() + " -> " + entry.getValue());
-                }
+        if (LOG) {
+            Log.d(PLUGIN_TAG, "--- 调整插件中组件的进程 BEGIN ---");
+            for (Map.Entry<String, String> entry : processMap.entrySet()) {
+                Log.d(PLUGIN_TAG, entry.getKey() + " -> " + entry.getValue());
             }
+        }
 
-            doAdjust(processMap, mComponents.getActivityMap());
-            doAdjust(processMap, mComponents.getServiceMap());
-            doAdjust(processMap, mComponents.getReceiverMap());
-            doAdjust(processMap, mComponents.getProviderMap());
+        doAdjust(processMap, mComponents.getActivityMap());
+        doAdjust(processMap, mComponents.getServiceMap());
+        doAdjust(processMap, mComponents.getReceiverMap());
+        doAdjust(processMap, mComponents.getProviderMap());
 
-            if (LOG) {
-                Log.d(PLUGIN_TAG, "--- 调整插件中组件的进程 END ---");
-            }
+        if (LOG) {
+            Log.d(PLUGIN_TAG, "--- 调整插件中组件的进程 END --- " + IPC.getCurrentProcessName());
         }
     }
 
-    private void doAdjust(HashMap<String, String> processMap, HashMap<String, ? extends ComponentInfo> infos) throws Exception {
+    private void doAdjust(HashMap<String, String> processMap, HashMap<String, ? extends ComponentInfo> infos) {
         for (HashMap.Entry<String, ? extends ComponentInfo> entry : infos.entrySet()) {
             ComponentInfo info = entry.getValue();
             if (info != null) {
                 String targetProcess = processMap.get(info.processName);
-                // 如果原始进程名称为空，说明解析插件 apk 时有问题（未解析每个组件的进程名称）。
-                // 此处抛出异常。
-                if (!TextUtils.isEmpty(targetProcess)) {
-                    info.processName = targetProcess;
-                }
 
-                if (LOG) {
-                    Log.d(PLUGIN_TAG, info.name + ":" + info.processName);
+                if (!TextUtils.isEmpty(targetProcess)) {
+                    if (LOG) {
+                        Log.d(TaskAffinityStates.TAG, String.format("--- 调整组件 %s, %s -> %s", info.name, info.processName, targetProcess));
+                    }
+
+                    info.processName = targetProcess;
                 }
             }
         }
