@@ -44,7 +44,7 @@ class ComponentsGenerator {
     def static final theme = 'android:theme'
     def static final themeTS = '@android:style/Theme.Translucent.NoTitleBar'
 
-    def static final THEME_NTS_NOT_APP_COMPAT = '@style/Theme.AppCompat'
+    def static final THEME_NTS_USE_APP_COMPAT = '@style/Theme.AppCompat'
     def static final THEME_NTS_NOT_USE_APP_COMPAT = '@android:style/Theme.NoTitleBar'
     def static themeNTS = THEME_NTS_NOT_USE_APP_COMPAT
 
@@ -58,7 +58,7 @@ class ComponentsGenerator {
     def static generateComponent(def applicationID, def config) {
         // 是否使用 AppCompat 库（涉及到默认主题）
         if (config.useAppCompat) {
-            themeNTS = THEME_NTS_NOT_APP_COMPAT
+            themeNTS = THEME_NTS_USE_APP_COMPAT
         } else {
             themeNTS = THEME_NTS_NOT_USE_APP_COMPAT
         }
