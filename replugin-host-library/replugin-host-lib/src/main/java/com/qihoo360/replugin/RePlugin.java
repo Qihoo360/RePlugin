@@ -32,6 +32,9 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.Factory2;
@@ -509,6 +512,38 @@ public class RePlugin {
         // 例如：com.qihoo360.replugin.sample.demo2:layout/from_demo1
         String idKey = pi.packageName + ":" + resTypeAndName;
         return res.getIdentifier(idKey, null, null);
+    }
+
+    /**
+     * 通过Layout名，来获取插件内的View
+     *
+     * @param pluginName 插件名
+     * @param layoutName Layout名字
+     * @param root Optional view to be the parent of the generated hierarchy.
+     * @return 插件的View。若为Null则表示获取失败
+     * @since 2.2.0
+     */
+    public static View fetchViewByLayoutName(String pluginName, String layoutName, ViewGroup root) {
+        Context context = fetchContext(pluginName);
+        if (context == null) {
+            // 插件没有找到
+            if (LogDebug.LOG) {
+                LogDebug.e(TAG, "fetchViewByLayoutName: Plugin not found. pn=" + pluginName + "; layoutName=" + layoutName);
+            }
+        }
+
+        String resTypeAndName = "layout/" + layoutName;
+        int id = fetchResourceIdByName(pluginName, resTypeAndName);
+        if (id <= 0) {
+            // 无法拿到资源，可能是资源没有找到
+            if (LogDebug.LOG) {
+                LogDebug.e(TAG, "fetchViewByLayoutName: fetch failed! pn=" + pluginName + "; layoutName=" + layoutName);
+            }
+            return null;
+        }
+
+        // TODO 可能要考虑WebView在API 19以上的特殊性
+        return LayoutInflater.from(context).inflate(id, root);
     }
 
     /**
