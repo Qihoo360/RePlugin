@@ -328,26 +328,43 @@ class PmHostSvc extends IPluginHost.Stub {
         }
 
         if (pi != null) {
-            // 插件是否需要更新
-            if (!mPluginMgr.isNewOrUpdatedPlugin(pi)) {
-                return pi;
-            }
-
-            // 常驻进程上下文
-            mPluginMgr.newPluginFound(pi, false);
-
-            // 通知其它进程
-            Intent intent = new Intent(PmBase.ACTION_NEW_PLUGIN);
-            intent.putExtra(RePluginConstants.KEY_PERSIST_NEED_RESTART, mNeedRestart);
-            intent.putExtra("obj", pi);
-            IPC.sendLocalBroadcast2AllSync(mContext, intent);
-
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "pluginDownloaded complete, info=" + pi);
-            }
+            // 通常到这里，表示“安装已成功”，这时不管处于什么状态，都应该通知外界更新插件内存表
+            syncPluginInfo2All(pi);
         }
 
         return pi;
+    }
+
+    private void syncPluginInfo2All(PluginInfo pi) {
+        // PS：若更新了“正在运行”的插件（属于“下次重启进程后更新”），则由于install返回的是“新的PluginInfo”，为防止出现“错误更新”，需要使用原来的
+        //
+        // 举例，有一个正在运行的插件A（其Info为PluginInfoOld）升级到新版（其Info为PluginInfoNew），则：
+        // 1. mManager.getService().install(path) 的返回值为：PluginInfoNew
+        // 2. PluginInfoOld在常驻进程中的内容修改为：PluginInfoOld.mPendingUpdate = PendingInfoNew
+        // 3. 同步到各进程，这里存在两种可能：
+        //    a) （有问题）同步的是PluginInfoNew，则所有进程的内存表都强制更新到新的Info上，因此【正在运行的】插件信息将丢失，会出现严重问题
+        //    b) （没问题）同步的是PluginInfoOld，只不过这个Old里面有个mPendingUpdate指向PendingInfoNew，则不会有问题，旧的仍被使用，符合预期
+        // 4. 最终install方法的返回值是PluginInfoNew，这样最外面拿到的就是安装成功的新插件信息，符合开发者的预期
+        PluginInfo needToSyncPi;
+        PluginInfo parent = pi.getParentInfo();
+        if (parent != null) {
+            needToSyncPi = parent;
+        } else {
+            needToSyncPi = pi;
+        }
+
+        // 在常驻进程内更新插件内存表
+        mPluginMgr.newPluginFound(needToSyncPi, false);
+
+        // 通知其它进程去更新
+        Intent intent = new Intent(PmBase.ACTION_NEW_PLUGIN);
+        intent.putExtra(RePluginConstants.KEY_PERSIST_NEED_RESTART, mNeedRestart);
+        intent.putExtra("obj", needToSyncPi);
+        IPC.sendLocalBroadcast2AllSync(mContext, intent);
+
+        if (LOG) {
+            LogDebug.d(TAG, "syncPluginInfo2All: Sync complete! syncPi=" + needToSyncPi);
+        }
     }
 
     private PluginInfo pluginDownloadedForPn(String path) {

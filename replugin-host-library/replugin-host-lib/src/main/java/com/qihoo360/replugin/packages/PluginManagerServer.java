@@ -28,16 +28,16 @@ import com.qihoo360.loader2.CertUtils;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
 import com.qihoo360.mobilesafe.api.Tasks;
-import com.qihoo360.replugin.utils.pkg.PackageFilesUtil;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginEventCallbacks;
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.base.IPC;
-import com.qihoo360.replugin.utils.FileUtils;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.model.PluginInfoList;
+import com.qihoo360.replugin.utils.FileUtils;
+import com.qihoo360.replugin.utils.pkg.PackageFilesUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -297,7 +297,6 @@ public class PluginManagerServer {
             }
             if (instPli.getVersion() > curPli.getVersion()) {
                 // 高版本升级
-                instPli.setIsThisPendingUpdateInfo(true);
                 curPli.setPendingUpdate(instPli);
                 curPli.setPendingDelete(null);
                 curPli.setPendingCover(null);
@@ -313,6 +312,9 @@ public class PluginManagerServer {
                     LogDebug.w(TAG, "updateOrLater: Plugin need update same version. clear PendingDelete.");
                 }
             }
+
+            // 设置其Parent为curPli，在PmBase.newPluginFound时会用到
+            instPli.setParentInfo(curPli);
         } else {
             if (LogDebug.LOG) {
                 LogDebug.i(TAG, "updateOrLater: Not running. Update now! pn=" + curPli.getName());

@@ -98,6 +98,18 @@ public class MainActivity extends Activity {
                 }, 1000);
             }
         });
+
+        // 刻意使用Thread的ClassLoader来测试效果
+        testThreadClassLoader();
+    }
+
+    private void testThreadClassLoader() {
+        // 在2.1.7及以前版本，如果直接调用此方法，则拿到的ClassLoader可能是PathClassLoader或者为空。有极个别Java库会用到此方法
+        // 这里务必确保：cl == getClassLoader()，才符合预期
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl != getClassLoader()) {
+            throw new RuntimeException("Thread.current.classLoader != getClassLoader(). cl=" + cl + "; getC=" + getClassLoader());
+        }
     }
 
     private static final int REQUEST_CODE_DEMO1 = 0x011;
