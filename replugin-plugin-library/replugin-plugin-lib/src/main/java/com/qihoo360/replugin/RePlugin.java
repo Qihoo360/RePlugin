@@ -527,7 +527,7 @@ public class RePlugin {
      *                       drawable/common_bg → 从“可绘制图片”里获取common_bg的ID <p>
      *                       详细见Android官方的说明
      * @return 资源的ID。若为0，则表示资源没有找到，无法使用
-     * @since 2.2.0
+     * @since 2.2.0 (老的host-lib版本也能使用)
      */
     public static int fetchResourceIdByName(String pluginName, String resTypeAndName) {
         if (!RePluginFramework.mHostInitialized) {
@@ -543,7 +543,7 @@ public class RePlugin {
      * @param layoutName Layout名字
      * @param root Optional view to be the parent of the generated hierarchy.
      * @return 插件的View。若为Null则表示获取失败
-     * @since 2.2.0
+     * @since 2.2.0 (老的host-lib版本也能使用)
      */
     public static View fetchViewByLayoutName(String pluginName, String layoutName, ViewGroup root) {
         if (!RePluginFramework.mHostInitialized) {
