@@ -37,6 +37,9 @@ public class HostConfigHelper {
     // 注意:以下配置项必须和 replugin-host-gradle 插件中的配置相同
     //------------------------------------------------------------
 
+    // 是否使用“常驻进程”（见PERSISTENT_NAME）作为插件的管理进程
+    public static boolean PERSISTENT_ENABLE = true;
+
     // 常驻进程名
     public static String PERSISTENT_NAME = ":GuardService";
 
@@ -73,6 +76,12 @@ public class HostConfigHelper {
         try {
             HOST_CONFIG_CLASS = ReflectUtils.getClass(HOST_CONFIG_FILE_PATH + HOST_CONFIG_FILE_NAME);
         } catch (ClassNotFoundException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
+            PERSISTENT_ENABLE = readField("PERSISTENT_ENABLE");
+        } catch (NoSuchFieldException e) {
             // Ignore, Just use default value
         }
 
