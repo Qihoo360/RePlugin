@@ -25,12 +25,14 @@ import android.content.res.Resources;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.View;
+import android.view.ViewGroup;
 
-import com.qihoo360.replugin.i.IPluginManager;
-import com.qihoo360.replugin.utils.ParcelUtils;
 import com.qihoo360.replugin.helper.LogDebug;
+import com.qihoo360.replugin.i.IPluginManager;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.packages.PluginRunningList;
+import com.qihoo360.replugin.utils.ParcelUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,8 @@ import java.util.List;
  */
 
 public class RePlugin {
+
+    static final String TAG = "RePlugin";
 
     /**
      * 表示目标进程根据实际情况自动调配
@@ -510,6 +514,42 @@ public class RePlugin {
         }
 
         return null;
+    }
+
+    /**
+     * 通过资源名（包括前缀和具体名字），来获取指定插件里的资源的ID
+     * <p>
+     * 性能消耗：等同于 fetchResources
+     *
+     * @param pluginName     插件名
+     * @param resTypeAndName 要获取的“资源类型+资源名”，格式为：“[type]/[name]”。例如： <p>
+     *                       → layout/common_title → 从“布局”里获取common_title的ID <p>
+     *                       → drawable/common_bg → 从“可绘制图片”里获取common_bg的ID <p>
+     *                       详细见Android官方的说明
+     * @return 资源的ID。若为0，则表示资源没有找到，无法使用
+     * @since 2.2.0 (老的host-lib版本也能使用)
+     */
+    public static int fetchResourceIdByName(String pluginName, String resTypeAndName) {
+        if (!RePluginFramework.mHostInitialized) {
+            return 0;
+        }
+        return RePluginCompat.fetchResourceIdByName(pluginName, resTypeAndName);
+    }
+
+    /**
+     * 通过Layout名，来获取插件内的View
+     *
+     * @param pluginName 插件名
+     * @param layoutName Layout名字
+     * @param root Optional view to be the parent of the generated hierarchy.
+     * @return 插件的View。若为Null则表示获取失败
+     * @since 2.2.0 (老的host-lib版本也能使用)
+     */
+    public static View fetchViewByLayoutName(String pluginName, String layoutName, ViewGroup root) {
+        if (!RePluginFramework.mHostInitialized) {
+            return null;
+        }
+        return RePluginCompat.fetchViewByLayoutName(pluginName, layoutName, root);
     }
 
     /**
