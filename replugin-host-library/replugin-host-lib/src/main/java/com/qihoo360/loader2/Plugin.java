@@ -19,6 +19,7 @@ package com.qihoo360.loader2;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -37,9 +38,11 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.packages.PluginManagerProxy;
+import com.qihoo360.replugin.utils.FileUtils;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -671,6 +674,17 @@ class Plugin {
             }
             odex.delete();
         }
+
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            // support for multidex below LOLLIPOP:delete Extra odex,if need
+            try {
+                FileUtils.forceDelete(mInfo.getExtraOdexDir());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         t1 = System.currentTimeMillis();
         rc = doLoad(logTag, context, parent, manager, load);
         if (LOG) {

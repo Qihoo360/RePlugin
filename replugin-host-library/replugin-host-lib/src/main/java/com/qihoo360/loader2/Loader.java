@@ -310,7 +310,7 @@ class Loader {
                     parent = getClass().getClassLoader().getParent(); // TODO: 这里直接用父类加载器
                 }
                 String soDir = mPackageInfo.applicationInfo.nativeLibraryDir;
-                mClassLoader = RePlugin.getConfig().getCallbacks().createPluginClassLoader(mPath, out, soDir, parent);
+                mClassLoader = RePlugin.getConfig().getCallbacks().createPluginClassLoader(mPluginObj.mInfo, mPath, out, soDir, parent);
                 Log.i("dex", "load " + mPath + " = " + mClassLoader);
 
                 if (mClassLoader == null) {

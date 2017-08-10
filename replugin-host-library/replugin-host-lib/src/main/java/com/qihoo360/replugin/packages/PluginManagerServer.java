@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -426,8 +427,19 @@ public class PluginManagerServer {
     private void move(@NonNull PluginInfo curPi, @NonNull PluginInfo newPi) {
         try {
             FileUtils.copyFile(newPi.getApkFile(), curPi.getApkFile());
-            FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
-            FileUtils.copyFile(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+
+            if (newPi.getDexFile().exists()) {
+                FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
+            }
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                FileUtils.copyDir(newPi.getExtraOdexDir(), curPi.getExtraOdexDir());
+            }
+
+            if (newPi.getNativeLibsDir().exists()) {
+                FileUtils.copyDir(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+            }
+
         } catch (IOException e) {
             if (LogRelease.LOGR) {
                 e.printStackTrace();
@@ -448,6 +460,9 @@ public class PluginManagerServer {
         try {
             FileUtils.forceDelete(new File(pi.getPath()));
             FileUtils.forceDelete(pi.getDexFile());
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                FileUtils.forceDelete(pi.getExtraOdexDir());
+            }
             FileUtils.forceDelete(pi.getNativeLibsDir());
         } catch (IOException e) {
             if (LogRelease.LOGR) {
