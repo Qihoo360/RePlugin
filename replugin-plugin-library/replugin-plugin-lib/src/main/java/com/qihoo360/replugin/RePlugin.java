@@ -522,9 +522,9 @@ public class RePlugin {
      * 性能消耗：等同于 fetchResources
      *
      * @param pluginName     插件名
-     * @param resTypeAndName 要获取的资源类型+插件名，格式为：“[type]/[name]”。例如： <p>
-     *                       layout/common_title → 从“布局”里获取common_title的ID <p>
-     *                       drawable/common_bg → 从“可绘制图片”里获取common_bg的ID <p>
+     * @param resTypeAndName 要获取的“资源类型+资源名”，格式为：“[type]/[name]”。例如： <p>
+     *                       → layout/common_title → 从“布局”里获取common_title的ID <p>
+     *                       → drawable/common_bg → 从“可绘制图片”里获取common_bg的ID <p>
      *                       详细见Android官方的说明
      * @return 资源的ID。若为0，则表示资源没有找到，无法使用
      * @since 2.2.0 (老的host-lib版本也能使用)
