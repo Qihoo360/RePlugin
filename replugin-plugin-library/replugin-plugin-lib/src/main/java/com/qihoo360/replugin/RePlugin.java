@@ -46,6 +46,8 @@ import java.util.List;
 
 public class RePlugin {
 
+    static final String TAG = "RePlugin";
+
     /**
      * 表示目标进程根据实际情况自动调配
      */
@@ -531,16 +533,7 @@ public class RePlugin {
         if (!RePluginFramework.mHostInitialized) {
             return 0;
         }
-
-        try {
-            return (int) ProxyRePluginVar.fetchResourceIdByName.call(null, pluginName, resTypeAndName);
-        } catch (Exception e) {
-            if (LogDebug.LOG) {
-                e.printStackTrace();
-            }
-        }
-
-        return 0;
+        return RePluginCompat.fetchResourceIdByName(pluginName, resTypeAndName);
     }
 
     /**
@@ -556,16 +549,7 @@ public class RePlugin {
         if (!RePluginFramework.mHostInitialized) {
             return null;
         }
-
-        try {
-            return (View) ProxyRePluginVar.fetchViewByLayoutName.call(null, pluginName, layoutName, root);
-        } catch (Exception e) {
-            if (LogDebug.LOG) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
+        return RePluginCompat.fetchViewByLayoutName(pluginName, layoutName, root);
     }
 
     /**
@@ -1144,10 +1128,6 @@ public class RePlugin {
 
         private static MethodInvoker fetchPluginNameByClassLoader;
 
-        private static MethodInvoker fetchResourceIdByName;
-
-        private static MethodInvoker fetchViewByLayoutName;
-
         private static MethodInvoker getPluginInfoList;
 
         private static MethodInvoker getPluginInfo;
@@ -1215,8 +1195,6 @@ public class RePlugin {
             fetchBinder = new MethodInvoker(classLoader, rePlugin, "fetchBinder", new Class<?>[]{String.class, String.class});
             fetchBinder2 = new MethodInvoker(classLoader, rePlugin, "fetchBinder", new Class<?>[]{String.class, String.class, String.class});
             fetchPluginNameByClassLoader = new MethodInvoker(classLoader, rePlugin, "fetchPluginNameByClassLoader", new Class<?>[]{ClassLoader.class});
-            fetchResourceIdByName = new MethodInvoker(classLoader, rePlugin, "fetchResourceIdByName", new Class<?>[]{String.class, String.class});
-            fetchViewByLayoutName = new MethodInvoker(classLoader, rePlugin, "fetchViewByLayoutName", new Class<?>[]{String.class, String.class, ViewGroup.class});
             getPluginInfoList = new MethodInvoker(classLoader, rePlugin, "getPluginInfoList", new Class<?>[]{});
             getPluginInfo = new MethodInvoker(classLoader, rePlugin, "getPluginInfo", new Class<?>[]{String.class});
             getPluginVersion = new MethodInvoker(classLoader, rePlugin, "getPluginVersion", new Class<?>[]{String.class});
