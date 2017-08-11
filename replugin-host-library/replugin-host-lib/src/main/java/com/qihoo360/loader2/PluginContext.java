@@ -283,15 +283,14 @@ public class PluginContext extends ContextThemeWrapper {
     /**
      * 设置文件的访问权限
      *
-     * @param name 需要被设置访问权限的文件
-     * @param mode 文件操作模式
+     * @param name             需要被设置访问权限的文件
+     * @param mode             文件操作模式
      * @param extraPermissions 文件访问权限
-     *
-     * 注意： <p>
-     * 此部分经由360安全部门审核后，在所有者|同组用户|其他用户三部分的权限设置中，认为在其他用户的权限设置存在一定的安全风险 <p>
-     * 目前暂且忽略传入的文件操作模式参数，并移除了允许其他用户的读写权限的操作 <p>
-     * 对于文件操作模式以及其他用户访问权限的设置，开发者可自行评估 <p>
-     *
+     *                         <p>
+     *                         注意： <p>
+     *                         此部分经由360安全部门审核后，在所有者|同组用户|其他用户三部分的权限设置中，认为在其他用户的权限设置存在一定的安全风险 <p>
+     *                         目前暂且忽略传入的文件操作模式参数，并移除了允许其他用户的读写权限的操作 <p>
+     *                         对于文件操作模式以及其他用户访问权限的设置，开发者可自行评估 <p>
      * @return
      */
     private final void setFilePermissionsFromMode(String name, int mode, int extraPermissions) {

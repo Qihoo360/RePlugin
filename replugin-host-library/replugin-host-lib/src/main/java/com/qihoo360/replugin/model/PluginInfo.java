@@ -236,9 +236,15 @@ public class PluginInfo implements Parcelable, Cloneable {
         }
 
         // 针对有问题的字段做除错处理
-        if (low <= 0) { low = Constant.ADAPTER_COMPATIBLE_VERSION; }
-        if (high <= 0) { high = Constant.ADAPTER_COMPATIBLE_VERSION; }
-        if (ver <= 0) { ver = pi.versionCode; }
+        if (low <= 0) {
+            low = Constant.ADAPTER_COMPATIBLE_VERSION;
+        }
+        if (high <= 0) {
+            high = Constant.ADAPTER_COMPATIBLE_VERSION;
+        }
+        if (ver <= 0) {
+            ver = pi.versionCode;
+        }
 
         PluginInfo pli = new PluginInfo(pn, alias, low, high, ver, path, PluginInfo.TYPE_NOT_INSTALL);
 
@@ -417,7 +423,7 @@ public class PluginInfo implements Parcelable, Cloneable {
      * 获取Extra Dex（优化后）生成时所在的目录 <p>
      * 若为"纯APK"插件，则会位于app_p_od/xx_eod中；若为"p-n"插件，则会位于"app_plugins_v3_odex/xx_eod"中 <p>
      * 若支持同版本覆盖安装的话，则会位于app_p_c/xx_eod中； <p>
-     *  注意：仅供框架内部使用;仅适用于Android 4.4.x及以下
+     * 注意：仅供框架内部使用;仅适用于Android 4.4.x及以下
      *
      * @return 优化后Extra Dex所在目录的File对象
      */
@@ -492,15 +498,6 @@ public class PluginInfo implements Parcelable, Cloneable {
      */
     public void setType(int type) {
         JSONHelper.putNoThrows(mJson, "type", type);
-    }
-
-    /**
-     * 设置插件的包名
-     */
-    public void setPkgName(String pkgName){
-        if(!TextUtils.equals(pkgName, getPackageName())){
-            JSONHelper.putNoThrows(mJson, "pkgname", pkgName);
-        }
     }
 
     /**
@@ -746,14 +743,14 @@ public class PluginInfo implements Parcelable, Cloneable {
         return pi;
     }
 
-    private void setPackageName(String pkgName){
-        if(!TextUtils.equals(pkgName, getPackageName())){
+    private void setPackageName(String pkgName) {
+        if (!TextUtils.equals(pkgName, getPackageName())) {
             JSONHelper.putNoThrows(mJson, "pkgname", pkgName);
         }
     }
 
-    private void setAlias(String alias){
-        if(!TextUtils.equals(alias, getAlias())){
+    private void setAlias(String alias) {
+        if (!TextUtils.equals(alias, getAlias())) {
             JSONHelper.putNoThrows(mJson, "ali", alias);
         }
     }
@@ -1092,8 +1089,8 @@ public class PluginInfo implements Parcelable, Cloneable {
 
     /**
      * 判断是否为p-n类型的插件？
-     * @return 是否为p-n类型的插件
      *
+     * @return 是否为p-n类型的插件
      * @deprecated 只用于旧的P-n插件，可能会废弃
      */
     public boolean isPnPlugin() {
