@@ -44,6 +44,7 @@ import com.qihoo360.replugin.component.dummy.DummyProvider;
 import com.qihoo360.replugin.component.dummy.DummyService;
 import com.qihoo360.replugin.component.process.PluginProcessHost;
 import com.qihoo360.replugin.component.service.server.PluginPitService;
+import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
@@ -228,19 +229,22 @@ class PmBase {
     }
 
     void init() {
-        if (IPC.isPersistentProcess()) {
-            mHostSvc = new PmHostSvc(mContext, this);
-            PluginProcessMain.installHost(mHostSvc);
-            PluginProcessMain.schedulePluginProcessLoop(PluginProcessMain.CHECK_STAGE1_DELAY);
-
+        if (HostConfigHelper.PERSISTENT_ENABLE) {
+            // （默认）“常驻进程”作为插件管理进程，则区分进程对待
+            if (IPC.isPersistentProcess()) {
+                initForPersistent();
+            } else {
+                initForClient();
+            }
         } else {
-            PluginProcessMain.installHost();
-        }
-
-        if (IPC.isPersistentProcess()) {
-            initForPersistent();
-        } else {
-            initForClient();
+            // “UI进程”作为插件管理进程（唯一进程），则此进程既可以作为Persistent也可以作为Client
+            if (IPC.isUIProcess()) {
+                initForPersistent();
+                initForClient();
+            } else {
+                // 其它进程？直接走Client即可
+                initForClient();
+            }
         }
 
         // 最新快照
@@ -262,6 +266,10 @@ class PmBase {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "search plugins from file system");
         }
+
+        mHostSvc = new PmHostSvc(mContext, this);
+        PluginProcessMain.installHost(mHostSvc);
+        PluginProcessMain.schedulePluginProcessLoop(PluginProcessMain.CHECK_STAGE1_DELAY);
 
         // 兼容即将废弃的p-n方案 by Jiongxuan Zhang
         mAll = new Builder.PxAll();
@@ -294,6 +302,8 @@ class PmBase {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "list plugins from persistent process");
         }
+
+        PluginProcessMain.installHost();
 
         List<PluginInfo> plugins = null;
         try {

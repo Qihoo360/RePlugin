@@ -144,30 +144,6 @@ public final class RePluginConfig {
     }
 
     /**
-     * 是否开启"双进程"模式？
-     *
-     * @return 是否开启
-     */
-    public boolean isPersistentEnable() {
-        return persistentEnable;
-    }
-
-    /**
-     * 设置是否允许开启"双进程"模式，开启后会极大的提升插件加载和获取的性能 <p>
-     * TODO 尚不支持单进程模式，在以后会开发
-     *
-     * @param persistentEnable 是否开启
-     * @return RePluginConfig自己。这样可以连环调用set方法
-     */
-    public RePluginConfig setPersistentEnable(boolean persistentEnable) {
-        if (!checkAllowModify()) {
-            return this;
-        }
-        this.persistentEnable = persistentEnable;
-        return this;
-    }
-
-    /**
      * 是否当插件没有指定类时，使用宿主的类？ <p>
      * 有关该开关的具体说明，请参见setUseHostClass方法
      *
