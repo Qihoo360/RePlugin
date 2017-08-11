@@ -443,7 +443,12 @@ public class PluginContext extends ContextThemeWrapper {
         // 直接获取插件的Application对象
         // NOTE 切勿获取mLoader.mPkgContext，因为里面的一些方法会调用getApplicationContext（如registerComponentCallback）
         // NOTE 这样会造成StackOverflow异常。所以只能获取Application对象（框架版本为3以上的会创建此对象）
-        return mLoader.mPluginObj.mApplicationClient.getObj();
+        //entry中调用context.getApplicationContext时mApplicationClient还没被赋值，会导致空指针造成插件安装失败
+        if(mLoader.mPluginObj.mApplicationClient == null){
+            return this;
+        }else{
+            return mLoader.mPluginObj.mApplicationClient.getObj();
+        }
     }
 
 

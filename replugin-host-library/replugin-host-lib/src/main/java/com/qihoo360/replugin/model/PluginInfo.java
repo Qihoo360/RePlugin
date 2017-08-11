@@ -495,6 +495,15 @@ public class PluginInfo implements Parcelable, Cloneable {
     }
 
     /**
+     * 设置插件的包名
+     */
+    public void setPkgName(String pkgName){
+        if(!TextUtils.equals(pkgName, getPackageName())){
+            JSONHelper.putNoThrows(mJson, "pkgname", pkgName);
+        }
+    }
+
+    /**
      * 是否已准备好了新版本？
      *
      * @return 是否已准备好
@@ -709,6 +718,7 @@ public class PluginInfo implements Parcelable, Cloneable {
         setVersion(info.getVersion());
         setPath(info.getPath());
         setType(info.getType());
+        setPkgName(info.getPackageName());
     }
 
     /**
