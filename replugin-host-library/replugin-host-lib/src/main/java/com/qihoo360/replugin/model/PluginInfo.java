@@ -709,7 +709,7 @@ public class PluginInfo implements Parcelable, Cloneable {
 
     /**
      * 更新插件信息。通常是在安装完新插件后调用此方法 <p>
-     * 只更新一些必要的方法，如插件版本、路径、时间等。插件名之类的不会被更新
+     * 只更新一些必要的方法，如插件版本、路径、时间等。
      *
      * @param info 新版本插件信息
      */
@@ -718,7 +718,8 @@ public class PluginInfo implements Parcelable, Cloneable {
         setVersion(info.getVersion());
         setPath(info.getPath());
         setType(info.getType());
-        setPkgName(info.getPackageName());
+        setPackageName(info.getPackageName());
+        setAlias(info.getAlias());
     }
 
     /**
@@ -743,6 +744,18 @@ public class PluginInfo implements Parcelable, Cloneable {
         }
 
         return pi;
+    }
+
+    private void setPackageName(String pkgName){
+        if(!TextUtils.equals(pkgName, getPackageName())){
+            JSONHelper.putNoThrows(mJson, "pkgname", pkgName);
+        }
+    }
+
+    private void setAlias(String alias){
+        if(!TextUtils.equals(alias, getAlias())){
+            JSONHelper.putNoThrows(mJson, "ali", alias);
+        }
     }
 
     private void setVersion(int version) {
