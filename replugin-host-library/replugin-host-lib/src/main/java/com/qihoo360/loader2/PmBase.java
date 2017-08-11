@@ -230,19 +230,26 @@ class PmBase {
 
     void init() {
         if (HostConfigHelper.PERSISTENT_ENABLE) {
-            // （默认）“常驻进程”作为插件管理进程，则区分进程对待
+            // （默认）“常驻进程”作为插件管理进程，则常驻进程作为Server，其余进程作为Client
             if (IPC.isPersistentProcess()) {
-                initForPersistent();
+                // 初始化“Server”所做工作
+                initForServer();
             } else {
+                // 连接到Server
                 initForClient();
             }
         } else {
-            // “UI进程”作为插件管理进程（唯一进程），则此进程既可以作为Persistent也可以作为Client
+            // “UI进程”作为插件管理进程（唯一进程），则UI进程既可以作为Server也可以作为Client
             if (IPC.isUIProcess()) {
-                initForPersistent();
-                initForClient();
+                // 1. 尝试初始化Server所做工作，
+                initForServer();
+
+                // 2. 注册该进程信息到“插件管理进程”中
+                // 注意：这里无需再做 initForClient，因为不需要再走一次Binder
+                PMF.sPluginMgr.attach();
+
             } else {
-                // 其它进程？直接走Client即可
+                // 其它进程？直接连接到Server即可
                 initForClient();
             }
         }
@@ -262,7 +269,7 @@ class PmBase {
      * Persistent(常驻)进程的初始化
      *
      */
-    private final void initForPersistent() {
+    private final void initForServer() {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "search plugins from file system");
         }
@@ -290,8 +297,6 @@ class PmBase {
                 LogRelease.e(PLUGIN_TAG, "lst.p: " + e.getMessage(), e);
             }
         }
-
-
     }
 
     /**
@@ -303,8 +308,17 @@ class PmBase {
             LogDebug.d(PLUGIN_TAG, "list plugins from persistent process");
         }
 
-        PluginProcessMain.installHost();
+        // 1. 先尝试连接
+        PluginProcessMain.connectToHostSvc();
 
+        // 2. 然后从常驻进程获取插件列表
+        refreshPluginsFromHostSvc();
+    }
+
+    /**
+     * 从HostSvc（插件管理所在进程）获取所有的插件信息
+     */
+    private void refreshPluginsFromHostSvc() {
         List<PluginInfo> plugins = null;
         try {
             plugins = PluginProcessMain.getPluginHost().listPlugins();

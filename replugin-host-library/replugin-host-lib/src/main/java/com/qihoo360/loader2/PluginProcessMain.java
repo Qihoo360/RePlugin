@@ -283,7 +283,7 @@ public class PluginProcessMain {
     /**
      * 非常驻进程调用，获取常驻进程的 IPluginHost
      */
-    static final void installHost() {
+    static final void connectToHostSvc() {
         Context context = PMF.getApplicationContext();
 
         //
@@ -352,6 +352,7 @@ public class PluginProcessMain {
             System.exit(1);
         }
 
+        // 注册该进程信息到“插件管理进程”中
         PMF.sPluginMgr.attach();
     }
 
@@ -369,7 +370,7 @@ public class PluginProcessMain {
                 }
             }
             // 再次唤起常驻进程
-            installHost();
+            connectToHostSvc();
         }
         return sPluginHostRemote;
     }
