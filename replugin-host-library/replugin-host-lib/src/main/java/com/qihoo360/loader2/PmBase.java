@@ -44,6 +44,7 @@ import com.qihoo360.replugin.component.dummy.DummyProvider;
 import com.qihoo360.replugin.component.dummy.DummyService;
 import com.qihoo360.replugin.component.process.PluginProcessHost;
 import com.qihoo360.replugin.component.service.server.PluginPitService;
+import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
@@ -228,19 +229,29 @@ class PmBase {
     }
 
     void init() {
-        if (IPC.isPersistentProcess()) {
-            mHostSvc = new PmHostSvc(mContext, this);
-            PluginProcessMain.installHost(mHostSvc);
-            PluginProcessMain.schedulePluginProcessLoop(PluginProcessMain.CHECK_STAGE1_DELAY);
-
+        if (HostConfigHelper.PERSISTENT_ENABLE) {
+            // （默认）“常驻进程”作为插件管理进程，则常驻进程作为Server，其余进程作为Client
+            if (IPC.isPersistentProcess()) {
+                // 初始化“Server”所做工作
+                initForServer();
+            } else {
+                // 连接到Server
+                initForClient();
+            }
         } else {
-            PluginProcessMain.installHost();
-        }
+            // “UI进程”作为插件管理进程（唯一进程），则UI进程既可以作为Server也可以作为Client
+            if (IPC.isUIProcess()) {
+                // 1. 尝试初始化Server所做工作，
+                initForServer();
 
-        if (IPC.isPersistentProcess()) {
-            initForPersistent();
-        } else {
-            initForClient();
+                // 2. 注册该进程信息到“插件管理进程”中
+                // 注意：这里无需再做 initForClient，因为不需要再走一次Binder
+                PMF.sPluginMgr.attach();
+
+            } else {
+                // 其它进程？直接连接到Server即可
+                initForClient();
+            }
         }
 
         // 最新快照
@@ -258,10 +269,14 @@ class PmBase {
      * Persistent(常驻)进程的初始化
      *
      */
-    private final void initForPersistent() {
+    private final void initForServer() {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "search plugins from file system");
         }
+
+        mHostSvc = new PmHostSvc(mContext, this);
+        PluginProcessMain.installHost(mHostSvc);
+        PluginProcessMain.schedulePluginProcessLoop(PluginProcessMain.CHECK_STAGE1_DELAY);
 
         // 兼容即将废弃的p-n方案 by Jiongxuan Zhang
         mAll = new Builder.PxAll();
@@ -282,8 +297,6 @@ class PmBase {
                 LogRelease.e(PLUGIN_TAG, "lst.p: " + e.getMessage(), e);
             }
         }
-
-
     }
 
     /**
@@ -295,6 +308,17 @@ class PmBase {
             LogDebug.d(PLUGIN_TAG, "list plugins from persistent process");
         }
 
+        // 1. 先尝试连接
+        PluginProcessMain.connectToHostSvc();
+
+        // 2. 然后从常驻进程获取插件列表
+        refreshPluginsFromHostSvc();
+    }
+
+    /**
+     * 从HostSvc（插件管理所在进程）获取所有的插件信息
+     */
+    private void refreshPluginsFromHostSvc() {
         List<PluginInfo> plugins = null;
         try {
             plugins = PluginProcessMain.getPluginHost().listPlugins();

@@ -24,7 +24,6 @@ import android.text.TextUtils;
 
 import com.qihoo360.loader.utils.SysUtils;
 import com.qihoo360.loader2.PluginProcessMain;
-import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 
@@ -58,13 +57,17 @@ public class IPC {
         sPackageName = context.getApplicationInfo().packageName;
 
         // 设置最终的常驻进程名
-        String cppn = HostConfigHelper.PERSISTENT_NAME;
-        if (!TextUtils.isEmpty(cppn)) {
-            if (cppn.startsWith(":")) {
-                sPersistentProcessName = sPackageName + cppn;
-            } else {
-                sPersistentProcessName = cppn;
+        if (HostConfigHelper.PERSISTENT_ENABLE) {
+            String cppn = HostConfigHelper.PERSISTENT_NAME;
+            if (!TextUtils.isEmpty(cppn)) {
+                if (cppn.startsWith(":")) {
+                    sPersistentProcessName = sPackageName + cppn;
+                } else {
+                    sPersistentProcessName = cppn;
+                }
             }
+        } else {
+            sPersistentProcessName = sPackageName;
         }
 
         sIsUIProcess = sCurrentProcess.equals(sPackageName);
@@ -105,11 +108,7 @@ public class IPC {
      * @return 插件处理逻辑所在进程名
      */
     public static String getPluginHostProcessName() {
-        if (isPersistentEnable()) {
-            return getPersistentProcessName();
-        } else {
-            return getCurrentProcessName();
-        }
+        return sPersistentProcessName;
     }
 
     /**
@@ -148,7 +147,7 @@ public class IPC {
      * @return 是否支持？
      */
     public static boolean isPersistentEnable() {
-        return RePlugin.getConfig().isPersistentEnable();
+        return HostConfigHelper.PERSISTENT_ENABLE;
     }
 
     /**

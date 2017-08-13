@@ -71,18 +71,20 @@ class ComponentsGenerator {
 
             /* 需要编译期动态修改进程名的组件*/
 
+            String pluginMgrProcessName = config.persistentEnable ? config.persistentName : applicationID
+
             // 常驻进程Provider
             provider(
                     "${name}":"com.qihoo360.replugin.component.process.ProcessPitProviderPersist",
                     "${authorities}":"${applicationID}.loader.p.main",
                     "${exp}":"false",
-                    "${process}":"${config.persistentName}")
+                    "${process}":"${pluginMgrProcessName}")
 
             provider(
                     "${name}":"com.qihoo360.replugin.component.provider.PluginPitProviderPersist",
                     "${authorities}":"${applicationID}.Plugin.NP.PSP",
                     "${exp}":"false",
-                    "${process}":"${config.persistentName}")
+                    "${process}":"${pluginMgrProcessName}")
 
             // ServiceManager 服务框架
             provider(
@@ -90,12 +92,12 @@ class ComponentsGenerator {
                     "${authorities}":"${applicationID}.svcmanager",
                     "${exp}":"false",
                     "${multiprocess}":"false",
-                    "${process}":"${config.persistentName}")
+                    "${process}":"${pluginMgrProcessName}")
 
             service(
                     "${name}":"com.qihoo360.replugin.component.service.server.PluginPitServiceGuard",
-                    "${process}":"${config.persistentName}")
-            
+                    "${process}":"${pluginMgrProcessName}")
+
             /* 透明坑 */
             config.countTranslucentStandard.times {
                 activity(

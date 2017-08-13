@@ -228,6 +228,9 @@ class RepluginConfig {
     /** 自定义进程的数量(除 UI 和 Persistent 进程) */
     def countProcess = 3
 
+    /** 是否使用常驻进程？ */
+    def persistentEnable = true
+
     /** 常驻进程名称（也就是上面说的 Persistent 进程，开发者可自定义）*/
     def persistentName = ':GuardService'
 
