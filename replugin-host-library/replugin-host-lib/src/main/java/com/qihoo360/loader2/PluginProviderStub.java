@@ -25,13 +25,13 @@ import android.os.IBinder.DeathRecipient;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.loader2.sp.IPref;
 import com.qihoo360.loader2.sp.PrefImpl;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.component.process.ProcessPitProviderBase;
 import com.qihoo360.replugin.component.process.ProcessPitProviderPersist;
 import com.qihoo360.replugin.helper.LogDebug;
+import com.qihoo360.replugin.utils.CloseableUtils;
 
 import java.util.Arrays;
 
@@ -127,7 +127,7 @@ public class PluginProviderStub {
                     //
                     PMF.sPluginMgr.mLocalCookie = cookie;
                     //
-                    PluginProcessMain.installHost();
+                    PluginProcessMain.connectToHostSvc();
                 }
             }
 

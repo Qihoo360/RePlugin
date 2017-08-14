@@ -65,14 +65,15 @@ public class RePluginCallbacks {
      * return new MyDexClassLoader(dexPath, optimizedDirectory, librarySearchPath, parent);
      * </code>
      *
+     * @param pi                 插件信息
      * @param dexPath            插件APK所在路径
      * @param optimizedDirectory 插件释放odex/oat的路径
      * @param librarySearchPath  插件SO库所在路径
      * @param parent             插件ClassLoader的父亲
      * @return 插件自己可用的PluginDexClassLoader对象。
      */
-    public PluginDexClassLoader createPluginClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
-        return new PluginDexClassLoader(dexPath, optimizedDirectory, librarySearchPath, parent);
+    public PluginDexClassLoader createPluginClassLoader(PluginInfo pi, String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
+        return new PluginDexClassLoader(pi, dexPath, optimizedDirectory, librarySearchPath, parent);
     }
 
     /**

@@ -65,6 +65,9 @@ public class RePluginHostConfig {
     // 常驻进程名字
     public static String PERSISTENT_NAME = "${config.persistentName}";
 
+    // 是否使用“常驻进程”（见PERSISTENT_NAME）作为插件的管理进程。若为False，则会使用默认进程
+    public static boolean PERSISTENT_ENABLE = ${config.persistentEnable};
+
     // 背景透明的坑的数量（每种 launchMode 不同）
     public static int ACTIVITY_PIT_COUNT_TS_STANDARD = ${config.countTranslucentStandard};
     public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TOP = ${config.countTranslucentSingleTop};

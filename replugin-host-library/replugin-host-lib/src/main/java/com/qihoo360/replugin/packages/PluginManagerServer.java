@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -28,16 +29,16 @@ import com.qihoo360.loader2.CertUtils;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
 import com.qihoo360.mobilesafe.api.Tasks;
-import com.qihoo360.replugin.utils.pkg.PackageFilesUtil;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginEventCallbacks;
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.base.IPC;
-import com.qihoo360.replugin.utils.FileUtils;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.model.PluginInfoList;
+import com.qihoo360.replugin.utils.FileUtils;
+import com.qihoo360.replugin.utils.pkg.PackageFilesUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -239,6 +240,14 @@ public class PluginManagerServer {
     private boolean copyOrMoveApk(String path, PluginInfo instPli) {
         File srcFile = new File(path);
         File newFile = instPli.getApkFile();
+
+        // 插件已被释放过一次？通常“同版本覆盖安装”时，覆盖次数超过2次的会出现此问题
+        // 此时，直接删除安装路径下的文件即可，这样就可以直接Move/Copy了
+        if (newFile.exists()) {
+            FileUtils.deleteQuietly(newFile);
+        }
+
+        // 将源APK文件移动/复制到安装路径下
         try {
             if (RePlugin.getConfig().isMoveFileWhenInstalling()) {
                 FileUtils.moveFile(srcFile, newFile);
@@ -289,7 +298,6 @@ public class PluginManagerServer {
             }
             if (instPli.getVersion() > curPli.getVersion()) {
                 // 高版本升级
-                instPli.setIsThisPendingUpdateInfo(true);
                 curPli.setPendingUpdate(instPli);
                 curPli.setPendingDelete(null);
                 curPli.setPendingCover(null);
@@ -305,6 +313,9 @@ public class PluginManagerServer {
                     LogDebug.w(TAG, "updateOrLater: Plugin need update same version. clear PendingDelete.");
                 }
             }
+
+            // 设置其Parent为curPli，在PmBase.newPluginFound时会用到
+            instPli.setParentInfo(curPli);
         } else {
             if (LogDebug.LOG) {
                 LogDebug.i(TAG, "updateOrLater: Not running. Update now! pn=" + curPli.getName());
@@ -416,8 +427,19 @@ public class PluginManagerServer {
     private void move(@NonNull PluginInfo curPi, @NonNull PluginInfo newPi) {
         try {
             FileUtils.copyFile(newPi.getApkFile(), curPi.getApkFile());
-            FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
-            FileUtils.copyFile(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+
+            if (newPi.getDexFile().exists()) {
+                FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
+            }
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                FileUtils.copyDir(newPi.getExtraOdexDir(), curPi.getExtraOdexDir());
+            }
+
+            if (newPi.getNativeLibsDir().exists()) {
+                FileUtils.copyDir(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+            }
+
         } catch (IOException e) {
             if (LogRelease.LOGR) {
                 e.printStackTrace();
@@ -438,6 +460,9 @@ public class PluginManagerServer {
         try {
             FileUtils.forceDelete(new File(pi.getPath()));
             FileUtils.forceDelete(pi.getDexFile());
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                FileUtils.forceDelete(pi.getExtraOdexDir());
+            }
             FileUtils.forceDelete(pi.getNativeLibsDir());
         } catch (IOException e) {
             if (LogRelease.LOGR) {

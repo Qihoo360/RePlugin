@@ -1,0 +1,13 @@
+
+dependencies {
+
+    if (android.defaultConfig.multiDexEnabled){
+
+        compile 'com.squareup.okhttp3:okhttp:3.4.1'
+        compile 'com.google.code.gson:gson:2.6.2'
+        compile 'com.squareup.pagerduty:pagerduty-incidents:2.0.0'
+        compile 'com.google.android.gms:play-services:9.6.1'
+
+    }
+
+}

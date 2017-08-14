@@ -427,6 +427,30 @@ public class FileUtils {
         }
     }
 
+    public static void copyDir(final File srcFile, final File destFile) throws IOException {
+        copyDir(srcFile, destFile, true);
+    }
+
+    public static void copyDir(final File srcFile, final File destFile,
+                               final boolean preserveFileDate) throws IOException {
+        checkFileRequirements(srcFile, destFile);
+        if (!srcFile.isDirectory()) {
+            throw new IOException("Source '" + srcFile + "' exists but is not a directory");
+        }
+        if (srcFile.getCanonicalPath().equals(destFile.getCanonicalPath())) {
+            throw new IOException("Source '" + srcFile + "' and destination '" + destFile + "' are the same");
+        }
+
+        if (destFile.exists() && destFile.canWrite() == false) {
+            throw new IOException("Destination '" + destFile + "' exists but is read-only");
+        }
+
+        File[] files = srcFile.listFiles();
+        for (File file : files) {
+            copyFile(file, new File(destFile, file.getName()), preserveFileDate);
+        }
+    }
+
     public static void copyFile(final File srcFile, final File destFile) throws IOException {
         copyFile(srcFile, destFile, true);
     }

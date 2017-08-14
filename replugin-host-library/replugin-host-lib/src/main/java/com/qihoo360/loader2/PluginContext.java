@@ -283,15 +283,14 @@ public class PluginContext extends ContextThemeWrapper {
     /**
      * 设置文件的访问权限
      *
-     * @param name 需要被设置访问权限的文件
-     * @param mode 文件操作模式
+     * @param name             需要被设置访问权限的文件
+     * @param mode             文件操作模式
      * @param extraPermissions 文件访问权限
-     *
-     * 注意： <p>
-     * 此部分经由360安全部门审核后，在所有者|同组用户|其他用户三部分的权限设置中，认为在其他用户的权限设置存在一定的安全风险 <p>
-     * 目前暂且忽略传入的文件操作模式参数，并移除了允许其他用户的读写权限的操作 <p>
-     * 对于文件操作模式以及其他用户访问权限的设置，开发者可自行评估 <p>
-     *
+     *                         <p>
+     *                         注意： <p>
+     *                         此部分经由360安全部门审核后，在所有者|同组用户|其他用户三部分的权限设置中，认为在其他用户的权限设置存在一定的安全风险 <p>
+     *                         目前暂且忽略传入的文件操作模式参数，并移除了允许其他用户的读写权限的操作 <p>
+     *                         对于文件操作模式以及其他用户访问权限的设置，开发者可自行评估 <p>
      * @return
      */
     private final void setFilePermissionsFromMode(String name, int mode, int extraPermissions) {
@@ -443,7 +442,12 @@ public class PluginContext extends ContextThemeWrapper {
         // 直接获取插件的Application对象
         // NOTE 切勿获取mLoader.mPkgContext，因为里面的一些方法会调用getApplicationContext（如registerComponentCallback）
         // NOTE 这样会造成StackOverflow异常。所以只能获取Application对象（框架版本为3以上的会创建此对象）
-        return mLoader.mPluginObj.mApplicationClient.getObj();
+        //entry中调用context.getApplicationContext时mApplicationClient还没被赋值，会导致空指针造成插件安装失败
+        if (mLoader.mPluginObj.mApplicationClient == null) {
+            return this;
+        } else {
+            return mLoader.mPluginObj.mApplicationClient.getObj();
+        }
     }
 
 
