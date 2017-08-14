@@ -515,15 +515,18 @@ public class RePlugin {
     }
 
     /**
-     * 通过Layout名，来获取插件内的View
+     * 通过Layout名，来获取插件内的View，并自动做“强制类型转换”（也可直接使用View类型） <p>
+     * 注意：若使用的是公共库，则务必按照Provided的形式引入，否则会出现“不同ClassLoader”导致的ClassCastException <p>
+     * 当然，非公共库不受影响，但请务必使用Android Framework内的View（例如WebView、ViewGroup等），或索性直接使用View
      *
      * @param pluginName 插件名
      * @param layoutName Layout名字
      * @param root Optional view to be the parent of the generated hierarchy.
      * @return 插件的View。若为Null则表示获取失败
+     * @throws ClassCastException 若不是想要的那个View类型，或者ClassLoader不同，则可能会出现此异常。应确保View类型正确
      * @since 2.2.0
      */
-    public static View fetchViewByLayoutName(String pluginName, String layoutName, ViewGroup root) {
+    public static <T extends View> T fetchViewByLayoutName(String pluginName, String layoutName, ViewGroup root) {
         Context context = fetchContext(pluginName);
         if (context == null) {
             // 插件没有找到
@@ -543,7 +546,10 @@ public class RePlugin {
         }
 
         // TODO 可能要考虑WebView在API 19以上的特殊性
-        return LayoutInflater.from(context).inflate(id, root);
+
+        // 强制转换到T类型，一旦转换出错就抛出ClassCastException异常并告诉外界
+        // noinspection unchecked
+        return (T) LayoutInflater.from(context).inflate(id, root);
     }
 
     /**
