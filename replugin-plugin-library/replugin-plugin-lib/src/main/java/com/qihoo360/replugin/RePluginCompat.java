@@ -73,7 +73,7 @@ class RePluginCompat {
     /**
      * @see RePlugin#fetchViewByLayoutName(String, String, ViewGroup)
      */
-    static View fetchViewByLayoutName(String pluginName, String layoutName, ViewGroup root) {
+    public static <T extends View> T fetchViewByLayoutName(String pluginName, String layoutName, ViewGroup root) {
         Context context = fetchContext(pluginName);
         if (context == null) {
             // 插件没有找到
@@ -93,6 +93,9 @@ class RePluginCompat {
         }
 
         // TODO 可能要考虑WebView在API 19以上的特殊性
-        return LayoutInflater.from(context).inflate(id, root);
+
+        // 强制转换到T类型，一旦转换出错就抛出ClassCastException异常并告诉外界
+        // noinspection unchecked
+        return (T) LayoutInflater.from(context).inflate(id, root);
     }
 }
