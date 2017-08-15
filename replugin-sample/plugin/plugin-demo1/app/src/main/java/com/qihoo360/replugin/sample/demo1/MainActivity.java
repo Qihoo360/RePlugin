@@ -162,6 +162,8 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName("demo2", "com.qihoo360.replugin.sample.demo2.activity.for_result.ForResultActivity"));
                 MainActivity.this.startActivityForResult(intent, REQUEST_CODE_DEMO2);
+                // 也可以这么用
+                // RePlugin.startActivityForResult(MainActivity.this, intent, REQUEST_CODE_DEMO2);
             }
         }));
         mItems.add(new TestItem("Activity: By Action", new View.OnClickListener() {
