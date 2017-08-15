@@ -29,6 +29,7 @@ import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import org.gradle.api.Project
 
+import java.lang.reflect.Field
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
@@ -99,24 +100,37 @@ public class Util {
                         map.put(jarPath, jarZip)
                     }
                 } else {
-                    if (checkJarInjectorVersion(project, jarPath)) {
-                        includeJars << jarPath
-                        map.put(jarPath, jarPath)
+                    //重定向jar
+                    File reJar = new File(project.getBuildDir().path +
+                            File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar"
+                            + File.separator + md5File(jar) + ".jar");
+                    String reJarPath = reJar.getAbsolutePath()
+                    boolean needInject = false
+                    if (reJar.exists()) {
+                        //检查修改插件版本
+                        needInject = checkJarInjectorVersion(reJarPath)
+                    } else {
+                        FileUtils.copyFile(jar, reJar)
+                        needInject = true;
+                    }
+                    //设置重定向jar
+                    setJarInput(jarInput, reJar)
+                    if(needInject){
+                        includeJars << reJarPath
+                        map.put(reJarPath, reJarPath)
 
                         /* 将 jar 包解压，并将解压后的目录加入 classpath */
                         // println ">>> 解压Jar${jarPath}"
-                        String jarZipDir = jar.getParent() + File.separatorChar + jar.getName().replace('.jar', '')
+                        String jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
                         if (unzip(jarPath, jarZipDir)) {
                             classPath << jarZipDir
-                            saveJarInjectorVersion(project, jarPath)
+                            //保存修改的插件版本号
+                            saveJarInjectorVersion(jarZipDir)
                             visitor.setBaseDir(jarZipDir)
                             Files.walkFileTree(Paths.get(jarZipDir), visitor)
                         }
-
                         // 删除 jar
-                        FileUtils.forceDelete(jar)
-                    }else{
-                        includeJars.remove(jarPath)
+                        FileUtils.forceDelete(reJar)
                     }
                 }
             }
@@ -124,62 +138,85 @@ public class Util {
         return classPath
     }
 
-    def static getJarInjectorVersionFile(Project project, String jar){
-        File localVersionFile = new File(project.getBuildDir().path,
-                FD_INTERMEDIATES + File.separator + "replugin_reclass"
-                        + File.separator + DigestUtils.md5Hex(jar));
-        return localVersionFile
+    def static md5File(File jar){
+        FileInputStream fileInputStream = new FileInputStream(jar);
+        String md5 = DigestUtils.md5Hex(fileInputStream);
+        fileInputStream.close()
+        return md5
+    }
+
+    def static setJarInput(JarInput jarInput, File rejar) {
+        Field fileField = null;
+        Class<?> clazz = jarInput.getClass();
+        while(fileField == null && clazz != Object.class){
+            try {
+                fileField = clazz.getDeclaredField("file");
+            } catch (Exception e) {
+                //ignore
+                clazz = clazz.getSuperclass();
+
+            }
+        }
+        if(fileField != null){
+            fileField.setAccessible(true);
+            fileField.set(jarInput, rejar);
+        }
     }
 
     /**
      * 通过META-INF/replugin_version.txt判断是否需要修改
      */
-    def static checkJarInjectorVersion(Project project, String jar) {
-        File localVersionFile = getJarInjectorVersionFile(project, jar)
-        if(!localVersionFile.exists()){
-            return true
-        }
+    def static checkJarInjectorVersion(String jar) {
         boolean needInjector = true;
+        ZipFile zf = null;
+        ZipEntry ze = null;
         InputStream inputStream = null;
-        try {
-            byte[] data = new byte[jar.length()]
-            inputStream = new FileInputStream(localVersionFile)
-            int len = inputStream.read(data, 0, data.length)
-            String ver = new String(data, "utf-8").trim()
-            needInjector = !AppConstant.VER.equals(ver)
-        } catch (Throwable e) {
+        try{
+            zf = new ZipFile(jar);
+            ze = zf.getEntry("META-INF/replugin_version.txt");
+            if(ze != null){
+                byte[] data = new byte[jar.length()];
+                inputStream = zf.getInputStream(ze);
+                int len = inputStream.read(data, 0, data.length);
+                String ver = new String(data, "utf-8").trim();
+                needInjector = !AppConstant.VER.equals(ver);
+            }
+        }catch (Throwable e){
             //
-        } finally {
-            if (inputStream != null) {
-                inputStream.close()
+        }finally{
+            if(inputStream != null){
+                inputStream.close();
+            }
+            if(zf != null){
+                zf.close();
             }
         }
-        return needInjector
+        return needInjector;
     }
 
     /**
      * 记录版本号到META-INF/replugin_version.txt
      */
-    def static saveJarInjectorVersion(Project project, String jar) {
-        File localVersionFile = getJarInjectorVersionFile(project, jar)
-        if (localVersionFile.exists()) {
-            localVersionFile.delete();
-        } else {
-            File dir = localVersionFile.getParentFile();
-            if (!dir.exists()) {
+    def static saveJarInjectorVersion(String jarZipDir) {
+        File verFile = new File(jarZipDir, "META-INF/replugin_version.txt");
+        if(verFile.exists()){
+            verFile.delete();
+        }else{
+            File dir = verFile.getParentFile();
+            if(!dir.exists()){
                 dir.mkdirs();
             }
         }
-        localVersionFile.createNewFile();
+        verFile.createNewFile();
         FileOutputStream fileOutputStream = null;
-        try {
-            fileOutputStream = new FileOutputStream(localVersionFile);
+        try{
+            fileOutputStream = new FileOutputStream(verFile);
             fileOutputStream.write(AppConstant.VER.getBytes("utf-8"));
             fileOutputStream.flush();
-        } catch (Throwable e) {
+        }catch (Throwable e){
             //
-        } finally {
-            if (fileOutputStream != null) {
+        }finally{
+            if(fileOutputStream!=null){
                 fileOutputStream.close();
             }
         }
