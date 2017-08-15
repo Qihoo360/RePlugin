@@ -16,12 +16,14 @@
 
 package com.qihoo360.replugin;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -205,6 +207,63 @@ public class RePlugin {
 
         try {
             Object obj = ProxyRePluginVar.startActivity2.call(null, context, intent, pluginName, activity);
+            if (obj != null) {
+                return (Boolean) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 通过 forResult 方式启动一个插件的 Activity
+     *
+     * @param activity    源 Activity
+     * @param intent      要打开 Activity 的 Intent，其中 ComponentName 的 Key 必须为插件名
+     * @param requestCode 请求码
+     * @see #startActivityForResult(Activity, Intent, int, Bundle)
+     * @since 2.1.3
+     */
+    public static boolean startActivityForResult(Activity activity, Intent intent, int requestCode) {
+        if (!RePluginFramework.mHostInitialized) {
+            return false;
+        }
+
+        try {
+            Object obj = ProxyRePluginVar.startActivityForResult.call(null, activity, intent, requestCode);
+            if (obj != null) {
+                return (Boolean) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 通过 forResult 方式启动一个插件的 Activity
+     *
+     * @param activity    源 Activity
+     * @param intent      要打开 Activity 的 Intent，其中 ComponentName 的 Key 必须为插件名
+     * @param requestCode 请求码
+     * @param options     附加的数据
+     * @see #startActivityForResult(Activity, Intent, int, Bundle)
+     * @since 2.1.3
+     */
+    public static boolean startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
+        if (!RePluginFramework.mHostInitialized) {
+            return false;
+        }
+
+        try {
+            Object obj = ProxyRePluginVar.startActivityForResult2.call(null, activity, intent, requestCode, options);
             if (obj != null) {
                 return (Boolean) obj;
             }
@@ -537,15 +596,18 @@ public class RePlugin {
     }
 
     /**
-     * 通过Layout名，来获取插件内的View
+     * 通过Layout名，来获取插件内的View，并自动做“强制类型转换”（也可直接使用View类型） <p>
+     * 注意：若使用的是公共库，则务必按照Provided的形式引入，否则会出现“不同ClassLoader”导致的ClassCastException <p>
+     * 当然，非公共库不受影响，但请务必使用Android Framework内的View（例如WebView、ViewGroup等），或索性直接使用View
      *
      * @param pluginName 插件名
      * @param layoutName Layout名字
      * @param root Optional view to be the parent of the generated hierarchy.
      * @return 插件的View。若为Null则表示获取失败
+     * @throws ClassCastException 若不是想要的那个View类型，或者ClassLoader不同，则可能会出现此异常。应确保View类型正确
      * @since 2.2.0 (老的host-lib版本也能使用)
      */
-    public static View fetchViewByLayoutName(String pluginName, String layoutName, ViewGroup root) {
+    public static <T extends View> T fetchViewByLayoutName(String pluginName, String layoutName, ViewGroup root) {
         if (!RePluginFramework.mHostInitialized) {
             return null;
         }
@@ -1106,6 +1168,10 @@ public class RePlugin {
 
         private static MethodInvoker startActivity2;
 
+        private static MethodInvoker startActivityForResult;
+
+        private static MethodInvoker startActivityForResult2;
+
         private static MethodInvoker createIntent;
 
         private static MethodInvoker createComponentName;
@@ -1184,6 +1250,8 @@ public class RePlugin {
 
             startActivity = new MethodInvoker(classLoader, rePlugin, "startActivity", new Class<?>[]{Context.class, Intent.class});
             startActivity2 = new MethodInvoker(classLoader, rePlugin, "startActivity", new Class<?>[]{Context.class, Intent.class, String.class, String.class});
+            startActivityForResult = new MethodInvoker(classLoader, rePlugin, "startActivityForResult", new Class<?>[]{Activity.class, Intent.class, int.class});
+            startActivityForResult2 = new MethodInvoker(classLoader, rePlugin, "startActivityForResult", new Class<?>[]{Context.class, Intent.class, int.class, Bundle.class});
             createIntent = new MethodInvoker(classLoader, rePlugin, "createIntent", new Class<?>[]{String.class, String.class});
             createComponentName = new MethodInvoker(classLoader, rePlugin, "createComponentName", new Class<?>[]{String.class, String.class});
             isForDev = new MethodInvoker(classLoader, rePlugin, "isForDev", new Class<?>[]{});
