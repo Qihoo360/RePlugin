@@ -8,8 +8,6 @@ import com.qihoo360.replugin.gradle.plugin.AppConstant
  */
 public class InjectorVersion {
 
-    def String jarPath
-
     def String jarMd5
 
     def String pluginVersion
@@ -18,14 +16,12 @@ public class InjectorVersion {
 
     }
 
-    InjectorVersion(String jarPath, String jarMd5, String pluginVersion) {
-        this.jarPath = jarPath
+    InjectorVersion(String jarMd5, String pluginVersion) {
         this.jarMd5 = jarMd5
         this.pluginVersion = pluginVersion
     }
 
     InjectorVersion(File jar){
-        this.jarPath = jar.getAbsolutePath()
         this.jarMd5 = Util.md5File(jar)
         this.pluginVersion = AppConstant.VER
     }
