@@ -22,6 +22,10 @@ import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInput
 import com.android.build.gradle.internal.scope.GlobalScope
 import com.android.sdklib.IAndroidTarget
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.stream.JsonReader
 import com.qihoo360.replugin.gradle.plugin.AppConstant
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
@@ -32,7 +36,6 @@ import org.gradle.api.Project
 import java.lang.reflect.Field
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES;
@@ -69,7 +72,8 @@ public class Util {
         def projectDir = project.getRootDir().absolutePath
 
         println ">>> Unzip Jar ..."
-
+        Map<String, InjectorVersion> injectorMap = readJarInjectorHistory(project)
+        boolean needSave = false
         inputs.each { TransformInput input ->
 
             input.directoryInputs.each { DirectoryInput dirInput ->
@@ -100,54 +104,134 @@ public class Util {
 
                 } else {
                     //重定向jar
-                    File reJar = new File(project.getBuildDir().path +
-                            File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar"
-                            + File.separator + md5File(jar) + ".jar");
-                    String reJarPath = reJar.getAbsolutePath()
-                    boolean needInject = false
-                    if (reJar.exists()) {
-                        //检查修改插件版本
-                        needInject = checkJarInjectorVersion(reJarPath)
+                    if (jarPath.contains(File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar")) {
+                        //
                     } else {
-                        FileUtils.copyFile(jar, reJar)
-                        needInject = true;
-                    }
-                    //设置重定向jar
-                    setJarInput(jarInput, reJar)
-                    if(needInject){
-                        includeJars << reJarPath
-                        map.put(reJarPath, reJarPath)
+                        String md5 = md5File(jar);
+                        File reJar = new File(project.getBuildDir().path +
+                                File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar"
+                                + File.separator + md5 + ".jar");
+                        String reJarPath = reJar.getAbsolutePath()
 
-                        /* 将 jar 包解压，并将解压后的目录加入 classpath */
-                        // println ">>> 解压Jar${jarPath}"
-                        String jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
-                        if (unzip(jarPath, jarZipDir)) {
-                            classPath << jarZipDir
-                            //保存修改的插件版本号
-                            saveJarInjectorVersion(jarZipDir)
-                            visitor.setBaseDir(jarZipDir)
-                            Files.walkFileTree(Paths.get(jarZipDir), visitor)
+                        boolean needInject = false
+                        if (reJar.exists()) {
+                            //检查修改插件版本
+                            InjectorVersion injectorVersion = injectorMap.get(jar.getAbsolutePath());
+                            if (injectorVersion != null) {
+                                if (!AppConstant.VER.equals(injectorVersion.pluginVersion)) {
+                                    //版本变化了
+                                    needInject = true
+                                } else {
+                                    if (!md5.equals(injectorVersion.jarMd5)) {
+                                        //原始jar内容变化
+                                        needInject = true
+                                    }
+                                }
+                            } else {
+                                //无记录
+                                needInject = true
+                            }
+                        } else {
+                            FileUtils.copyFile(jar, reJar)
+                            needInject = true;
                         }
-                        // 删除 jar
-                        FileUtils.forceDelete(reJar)
+                        //设置重定向jar
+                        setJarInput(jarInput, reJar)
+                        if (needInject) {
+                            includeJars << reJarPath
+                            map.put(reJarPath, reJarPath)
+
+                            /* 将 jar 包解压，并将解压后的目录加入 classpath */
+                            // println ">>> 解压Jar${jarPath}"
+                            String jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
+                            if (unzip(jarPath, jarZipDir)) {
+                                classPath << jarZipDir
+                                //保存修改的插件版本号
+                                needSave = true
+                                injectorMap.put(jar.getAbsolutePath(), new InjectorVersion(jar))
+
+                                visitor.setBaseDir(jarZipDir)
+                                Files.walkFileTree(Paths.get(jarZipDir), visitor)
+                            }
+                            // 删除 jar
+                            FileUtils.forceDelete(reJar)
+                        } else {
+                            map.remove(reJarPath)
+                            includeJars.remove(reJarPath)
+                        }
                     }
                 }
             }
         }
+        if (needSave) {
+            saveJarInjectorHistory(project, injectorMap)
+        }
         return classPath
     }
 
-    def static md5File(File jar){
+    /**
+     * 计算jar的md5
+     */
+    def static md5File(File jar) {
         FileInputStream fileInputStream = new FileInputStream(jar);
         String md5 = DigestUtils.md5Hex(fileInputStream);
         fileInputStream.close()
         return md5
     }
 
+    /**
+     * 读取修改jar的记录
+     */
+    def static readJarInjectorHistory(Project project) {
+        File file = new File(project.getBuildDir(), FD_INTERMEDIATES
+                + File.separator + "replugin-jar" + File.separator + "version.json");
+        if (!file.exists()) {
+            return new HashMap<String, InjectorVersion>();
+        }
+        Gson gson = new GsonBuilder()
+                .create();
+        FileReader fileReader = new FileReader(file)
+        JsonReader jsonReader = new JsonReader(fileReader);
+        Map<String, InjectorVersion> injectorMap = gson.fromJson(jsonReader, new TypeToken<Map<String, InjectorVersion>>() {
+        }.getType());
+        jsonReader.close()
+        if (injectorMap == null) {
+            injectorMap = new HashMap<String, InjectorVersion>();
+        }
+        return injectorMap;
+    }
+
+    /**
+     * 保存修改jar的记录
+     */
+    def static saveJarInjectorHistory(Project project, Map<String, InjectorVersion> injectorMap) {
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
+        File file = new File(project.getBuildDir(), FD_INTERMEDIATES
+                + File.separator + "replugin-jar" + File.separator + "version.json");
+        if (file.exists()) {
+            file.delete()
+        } else {
+            File dir = file.getParentFile();
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+        }
+        file.createNewFile()
+        FileWriter fileWriter = new FileWriter(file);
+        String json = gson.toJson(injectorMap);
+        fileWriter.write(json)
+        fileWriter.close()
+    }
+
+    /**
+     * 反射，修改引用的jar路径
+     */
     def static setJarInput(JarInput jarInput, File rejar) {
         Field fileField = null;
         Class<?> clazz = jarInput.getClass();
-        while(fileField == null && clazz != Object.class){
+        while (fileField == null && clazz != Object.class) {
             try {
                 fileField = clazz.getDeclaredField("file");
             } catch (Exception e) {
@@ -155,68 +239,9 @@ public class Util {
                 clazz = clazz.getSuperclass();
             }
         }
-        if(fileField != null){
+        if (fileField != null) {
             fileField.setAccessible(true);
             fileField.set(jarInput, rejar);
-        }
-    }
-
-    /**
-     * 通过META-INF/replugin_version.txt判断是否需要修改
-     */
-    def static checkJarInjectorVersion(String jar) {
-        boolean needInjector = true;
-        ZipFile zf = null;
-        ZipEntry ze = null;
-        InputStream inputStream = null;
-        try{
-            zf = new ZipFile(jar);
-            ze = zf.getEntry("META-INF/replugin_version.txt");
-            if(ze != null){
-                byte[] data = new byte[jar.length()];
-                inputStream = zf.getInputStream(ze);
-                int len = inputStream.read(data, 0, data.length);
-                String ver = new String(data, "utf-8").trim();
-                needInjector = !AppConstant.VER.equals(ver);
-            }
-        }catch (Throwable e){
-            //
-        }finally{
-            if(inputStream != null){
-                inputStream.close();
-            }
-            if(zf != null){
-                zf.close();
-            }
-        }
-        return needInjector;
-    }
-
-    /**
-     * 记录版本号到META-INF/replugin_version.txt
-     */
-    def static saveJarInjectorVersion(String jarZipDir) {
-        File verFile = new File(jarZipDir, "META-INF/replugin_version.txt");
-        if(verFile.exists()){
-            verFile.delete();
-        }else{
-            File dir = verFile.getParentFile();
-            if(!dir.exists()){
-                dir.mkdirs();
-            }
-        }
-        verFile.createNewFile();
-        FileOutputStream fileOutputStream = null;
-        try{
-            fileOutputStream = new FileOutputStream(verFile);
-            fileOutputStream.write(AppConstant.VER.getBytes("utf-8"));
-            fileOutputStream.flush();
-        }catch (Throwable e){
-            //
-        }finally{
-            if(fileOutputStream!=null){
-                fileOutputStream.close();
-            }
         }
     }
 
