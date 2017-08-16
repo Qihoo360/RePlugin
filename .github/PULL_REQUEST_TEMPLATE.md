@@ -1,6 +1,6 @@
-Thank you for contributing! Let's make RePlugin better and better!
+#### 要解决的问题 Describe the problem to be solved
+1.
+2.
 
-Now please tell us the following info for better understanding:
-### Summary
-### Description 
-The [issue id](https://github.com/Qihoo360/RePlugin/issues) of this Pull Request fixes and your general idea of implementation.
+#### 要解决的Issue编号（可多个） Associated issue number (multiple)
+#

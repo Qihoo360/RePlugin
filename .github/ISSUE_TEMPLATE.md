@@ -1,8 +1,16 @@
-You may also want to read our [issue guide](https://github.com/Qihoo360/RePlugin/wiki/%E6%8F%90%E5%87%BAIssue).
+#### 问题详细描述 Detailed description of the problem
 
-**RePlugin version**:
 
-**Android compile SDK version**:
+#### 复现问题步骤 Steps to reproduce the problem
+1. 
+2. 
 
-**Android ROM**:
+#### 其它重要信息 Other important information
 
+replugin-host-lib/gradle Version:
+rePlugin-plugin-lib/gradle Version:
+
+Android API Version：
+Android 手机型号&ROM(Phone model & ROM): 
+
+#### Logcat上下文 Logcat context
