@@ -176,12 +176,17 @@ public class ReClassTransform extends Transform {
             File jar = new File(it)
             String JarAfterzip = map.get(jar.getParent() + File.separatorChar + jar.getName())
             String dirAfterUnzip = JarAfterzip.replace('.jar', '')
-            // println ">>> 压缩目录 $dirAfterUnzip"
-            
-            Util.zipDir(dirAfterUnzip, JarAfterzip)
 
-            // println ">>> 删除目录 $dirAfterUnzip"
-            FileUtils.deleteDirectory(new File(dirAfterUnzip))
+            if(new File(dirAfterUnzip).exists()){
+                // println ">>> 压缩目录 $dirAfterUnzip"
+
+                Util.zipDir(dirAfterUnzip, JarAfterzip)
+
+                // println ">>> 删除目录 $dirAfterUnzip"
+                FileUtils.deleteDirectory(new File(dirAfterUnzip))
+            }else{
+                println '>>> ignore:no exist '+dirAfterUnzip
+            }
         }
     }
 
