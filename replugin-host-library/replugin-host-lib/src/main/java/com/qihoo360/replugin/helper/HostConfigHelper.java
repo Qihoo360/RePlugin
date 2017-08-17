@@ -47,7 +47,7 @@ public class HostConfigHelper {
     public static int ACTIVITY_PIT_COUNT_TS_STANDARD = 2;
     public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TOP = 2;
     public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TASK = 2;
-    public static int ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE = 2;
+    public static int ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE = 3;
 
     // 背景不透明的坑的数量（每种 launchMode 不同）
     public static int ACTIVITY_PIT_COUNT_NTS_STANDARD = 6;
