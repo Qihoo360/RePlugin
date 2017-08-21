@@ -12,6 +12,8 @@ public class JarPatchInfo {
 
     def String pluginVersion
 
+    def String manifestActivitiesMd5
+
     JarPatchInfo(){
 
     }
@@ -21,8 +23,13 @@ public class JarPatchInfo {
         this.pluginVersion = pluginVersion
     }
 
-    JarPatchInfo(File jar){
+    JarPatchInfo(File jar,String activitiesMd5){
         this.jarMd5 = Util.md5File(jar)
         this.pluginVersion = AppConstant.VER
+        this.manifestActivitiesMd5 = activitiesMd5
+    }
+
+    JarPatchInfo(File jar){
+        this(jar, null)
     }
 }

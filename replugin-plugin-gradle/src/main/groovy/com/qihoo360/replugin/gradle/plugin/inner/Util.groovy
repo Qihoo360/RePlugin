@@ -27,6 +27,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.stream.JsonReader
 import com.qihoo360.replugin.gradle.plugin.AppConstant
+import com.qihoo360.replugin.gradle.plugin.manifest.ManifestAPI
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import com.google.common.base.Charsets
@@ -77,6 +78,22 @@ public class Util {
         Map<String, JarPatchInfo> infoMap = readJarInjectorHistory(project, buildType)
         final String injectDir = project.getBuildDir().path +
                 File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar"+ File.separator + buildType;
+        def activityList = new ArrayList<>();
+        new ManifestAPI().getActivities(project, buildType).each {
+            // 处理没有被忽略的 Activity
+            if (!(it in CommonData.ignoredActivities)) {
+                //
+                activityList.add(it)
+            }
+        }
+        Collections.sort(activityList, new Comparator<String>(){
+            @Override
+            int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        String activityMd5 = DigestUtils.md5Hex(activityList.toString());
+
         boolean needSave = false
         inputs.each { TransformInput input ->
 
@@ -116,7 +133,9 @@ public class Util {
                         //检查修改插件版本
                         JarPatchInfo info = infoMap.get(jar.getAbsolutePath());
                         if (info != null) {
-                            if (!AppConstant.VER.equals(info.pluginVersion)) {
+                            if(!activityMd5.equals(info.manifestActivitiesMd5)){
+                                needInject = true
+                            }else  if (!AppConstant.VER.equals(info.pluginVersion)) {
                                 //版本变化了
                                 needInject = true
                             } else {
@@ -144,7 +163,7 @@ public class Util {
                             classPath << jarZipDir
                             //保存修改的插件版本号
                             needSave = true
-                            infoMap.put(jar.getAbsolutePath(), new JarPatchInfo(jar))
+                            infoMap.put(jar.getAbsolutePath(), new JarPatchInfo(jar, activityMd5))
 
                             visitor.setBaseDir(jarZipDir)
                             Files.walkFileTree(Paths.get(jarZipDir), visitor)
