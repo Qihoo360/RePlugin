@@ -47,14 +47,16 @@ public class Util {
 
     /** 生成 ClassPool 使用的 ClassPath 集合，同时将要处理的 jar 写入 includeJars */
     def
-    static getClassPaths(Project project, GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
+    static getClassPaths(Project project, String buildType,GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
         def classpathList = []
+
+        includeJars.clear()
 
         // android.jar
         classpathList.add(getAndroidJarPath(globalScope))
 
         // 原始项目中引用的 classpathList
-        getProjectClassPath(project, inputs, includeJars, map).each {
+        getProjectClassPath(project, buildType, inputs, includeJars, map).each {
             classpathList.add(it)
         }
 
@@ -64,7 +66,7 @@ public class Util {
     }
 
     /** 获取原始项目中的 ClassPath */
-    def private static getProjectClassPath(Project project,
+    def private static getProjectClassPath(Project project,String buildType,
                                            Collection<TransformInput> inputs,
                                            Set<String> includeJars, Map<String, String> map) {
         def classPath = []
@@ -72,7 +74,9 @@ public class Util {
         def projectDir = project.getRootDir().absolutePath
 
         println ">>> Unzip Jar ..."
-        Map<String, InjectorVersion> injectorMap = readJarInjectorHistory(project)
+        Map<String, JarPatchInfo> infoMap = readJarInjectorHistory(project, buildType)
+        final String injectDir = project.getBuildDir().path +
+                File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar"+ File.separator + buildType;
         boolean needSave = false
         inputs.each { TransformInput input ->
 
@@ -87,9 +91,9 @@ public class Util {
             input.jarInputs.each { JarInput jarInput ->
                 File jar = jarInput.file
                 def jarPath = jar.absolutePath
-
-                if (!jarPath.contains(projectDir)) {
-
+                if (jarPath.contains(File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar")) {
+                    //
+                }else  if (!jarPath.contains(projectDir)) {
                     String jarZipDir = project.getBuildDir().path +
                             File.separator + FD_INTERMEDIATES + File.separator + "exploded-aar" +
                             File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class";
@@ -101,70 +105,62 @@ public class Util {
                         Files.walkFileTree(Paths.get(jarZipDir), visitor)
                         map.put(jarPath, jarZip)
                     }
-
                 } else {
                     //重定向jar
-                    if (jarPath.contains(File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar")) {
-                        //
-                    } else {
-                        String md5 = md5File(jar);
-                        File reJar = new File(project.getBuildDir().path +
-                                File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar"
-                                + File.separator + md5 + ".jar");
-                        String reJarPath = reJar.getAbsolutePath()
+                    String md5 = md5File(jar);
+                    File reJar = new File(injectDir + File.separator + md5 + ".jar");
+                    jarPath = reJar.getAbsolutePath()
 
-                        boolean needInject = false
-                        if (reJar.exists()) {
-                            //检查修改插件版本
-                            InjectorVersion injectorVersion = injectorMap.get(jar.getAbsolutePath());
-                            if (injectorVersion != null) {
-                                if (!AppConstant.VER.equals(injectorVersion.pluginVersion)) {
-                                    //版本变化了
-                                    needInject = true
-                                } else {
-                                    if (!md5.equals(injectorVersion.jarMd5)) {
-                                        //原始jar内容变化
-                                        needInject = true
-                                    }
-                                }
-                            } else {
-                                //无记录
+                    boolean needInject = false
+                    if (reJar.exists()) {
+                        //检查修改插件版本
+                        JarPatchInfo info = infoMap.get(jar.getAbsolutePath());
+                        if (info != null) {
+                            if (!AppConstant.VER.equals(info.pluginVersion)) {
+                                //版本变化了
                                 needInject = true
+                            } else {
+                                if (!md5.equals(info.jarMd5)) {
+                                    //原始jar内容变化
+                                    needInject = true
+                                }
                             }
                         } else {
-                            FileUtils.copyFile(jar, reJar)
-                            needInject = true;
+                            //无记录
+                            needInject = true
                         }
-                        //设置重定向jar
-                        setJarInput(jarInput, reJar)
-                        if (needInject) {
-                            includeJars << reJarPath
-                            map.put(reJarPath, reJarPath)
+                    } else {
+                        needInject = true;
+                    }
+                    //设置重定向jar
+                    setJarInput(jarInput, reJar)
+                    if (needInject) {
+                        /* 将 jar 包解压，并将解压后的目录加入 classpath */
+                        // println ">>> 解压Jar${jarPath}"
+                        String jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
+                        if (unzip(jar.getAbsolutePath(), jarZipDir)) {
 
-                            /* 将 jar 包解压，并将解压后的目录加入 classpath */
-                            // println ">>> 解压Jar${jarPath}"
-                            String jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
-                            if (unzip(jarPath, jarZipDir)) {
-                                classPath << jarZipDir
-                                //保存修改的插件版本号
-                                needSave = true
-                                injectorMap.put(jar.getAbsolutePath(), new InjectorVersion(jar))
+                            includeJars << jarPath
+                            classPath << jarZipDir
+                            //保存修改的插件版本号
+                            needSave = true
+                            infoMap.put(jar.getAbsolutePath(), new JarPatchInfo(jar))
 
-                                visitor.setBaseDir(jarZipDir)
-                                Files.walkFileTree(Paths.get(jarZipDir), visitor)
-                            }
-                            // 删除 jar
+                            visitor.setBaseDir(jarZipDir)
+                            Files.walkFileTree(Paths.get(jarZipDir), visitor)
+
+                            map.put(jarPath, jarPath)
+                        }
+                        // 删除 jar
+                        if (reJar.exists()) {
                             FileUtils.forceDelete(reJar)
-                        } else {
-                            map.remove(reJarPath)
-                            includeJars.remove(reJarPath)
                         }
                     }
                 }
             }
         }
         if (needSave) {
-            saveJarInjectorHistory(project, injectorMap)
+            saveJarInjectorHistory(project, buildType, infoMap)
         }
         return classPath
     }
@@ -182,21 +178,21 @@ public class Util {
     /**
      * 读取修改jar的记录
      */
-    def static readJarInjectorHistory(Project project) {
-        File file = new File(project.getBuildDir(), FD_INTERMEDIATES
-                + File.separator + "replugin-jar" + File.separator + "version.json");
+    def static readJarInjectorHistory(Project project, String buildType) {
+        final String dir = FD_INTERMEDIATES + File.separator + "replugin-jar"+ File.separator + buildType;
+        File file = new File(project.getBuildDir(), dir + File.separator + "version.json");
         if (!file.exists()) {
-            return new HashMap<String, InjectorVersion>();
+            return new HashMap<String, JarPatchInfo>();
         }
         Gson gson = new GsonBuilder()
                 .create();
         FileReader fileReader = new FileReader(file)
         JsonReader jsonReader = new JsonReader(fileReader);
-        Map<String, InjectorVersion> injectorMap = gson.fromJson(jsonReader, new TypeToken<Map<String, InjectorVersion>>() {
+        Map<String, JarPatchInfo> injectorMap = gson.fromJson(jsonReader, new TypeToken<Map<String, JarPatchInfo>>() {
         }.getType());
         jsonReader.close()
         if (injectorMap == null) {
-            injectorMap = new HashMap<String, InjectorVersion>();
+            injectorMap = new HashMap<String, JarPatchInfo>();
         }
         return injectorMap;
     }
@@ -204,18 +200,18 @@ public class Util {
     /**
      * 保存修改jar的记录
      */
-    def static saveJarInjectorHistory(Project project, Map<String, InjectorVersion> injectorMap) {
+    def static saveJarInjectorHistory(Project project,String buildType, Map<String, JarPatchInfo> injectorMap) {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
-        File file = new File(project.getBuildDir(), FD_INTERMEDIATES
-                + File.separator + "replugin-jar" + File.separator + "version.json");
+        final String dir = FD_INTERMEDIATES + File.separator + "replugin-jar"+ File.separator + buildType;
+        File file = new File(project.getBuildDir(), dir + File.separator + "version.json");
         if (file.exists()) {
             file.delete()
         } else {
-            File dir = file.getParentFile();
-            if (!dir.exists()) {
-                dir.mkdirs()
+            File p = file.getParentFile();
+            if (!p.exists()) {
+                p.mkdirs()
             }
         }
         file.createNewFile()
