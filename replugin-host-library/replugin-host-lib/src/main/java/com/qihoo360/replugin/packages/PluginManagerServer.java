@@ -418,6 +418,7 @@ public class PluginManagerServer {
 
         if (covered) {
             curInfo.setPendingCover(null);
+            newInfo.setIsPendingCover(false);
         } else {
             curInfo.update(newInfo);
             curInfo.setPendingUpdate(null);
