@@ -313,7 +313,9 @@ public class PluginServiceServer {
         if (sr != null) {
             return sr;
         }
-        sr = mServicesByIntent.get(service);
+
+        Intent.FilterComparison fi = new Intent.FilterComparison(service);
+        sr = mServicesByIntent.get(fi);
         if (sr != null) {
             return sr;
         }
@@ -345,7 +347,7 @@ public class PluginServiceServer {
         }
 
         // 构建，放入表中
-        Intent.FilterComparison fi = new Intent.FilterComparison(service);
+
         sr = new ServiceRecord(cn, fi, si);
         mServicesByName.put(cn, sr);
         mServicesByIntent.put(fi, sr);

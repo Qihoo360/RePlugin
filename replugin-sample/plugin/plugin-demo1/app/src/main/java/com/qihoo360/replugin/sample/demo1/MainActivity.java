@@ -216,6 +216,15 @@ public class MainActivity extends Activity {
                 v.getContext().startService(intent);
             }
         }));
+        mItems.add(new TestItem("Service: Implicit Start (at :UI process)", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setPackage("com.qihoo360.replugin.sample.demo1");
+                intent.setAction("com.qihoo360.replugin.sample.demo1.action.XXXX");
+                v.getContext().startService(intent);
+            }
+        }));
         mItems.add(new TestItem("Provider: Query (at UI process)", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
