@@ -30,10 +30,8 @@ android {
         minSdkVersion 9
         targetSdkVersion 25
 
-        testVariants.all {
-            it.mergedFlavor.manifestPlaceholders = [persistentName: ":GuardService"]
-        }
-
+        versionCode 2
+        versionName "2.1.7"
         consumerProguardFiles 'replugin-rules.pro'
     }
 
