@@ -620,7 +620,6 @@ public class PluginInfo implements Parcelable, Cloneable {
         } else {
             mJson.remove("cover");
         }
-        setPath(getApkFile().getPath());
     }
 
     /**
