@@ -26,8 +26,8 @@ android {
     buildToolsVersion '25.0.0'
 
     defaultConfig {
-        versionName "1.0"
-        versionCode 100
+        versionName "1.1"
+        versionCode 104
         targetSdkVersion 21
         applicationId "com.qihoo360.replugin.sample.demo2"
         minSdkVersion 15
