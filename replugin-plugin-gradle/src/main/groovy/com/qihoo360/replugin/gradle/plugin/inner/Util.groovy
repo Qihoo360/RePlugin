@@ -119,14 +119,16 @@ public class Util {
                     boolean needInject = checkNeedInjector(infoMap, jar, reJar, activityMd5, md5);
 
                     //设置重定向jar
-                    setJarInput(jarInput, reJar)
+//                    setJarInput(jarInput, reJar)
+                    //ReClassTransform.copyJar需要用到
+                    map.put(jar.getAbsolutePath(), jarPath)
                     if (needInject) {
                         /* 将 jar 包解压，并将解压后的目录加入 classpath */
                         // println ">>> 解压Jar${jarPath}"
                         String jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
                         if (unzip(jar.getAbsolutePath(), jarZipDir)) {
 
-                            includeJars << jarPath
+                            includeJars << jar.getAbsolutePath()
                             classPath << jarZipDir
                             //保存修改的插件版本号
                             needSave = true
@@ -134,8 +136,6 @@ public class Util {
 
                             visitor.setBaseDir(jarZipDir)
                             Files.walkFileTree(Paths.get(jarZipDir), visitor)
-
-                            map.put(jarPath, jarPath)
                         }
                         // 删除 jar
                         if (reJar.exists()) {
