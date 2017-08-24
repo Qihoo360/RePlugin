@@ -110,47 +110,14 @@ public class Util {
                 def jarPath = jar.absolutePath
                 if (jarPath.contains(File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar")) {
                     //
-                }else  if (!jarPath.contains(projectDir)) {
-                    String jarZipDir = project.getBuildDir().path +
-                            File.separator + FD_INTERMEDIATES + File.separator + "exploded-aar" +
-                            File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class";
-                    if (unzip(jarPath, jarZipDir)) {
-                        def jarZip = jarZipDir + ".jar"
-                        includeJars << jarPath
-                        classPath << jarZipDir
-                        visitor.setBaseDir(jarZipDir)
-                        Files.walkFileTree(Paths.get(jarZipDir), visitor)
-                        map.put(jarPath, jarZip)
-                    }
-                } else {
+                }else{
                     //重定向jar
                     String md5 = md5File(jar);
                     File reJar = new File(injectDir + File.separator + md5 + ".jar");
                     jarPath = reJar.getAbsolutePath()
 
-                    boolean needInject = false
-                    if (reJar.exists()) {
-                        //检查修改插件版本
-                        JarPatchInfo info = infoMap.get(jar.getAbsolutePath());
-                        if (info != null) {
-                            if(!activityMd5.equals(info.manifestActivitiesMd5)){
-                                needInject = true
-                            }else  if (!AppConstant.VER.equals(info.pluginVersion)) {
-                                //版本变化了
-                                needInject = true
-                            } else {
-                                if (!md5.equals(info.jarMd5)) {
-                                    //原始jar内容变化
-                                    needInject = true
-                                }
-                            }
-                        } else {
-                            //无记录
-                            needInject = true
-                        }
-                    } else {
-                        needInject = true;
-                    }
+                    boolean needInject = checkNeedInjector(infoMap, jar, reJar, activityMd5, md5);
+
                     //设置重定向jar
                     setJarInput(jarInput, reJar)
                     if (needInject) {
@@ -192,6 +159,34 @@ public class Util {
         String md5 = DigestUtils.md5Hex(fileInputStream);
         fileInputStream.close()
         return md5
+    }
+
+
+    def static checkNeedInjector( Map<String, JarPatchInfo> infoMap, File jar,File reJar,String activityMd5,String md5){
+        boolean needInject = false
+        if (reJar.exists()) {
+            //检查修改插件版本
+            JarPatchInfo info = infoMap.get(jar.getAbsolutePath());
+            if (info != null) {
+                if(!activityMd5.equals(info.manifestActivitiesMd5)){
+                    needInject = true
+                }else  if (!AppConstant.VER.equals(info.pluginVersion)) {
+                    //版本变化了
+                    needInject = true
+                } else {
+                    if (!md5.equals(info.jarMd5)) {
+                        //原始jar内容变化
+                        needInject = true
+                    }
+                }
+            } else {
+                //无记录
+                needInject = true
+            }
+        } else {
+            needInject = true;
+        }
+        return needInject;
     }
 
     /**
