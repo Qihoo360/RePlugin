@@ -127,6 +127,7 @@ public class PluginLibraryInternalProxy {
 	                    + isDynamicClass(plugin, componentName.getClassName()));
 	        }
 	        if (isDynamicClass(plugin, componentName.getClassName())) {
+                intent.putExtra(IPluginManager.KEY_COMPATIBLE, true);
 	            intent.setComponent(new ComponentName(IPC.getPackageName(), componentName.getClassName()));
 	            context.startActivity(intent);
 	            return false;
@@ -225,6 +226,7 @@ public class PluginLibraryInternalProxy {
         }
 
         if (Factory2.isDynamicClass(plugin, activity)) {
+            intent.putExtra(IPluginManager.KEY_COMPATIBLE, true);
             intent.setComponent(new ComponentName(IPC.getPackageName(), activity));
             context.startActivity(intent);
             return true;
