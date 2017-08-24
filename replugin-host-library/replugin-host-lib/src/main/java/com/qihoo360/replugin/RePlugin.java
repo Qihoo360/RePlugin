@@ -810,9 +810,9 @@ public class RePlugin {
 
     /**
      * 注册一个“跳转”类。一旦系统或自身想调用指定类时，将自动跳转到插件里的另一个类。 <p>
-     * 例如，系统想访问CallShowService类，但此类在宿主中不存在，只在CallShow中有，则： <p>
+     * 例如，系统想访问CallShowService类，但此类在宿主中不存在，只在callshow插件中有，则： <p>
      * 未注册“跳转类”时：直接到宿主中寻找CallShowService类，找到后就加载，找不到就崩溃（若不Catch） <p>
-     * 注册“挑转类”后，直接将CallShowService的调用“跳转到”插件的CallShowService类中（名字可以不同）。这种情况下，需要调用： <p>
+     * 注册“挑转类”后，直接将CallShowService的调用“跳转到”callshow插件的CallShowService2类中（名字可以不同）。这种情况下，需要调用： <p>
      * <code>
      * RePlugin.registerHookingClass("com.qihoo360.mobilesafe.CallShowService", <p>
      * 　　　　　　　　　　　　RePlugin.createComponentName("callshow", "com.qihoo360.callshow.CallShowService2"), <p>
