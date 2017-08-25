@@ -35,6 +35,10 @@ import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.packages.PluginManagerProxy;
 import com.qihoo360.replugin.packages.PluginManagerServer;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -229,6 +233,10 @@ public class PluginProcessMain {
             }
             return super.toString();
         }
+
+        public IPluginClient getClient() {
+            return client;
+        }
     }
 
     static final void reportStatus() {
@@ -240,6 +248,78 @@ public class PluginProcessMain {
                 LogDebug.i(PLUGIN_TAG, "i=" + r.index + " p=" + r.plugin + " a=" + r.activities + " s=" + r.services + " b=" + r.binders);
             }
         }
+    }
+
+    static final String dump() {
+
+        // 1.dump Activity映射表
+        JSONArray activityArr = new JSONArray();
+        for (ProcessClientRecord clientRecord : ALL.values()) {
+            try {
+                IPluginClient pluginClient = clientRecord.getClient();
+                if (pluginClient == null) {
+                    continue;
+                }
+
+                String clientDumpInfo = pluginClient.dumpActivities();
+                JSONArray clientDumpArr = new JSONArray(clientDumpInfo);
+                if (clientDumpArr.length() > 0) {
+                    for (int i = 0; i < clientDumpArr.length(); i++) {
+                        activityArr.put(clientDumpArr.getJSONObject(i));
+                    }
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 2.dump 插件信息表
+        JSONArray pluginArr = new JSONArray();
+        List<PluginInfo> pluginList = MP.getPlugins(false);
+        if (pluginList != null) {
+            JSONObject pluginObj;
+            for (PluginInfo pluginInfo : pluginList) {
+                try {
+                    pluginObj = new JSONObject();
+                    pluginObj.put(pluginInfo.getName(), pluginInfo.toString());
+                    pluginArr.put(pluginObj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // 3.dump service
+        JSONArray serviceArr = new JSONArray();
+        for (ProcessClientRecord clientRecord : ALL.values()) {
+            try {
+                IPluginClient pluginClient = clientRecord.getClient();
+                if (pluginClient == null) {
+                    continue;
+                }
+
+                String clientDumpInfo = pluginClient.dumpServices();
+                JSONArray clientDumpArr = new JSONArray(clientDumpInfo);
+                if (clientDumpArr.length() > 0) {
+                    for (int i = 0; i < clientDumpArr.length(); i++) {
+                        serviceArr.put(clientDumpArr.getJSONObject(i));
+                    }
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+
+        JSONObject detailObj = new JSONObject();
+        try {
+            detailObj.put("activity", activityArr);
+            detailObj.put("service", serviceArr);
+            detailObj.put("plugin", pluginArr);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return detailObj.toString();
     }
 
     static final void dump(FileDescriptor fd, PrintWriter writer, String[] args) {

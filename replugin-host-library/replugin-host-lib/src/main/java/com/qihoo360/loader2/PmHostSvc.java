@@ -621,4 +621,9 @@ class PmHostSvc extends IPluginHost.Stub {
     public String getProcessNameByPid(int pid) throws RemoteException {
         return PluginProcessMain.getProcessNameByPid(pid);
     }
+
+    @Override
+    public String dump() {
+        return PluginProcessMain.dump();
+    }
 }

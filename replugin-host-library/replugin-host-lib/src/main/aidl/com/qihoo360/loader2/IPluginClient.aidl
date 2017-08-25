@@ -31,4 +31,14 @@ interface IPluginClient {
      * @param Intent   广播的 Intent 数据
      */
     void onReceive(String plugin, String receiver, in Intent intent);
+
+    /**
+     * dump通过插件化框架启动起来的Service信息
+     */
+    String dumpServices();
+
+    /**
+     * dump插件化框架中存储的详细Activity坑位映射表
+     */
+    String dumpActivities();
 }
