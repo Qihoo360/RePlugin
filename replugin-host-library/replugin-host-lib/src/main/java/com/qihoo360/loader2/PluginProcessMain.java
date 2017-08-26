@@ -252,8 +252,10 @@ public class PluginProcessMain {
 
     static final String dump() {
 
-        // 1.dump Activity映射表
+        // 1.dump Activity映射表, service列表
         JSONArray activityArr = new JSONArray();
+        JSONArray serviceArr = new JSONArray();
+
         for (ProcessClientRecord clientRecord : ALL.values()) {
             try {
                 IPluginClient pluginClient = clientRecord.getClient();
@@ -261,11 +263,21 @@ public class PluginProcessMain {
                     continue;
                 }
 
-                String clientDumpInfo = pluginClient.dumpActivities();
-                JSONArray clientDumpArr = new JSONArray(clientDumpInfo);
-                if (clientDumpArr.length() > 0) {
-                    for (int i = 0; i < clientDumpArr.length(); i++) {
-                        activityArr.put(clientDumpArr.getJSONObject(i));
+                String activityDumpInfo = pluginClient.dumpActivities();
+                JSONArray activityList = new JSONArray(activityDumpInfo);
+                int activityCount = activityList.length();
+                if (activityCount > 0) {
+                    for (int i = 0; i < activityCount; i++) {
+                        activityArr.put(activityList.getJSONObject(i));
+                    }
+                }
+
+                String serviceDumpInfo = pluginClient.dumpServices();
+                JSONArray serviceList = new JSONArray(serviceDumpInfo);
+                int serviceCount = serviceList.length();
+                if (serviceCount > 0) {
+                    for (int i = 0; i < serviceCount; i++) {
+                        serviceArr.put(serviceList.getJSONObject(i));
                     }
                 }
             } catch (Throwable e) {
@@ -286,27 +298,6 @@ public class PluginProcessMain {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
-        }
-
-        // 3.dump service
-        JSONArray serviceArr = new JSONArray();
-        for (ProcessClientRecord clientRecord : ALL.values()) {
-            try {
-                IPluginClient pluginClient = clientRecord.getClient();
-                if (pluginClient == null) {
-                    continue;
-                }
-
-                String clientDumpInfo = pluginClient.dumpServices();
-                JSONArray clientDumpArr = new JSONArray(clientDumpInfo);
-                if (clientDumpArr.length() > 0) {
-                    for (int i = 0; i < clientDumpArr.length(); i++) {
-                        serviceArr.put(clientDumpArr.getJSONObject(i));
-                    }
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
             }
         }
 

@@ -34,7 +34,7 @@ public class DumpUtils {
     private static final String TAG = RePluginInternal.FOR_DEV ? DumpUtils.class.getSimpleName() : "DumpUtils";
 
     /**
-     * 获取所有通过RePlugin运行起来的“插件中”的Service
+     * dump RePlugin框架运行时的详细信息，包括：Activity 坑位映射表，正在运行的 Service，以及详细的插件信息
      *
      * @param fd
      * @param writer
