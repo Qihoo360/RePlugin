@@ -14,13 +14,11 @@ public class JarPatchInfo {
 
     def String manifestActivitiesMd5
 
+    /**
+     * gson需要
+     */
     JarPatchInfo(){
 
-    }
-
-    JarPatchInfo(String jarMd5, String pluginVersion) {
-        this.jarMd5 = jarMd5
-        this.pluginVersion = pluginVersion
     }
 
     JarPatchInfo(File jar,String activitiesMd5){
@@ -29,7 +27,4 @@ public class JarPatchInfo {
         this.manifestActivitiesMd5 = activitiesMd5
     }
 
-    JarPatchInfo(File jar){
-        this(jar, null)
-    }
 }

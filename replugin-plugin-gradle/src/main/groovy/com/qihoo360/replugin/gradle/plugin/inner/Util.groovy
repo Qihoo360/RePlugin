@@ -30,8 +30,6 @@ import com.qihoo360.replugin.gradle.plugin.AppConstant
 import com.qihoo360.replugin.gradle.plugin.manifest.ManifestAPI
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
-import com.google.common.base.Charsets
-import com.google.common.hash.Hashing
 import org.gradle.api.Project
 
 import java.lang.reflect.Field
@@ -39,8 +37,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipFile
 
-import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES;
-
+import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES
 /**
  * @author RePlugin Team
  */
@@ -48,7 +45,7 @@ public class Util {
 
     /** 生成 ClassPool 使用的 ClassPath 集合，同时将要处理的 jar 写入 includeJars */
     def
-    static getClassPaths(Project project, String buildType,GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
+    static getClassPaths(Project project, String buildType, GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
         def classpathList = []
 
         includeJars.clear()
@@ -67,32 +64,18 @@ public class Util {
     }
 
     /** 获取原始项目中的 ClassPath */
-    def private static getProjectClassPath(Project project,String buildType,
+    def private static getProjectClassPath(Project project, String buildType,
                                            Collection<TransformInput> inputs,
                                            Set<String> includeJars, Map<String, String> map) {
         def classPath = []
         def visitor = new ClassFileVisitor()
-        def projectDir = project.getRootDir().absolutePath
 
         println ">>> Unzip Jar ..."
         Map<String, JarPatchInfo> infoMap = readJarInjectorHistory(project, buildType)
         final String injectDir = project.getBuildDir().path +
                 File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar"+ File.separator + buildType;
-        def activityList = new ArrayList<>();
-        new ManifestAPI().getActivities(project, buildType).each {
-            // 处理没有被忽略的 Activity
-            if (!(it in CommonData.ignoredActivities)) {
-                //
-                activityList.add(it)
-            }
-        }
-        Collections.sort(activityList, new Comparator<String>(){
-            @Override
-            int compare(String o1, String o2) {
-                return o1.compareTo(o2);
-            }
-        });
-        String activityMd5 = DigestUtils.md5Hex(activityList.toString());
+
+        String activityMd5 = genActivityMd5(project, buildType);
 
         boolean needSave = false
         inputs.each { TransformInput input ->
@@ -108,39 +91,31 @@ public class Util {
             input.jarInputs.each { JarInput jarInput ->
                 File jar = jarInput.file
                 def jarPath = jar.absolutePath
-                if (jarPath.contains(File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar")) {
-                    //
-                }else{
-                    //重定向jar
-                    String md5 = md5File(jar);
-                    File reJar = new File(injectDir + File.separator + md5 + ".jar");
-                    jarPath = reJar.getAbsolutePath()
 
-                    boolean needInject = checkNeedInjector(infoMap, jar, reJar, activityMd5, md5);
+                String md5 = md5File(jar);
+                File reJar = new File(injectDir + File.separator + md5 + ".jar");
 
-                    //设置重定向jar
-//                    setJarInput(jarInput, reJar)
-                    //ReClassTransform.copyJar需要用到
-                    map.put(jar.getAbsolutePath(), jarPath)
-                    if (needInject) {
-                        /* 将 jar 包解压，并将解压后的目录加入 classpath */
-                        // println ">>> 解压Jar${jarPath}"
-                        String jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
-                        if (unzip(jar.getAbsolutePath(), jarZipDir)) {
+                boolean needInject = checkNeedInjector(infoMap, jar, reJar, activityMd5, md5);
 
-                            includeJars << jar.getAbsolutePath()
-                            classPath << jarZipDir
-                            //保存修改的插件版本号
-                            needSave = true
-                            infoMap.put(jar.getAbsolutePath(), new JarPatchInfo(jar, activityMd5))
+                //ReClassTransform.copyJar需要用到
+                map.put(jarPath, jar.getAbsolutePath())
+                if (needInject) {
+                    /* 将 jar 包解压，并将解压后的目录加入 classpath */
+                    // println ">>> 解压Jar${jarPath}"
+                    String jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
+                    if (unzip(jarPath, jarZipDir)) {
 
-                            visitor.setBaseDir(jarZipDir)
-                            Files.walkFileTree(Paths.get(jarZipDir), visitor)
-                        }
-                        // 删除 jar
-                        if (reJar.exists()) {
-                            FileUtils.forceDelete(reJar)
-                        }
+                        includeJars << jarPath
+                        classPath << jarZipDir
+                        //保存修改的插件版本号
+                        needSave = true
+                        infoMap.put(jarPath, new JarPatchInfo(jar, activityMd5))
+
+                        visitor.setBaseDir(jarZipDir)
+                        Files.walkFileTree(Paths.get(jarZipDir), visitor)
+                    }
+                    if (reJar.exists()) {
+                        FileUtils.forceDelete(reJar)
                     }
                 }
             }
@@ -149,6 +124,27 @@ public class Util {
             saveJarInjectorHistory(project, buildType, infoMap)
         }
         return classPath
+    }
+
+    /**
+     * activities的md5
+     */
+    def static genActivityMd5(Project project, String buildType){
+        def activityList = new ArrayList<>();
+        new ManifestAPI().getActivities(project, buildType).each {
+            // 处理没有被忽略的 Activity
+            if (!(it in CommonData.ignoredActivities)) {
+                //
+                activityList.add(it)
+            }
+        }
+        Collections.sort(activityList, new Comparator<String>(){
+            @Override
+            int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        return DigestUtils.md5Hex(activityList.toString());
     }
 
     /**
@@ -163,29 +159,19 @@ public class Util {
 
 
     def static checkNeedInjector( Map<String, JarPatchInfo> infoMap, File jar,File reJar,String activityMd5,String md5){
-        boolean needInject = false
+        boolean needInject = true
+
         if (reJar.exists()) {
-            //检查修改插件版本
             JarPatchInfo info = infoMap.get(jar.getAbsolutePath());
             if (info != null) {
-                if(!activityMd5.equals(info.manifestActivitiesMd5)){
-                    needInject = true
-                }else  if (!AppConstant.VER.equals(info.pluginVersion)) {
-                    //版本变化了
-                    needInject = true
-                } else {
-                    if (!md5.equals(info.jarMd5)) {
-                        //原始jar内容变化
-                        needInject = true
-                    }
+                if (activityMd5.equals(info.manifestActivitiesMd5)
+                        && AppConstant.VER.equals(info.pluginVersion)
+                        && md5.equals(info.jarMd5)) {
+                    needInject = false
                 }
-            } else {
-                //无记录
-                needInject = true
             }
-        } else {
-            needInject = true;
         }
+
         return needInject;
     }
 

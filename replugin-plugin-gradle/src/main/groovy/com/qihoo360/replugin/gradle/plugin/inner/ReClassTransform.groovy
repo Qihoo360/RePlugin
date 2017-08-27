@@ -214,7 +214,7 @@ public class ReClassTransform extends Transform {
     /**
      * 初始化 ClassPool
      */
-    def initClassPool(Collection<TransformInput> inputs,String buildType) {
+    def initClassPool(Collection<TransformInput> inputs, String buildType) {
         Util.newSection()
         def pool = new ClassPool(true)
         // 添加编译时需要引用的到类到 ClassPool, 同时记录要修改的 jar 到 includeJars
