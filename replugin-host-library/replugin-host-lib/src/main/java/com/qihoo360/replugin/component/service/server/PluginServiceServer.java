@@ -31,19 +31,24 @@ import android.util.Log;
 import com.qihoo360.i.Factory;
 import com.qihoo360.loader2.mgr.IServiceConnection;
 import com.qihoo360.mobilesafe.core.BuildConfig;
-import com.qihoo360.replugin.utils.basic.ArrayMap;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.base.ThreadUtils;
 import com.qihoo360.replugin.component.ComponentList;
 import com.qihoo360.replugin.component.utils.PluginClientHelper;
+import com.qihoo360.replugin.helper.JSONHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
+import com.qihoo360.replugin.utils.basic.ArrayMap;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
@@ -422,7 +427,9 @@ public class PluginServiceServer {
         sr.service = s;
 
         // 开启“坑位”服务，防止进程被杀
-        startPitService();
+        ComponentName pitCN = getPitComponentName();
+        sr.pitComponentName = pitCN;
+        startPitService(pitCN);
         return true;
     }
 
@@ -487,7 +494,9 @@ public class PluginServiceServer {
         r.service.onDestroy();
 
         // 停止“坑位”服务，系统可以根据需要来回收了
-        stopPitService();
+        ComponentName pitCN = getPitComponentName();
+        r.pitComponentName = pitCN;
+        stopPitService(pitCN);
     }
 
     // 通过反射调用Service.attachBaseContext方法（Protected的）
@@ -535,6 +544,13 @@ public class PluginServiceServer {
                 return PluginServiceServer.this.unbindServiceLocked(conn);
             }
         }
+
+        @Override
+        public String dump() throws RemoteException {
+            synchronized (LOCKER) {
+                return PluginServiceServer.this.dump();
+            }
+        }
     }
 
     // 通过Client端传来的IBinder（Messenger）来获取Pid，以及进程信息
@@ -548,19 +564,24 @@ public class PluginServiceServer {
         return pr;
     }
 
-    // 开启“坑位”服务，防止进程被杀
-    private void startPitService() {
-        // TODO 其实，有一种更好的办法……敬请期待
+    // 构建一个占坑服务
+    private ComponentName getPitComponentName() {
         String pname = IPC.getCurrentProcessName();
         int process = PluginClientHelper.getProcessInt(pname);
 
-        ComponentName cn = PluginPitService.makeComponentName(mContext, process);
+        return PluginPitService.makeComponentName(mContext, process);
+    }
+
+    // 开启“坑位”服务，防止进程被杀
+    private void startPitService(ComponentName pitCN) {
+        // TODO 其实，有一种更好的办法……敬请期待
+
         if (LOG) {
-            LogDebug.d(TAG, "startPitService: Start " + cn);
+            LogDebug.d(TAG, "startPitService: Start " + pitCN);
         }
 
         Intent intent = new Intent();
-        intent.setComponent(cn);
+        intent.setComponent(pitCN);
 
         try {
             mContext.startService(intent);
@@ -571,17 +592,14 @@ public class PluginServiceServer {
     }
 
     // 停止“坑位”服务，系统可以根据需要来回收了
-    private void stopPitService() {
-        String pname = IPC.getCurrentProcessName();
-        int process = PluginClientHelper.getProcessInt(pname);
+    private void stopPitService(ComponentName pitCN) {
 
-        ComponentName cn = PluginPitService.makeComponentName(mContext, process);
         if (LOG) {
-            LogDebug.d(TAG, "stopPitService: Stop " + cn);
+            LogDebug.d(TAG, "stopPitService: Stop " + pitCN);
         }
 
         Intent intent = new Intent();
-        intent.setComponent(cn);
+        intent.setComponent(pitCN);
         try {
             mContext.stopService(intent);
         } catch (Exception e) {
@@ -590,4 +608,34 @@ public class PluginServiceServer {
         }
     }
 
+    /**
+     * dump当前进程中运行的service详细信息，供client端使用
+     *
+     * @return
+     */
+    private String dump() {
+
+        if (mServicesByName == null || mServicesByName.isEmpty()) {
+            return null;
+        }
+
+        JSONArray jsonArray = new JSONArray();
+
+        JSONObject serviceObj;
+        for (Map.Entry<ComponentName, ServiceRecord> entry : mServicesByName.entrySet()) {
+            ComponentName key = entry.getKey();
+            ServiceRecord value = entry.getValue();
+
+            serviceObj = new JSONObject();
+
+            JSONHelper.putNoThrows(serviceObj, "className", key.getClassName());
+            JSONHelper.putNoThrows(serviceObj, "process", value.getServiceInfo().processName);
+            JSONHelper.putNoThrows(serviceObj, "plugin", value.getPlugin());
+            JSONHelper.putNoThrows(serviceObj, "pitClassName", value.getPitComponentName().getClassName());
+
+            jsonArray.put(serviceObj);
+        }
+
+        return jsonArray.toString();
+    }
 }

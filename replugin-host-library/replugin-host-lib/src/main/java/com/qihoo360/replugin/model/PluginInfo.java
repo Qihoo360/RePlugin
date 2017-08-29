@@ -22,7 +22,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -42,6 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -848,14 +848,15 @@ public class PluginInfo implements Parcelable, Cloneable {
             b.append("[DEX_EXTRACTED] ");
         }
 
-        // 插件是否“已被使用”
-        if (RePlugin.isPluginUsed(getName())) {
-            b.append("[USED] ");
-        }
-
         // 插件是否“正在使用”
         if (RePlugin.isPluginRunning(getName())) {
-            b.append("[USING] ");
+            b.append("[RUNNING] ");
+        }
+
+        // 哪些进程使用
+        String[] processes = RePlugin.getRunningProcessesByPlugin(getName());
+        if (processes != null) {
+            b.append("processes=").append(Arrays.toString(processes)).append(' ');
         }
 
         // 插件基本信息
@@ -877,7 +878,25 @@ public class PluginInfo implements Parcelable, Cloneable {
 
     @Override
     public boolean equals(Object obj) {
-        return mJson.equals(obj);
+        if (obj == null) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        PluginInfo pluginInfo = (PluginInfo) obj;
+
+        try {
+            return pluginInfo.mJson.equals(mJson);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 

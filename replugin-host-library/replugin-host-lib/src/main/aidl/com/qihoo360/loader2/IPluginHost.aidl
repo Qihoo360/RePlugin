@@ -109,4 +109,9 @@ interface IPluginHost {
      * 通过PID来获取进程名
      */
     String getProcessNameByPid(int pid);
+
+    /**
+     * dump详细的运行时信息
+     */
+    String dump();
 }

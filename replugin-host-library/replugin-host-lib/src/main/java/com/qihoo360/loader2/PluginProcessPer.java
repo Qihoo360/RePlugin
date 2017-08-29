@@ -330,4 +330,29 @@ class PluginProcessPer extends IPluginClient.Stub {
     public void onReceive(String plugin, final String receiver, final Intent intent) {
         PluginReceiverHelper.onPluginReceiverReceived(plugin, receiver, mReceivers, intent);
     }
+
+    @Override
+    public String dumpServices() {
+        try {
+            IPluginServiceServer pss = fetchServiceServer();
+            if (pss != null) {
+                try {
+                    return pss.dump();
+                } catch (Throwable e) {
+                    if (LOGR) {
+                        LogRelease.e(PLUGIN_TAG, "psc.sts: pss e", e);
+                    }
+                }
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public String dumpActivities() {
+        return mACM.dump();
+    }
 }
