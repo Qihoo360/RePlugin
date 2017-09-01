@@ -23,7 +23,11 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Binder;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
@@ -66,6 +70,11 @@ public class PluginServiceServer {
 
     private static final byte[] LOCKER = new byte[0];
 
+    /**
+     * Service onStartCommand
+     */
+    private static final int WHAT_ON_START_COMMAND = 1;
+
     private final Context mContext;
 
     private final Stub mStub;
@@ -86,6 +95,31 @@ public class PluginServiceServer {
     private final ArrayMap<ComponentName, ServiceRecord> mServicesByName = new ArrayMap<>();
     private final ArrayMap<Intent.FilterComparison, ServiceRecord> mServicesByIntent = new ArrayMap<>();
 
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            switch (msg.what) {
+                case WHAT_ON_START_COMMAND:
+                    Bundle data = msg.getData();
+                    Intent intent = data.getParcelable("intent");
+
+                    if (intent != null) {
+                        ServiceRecord sr = retrieveServiceLocked(intent);
+                        if (sr != null) {
+                            sr.service.onStartCommand(intent, 0, 0);
+                        } else {
+                            if (LOG) {
+                                LogDebug.e(PLUGIN_TAG, "pss.onStartCommand fail.");
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+    };
+
     public PluginServiceServer(Context context) {
         mContext = context;
         mStub = new Stub();
@@ -104,21 +138,6 @@ public class PluginServiceServer {
             return null;
         }
 
-        try {
-            final Intent finalIntent = intent;
-            ThreadUtils.syncToMainThread(new Callable<Integer>() {
-                @Override
-                public Integer call() throws Exception {
-                    return sr.service.onStartCommand(finalIntent, 0, 0); // TODO 第一和第二个参数;
-                }
-            }, 6000);
-        } catch (Throwable e) {
-            if (LOG) {
-                LogDebug.e(PLUGIN_TAG, "pss.ssl e:", e);
-            }
-            return null;
-        }
-
         sr.startRequested = true;
 
         // 加入到列表中，统一管理
@@ -127,6 +146,15 @@ public class PluginServiceServer {
         if (LOG) {
             LogDebug.i(PLUGIN_TAG, "PSM.startService(): Start! in=" + intent + "; sr=" + sr);
         }
+
+        // 从binder线程post到ui线程，去执行Service的onStartCommand操作
+        Message message = mHandler.obtainMessage(WHAT_ON_START_COMMAND);
+        Bundle data = new Bundle();
+        data.putParcelable("intent", intent);
+        message.setData(data);
+
+        mHandler.sendMessage(message);
+
         return cn;
     }
 
