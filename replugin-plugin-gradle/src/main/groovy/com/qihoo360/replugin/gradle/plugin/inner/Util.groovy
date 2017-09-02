@@ -94,11 +94,10 @@ public class Util {
 
                 String md5 = md5File(jar);
                 File reJar = new File(injectDir + File.separator + md5 + ".jar");
-
                 boolean needInject = checkNeedInjector(infoMap, jar, reJar, activityMd5, md5);
 
                 //ReClassTransform.copyJar需要用到
-                map.put(jarPath, jar.getAbsolutePath())
+                map.put(jarPath, reJar.getAbsolutePath())
                 if (needInject) {
                     /* 将 jar 包解压，并将解压后的目录加入 classpath */
                     // println ">>> 解压Jar${jarPath}"
