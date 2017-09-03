@@ -32,7 +32,6 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 
-import java.lang.reflect.Field
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipFile
@@ -71,11 +70,11 @@ public class Util {
         def visitor = new ClassFileVisitor()
 
         println ">>> Unzip Jar ..."
-        Map<String, JarPatchInfo> infoMap = readJarInjectorHistory(project, buildType)
-        final String injectDir = project.getBuildDir().path +
+        def infoMap = readJarInjectorHistory(project, buildType)
+        final def injectDir = project.getBuildDir().path +
                 File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar"+ File.separator + buildType;
 
-        String activityMd5 = genActivityMd5(project, buildType);
+        def activityMd5 = genActivityMd5(project, buildType);
 
         boolean needSave = false
         inputs.each { TransformInput input ->
@@ -89,19 +88,20 @@ public class Util {
             }
 
             input.jarInputs.each { JarInput jarInput ->
-                File jar = jarInput.file
+                def jar = jarInput.file
                 def jarPath = jar.absolutePath
 
-                String md5 = md5File(jar);
-                File reJar = new File(injectDir + File.separator + md5 + ".jar");
+                def md5 = md5File(jar);
+                def reJar = new File(injectDir + File.separator + md5 + ".jar");
+                def reJarPath = reJar.getAbsolutePath()
                 boolean needInject = checkNeedInjector(infoMap, jar, reJar, activityMd5, md5);
 
                 //ReClassTransform.copyJar需要用到
-                map.put(jarPath, reJar.getAbsolutePath())
+                map.put(jarPath, reJarPath)
                 if (needInject) {
                     /* 将 jar 包解压，并将解压后的目录加入 classpath */
                     // println ">>> 解压Jar${jarPath}"
-                    String jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
+                    def jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
                     if (unzip(jarPath, jarZipDir)) {
 
                         includeJars << jarPath
@@ -150,8 +150,8 @@ public class Util {
      * 计算jar的md5
      */
     def static md5File(File jar) {
-        FileInputStream fileInputStream = new FileInputStream(jar);
-        String md5 = DigestUtils.md5Hex(fileInputStream);
+        def fileInputStream = new FileInputStream(jar);
+        def md5 = DigestUtils.md5Hex(fileInputStream);
         fileInputStream.close()
         return md5
     }
@@ -161,7 +161,7 @@ public class Util {
         boolean needInject = true
 
         if (reJar.exists()) {
-            JarPatchInfo info = infoMap.get(jar.getAbsolutePath());
+            def info = infoMap.get(jar.getAbsolutePath());
             if (info != null) {
                 if (activityMd5.equals(info.manifestActivitiesMd5)
                         && AppConstant.VER.equals(info.pluginVersion)
@@ -218,26 +218,6 @@ public class Util {
         String json = gson.toJson(injectorMap);
         fileWriter.write(json)
         fileWriter.close()
-    }
-
-    /**
-     * 反射，修改引用的jar路径
-     */
-    def static setJarInput(JarInput jarInput, File rejar) {
-        Field fileField = null;
-        Class<?> clazz = jarInput.getClass();
-        while (fileField == null && clazz != Object.class) {
-            try {
-                fileField = clazz.getDeclaredField("file");
-            } catch (Exception e) {
-                //ignore
-                clazz = clazz.getSuperclass();
-            }
-        }
-        if (fileField != null) {
-            fileField.setAccessible(true);
-            fileField.set(jarInput, rejar);
-        }
     }
 
     /**
