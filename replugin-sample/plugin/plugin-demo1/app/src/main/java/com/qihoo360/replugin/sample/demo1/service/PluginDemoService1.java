@@ -41,6 +41,7 @@ public class PluginDemoService1 extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
         Toast.makeText(this, "PluginDemoService1.action = " + action, Toast.LENGTH_SHORT).show();
+        LogX.logDebug(TAG, "PluginDemoService1 onStartCommand()");
         return super.onStartCommand(intent, flags, startId);
     }
 
