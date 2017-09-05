@@ -418,6 +418,9 @@ public class PluginManagerServer {
 
         if (covered) {
             curInfo.setPendingCover(null);
+            newInfo.setIsPendingCover(false);
+            //修改isPendingCover属性后必须同时修改json中的path路径
+            newInfo.setPath(newInfo.getApkFile().getPath());
         } else {
             curInfo.update(newInfo);
             curInfo.setPendingUpdate(null);
