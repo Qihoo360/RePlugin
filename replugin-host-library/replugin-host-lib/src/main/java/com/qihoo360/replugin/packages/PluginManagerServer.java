@@ -207,7 +207,7 @@ public class PluginManagerServer {
     private int checkVersion(PluginInfo instPli, PluginInfo curPli) {
         // 支持插件同版本覆盖安装？
         // 若现在要安装的，与之前的版本相同，则覆盖掉之前的版本；
-        if (instPli.getVersion() == curPli.getVersion()) {
+        if (instPli.getVersion() == curPli.getVersion() && instPli.getPluginType() == curPli.getPluginType()) {
             if (LogDebug.LOG) {
                 LogDebug.d(TAG, "isSameVersion: same version. " +
                         "inst_ver=" + instPli.getVersion() + "; cur_ver=" + curPli.getVersion());
@@ -296,7 +296,8 @@ public class PluginManagerServer {
             if (LogDebug.LOG) {
                 LogDebug.w(TAG, "updateOrLater: Plugin is running. Later. pn=" + curPli.getName());
             }
-            if (instPli.getVersion() > curPli.getVersion()) {
+            if (instPli.getVersion() > curPli.getVersion() ||
+                    instPli.getVersion() == curPli.getVersion() && instPli.getPluginType() != curPli.getPluginType()) {
                 // 高版本升级
                 curPli.setPendingUpdate(instPli);
                 curPli.setPendingDelete(null);
