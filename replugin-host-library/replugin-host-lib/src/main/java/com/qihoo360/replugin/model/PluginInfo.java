@@ -22,6 +22,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -41,8 +42,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -360,12 +363,74 @@ public class PluginInfo implements Parcelable, Cloneable {
     /**
      * 插件的Dex是否已被优化（释放）了？
      *
-     * @return 是否被使用过
+     * @return
      */
     public boolean isDexExtracted() {
-        File f = getDexFile();
-        // 文件存在，且大小不为 0 时，才返回 true。
-        return f.exists() && FileUtils.sizeOf(f) > 0;
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            return isAOTDexExtracted();
+        } else {
+            File f = getDexFile();
+            // 文件存在，且大小不为 0 时，才返回 true。
+            return f.exists() && FileUtils.sizeOf(f) > 0;
+        }
+    }
+
+    /**
+     * 在Art虚拟机，引入AOT编译后（即全时段的编译，All-Of-the-Time compilation），判断插件的Dex是否已被优化（释放）了？
+     *
+     * @return
+     */
+    private boolean isAOTDexExtracted() {
+        String installedFileName = makeInstalledFileName();
+
+        File oatDir = getAOTDexClassLoaderOatDir();
+        List<String> oatCpuTypeList = getAOTOatCpuTypeList(oatDir);
+
+        if (oatCpuTypeList != null && oatCpuTypeList.size() > 0) {
+
+            for (String cpuType : oatCpuTypeList) {
+                File odexFile = new File(oatDir, cpuType + File.separator + installedFileName + ".odex");
+                File vdexFile = new File(oatDir, cpuType + File.separator + installedFileName + ".vdex");
+
+                if ((odexFile.exists() && FileUtils.sizeOf(odexFile) > 0) && (vdexFile.exists() && FileUtils.sizeOf(vdexFile) > 0)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Art虚拟机，引入AOT编译后，读取oat目录下所有子目录，即cpu类型列表
+     *
+     * @param oatDir
+     * @return
+     */
+    private List<String> getAOTOatCpuTypeList(File oatDir) {
+        List<String> list = new ArrayList<>();
+
+        if (oatDir != null && oatDir.exists() && oatDir.isDirectory()) {
+            File[] listFiles = oatDir.listFiles();
+
+            if (listFiles != null && listFiles.length > 0) {
+                for (File childFile : listFiles) {
+                    if (childFile != null && childFile.exists() && childFile.isDirectory()) {
+                        list.add(childFile.getName());
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Art虚拟机，引入AOT编译后，读取dex释放后的oat子目录，即APK当前目录下的oat目录
+     *
+     * @return
+     */
+    private File getAOTDexClassLoaderOatDir() {
+        return new File(getApkDir(), "oat");
     }
 
     /**
@@ -376,6 +441,15 @@ public class PluginInfo implements Parcelable, Cloneable {
      * @return Apk所在的File对象
      */
     public File getApkFile() {
+        return new File(getApkDir(), makeInstalledFileName() + ".jar");
+    }
+
+    /**
+     * 获取APK存放目录
+     *
+     * @return
+     */
+    public String getApkDir() {
         // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
         Context context = RePluginInternal.getAppContext();
         File dir;
@@ -386,7 +460,8 @@ public class PluginInfo implements Parcelable, Cloneable {
         } else {
             dir = context.getDir(Constant.LOCAL_PLUGIN_APK_SUB_DIR, 0);
         }
-        return new File(dir, makeInstalledFileName() + ".jar");
+
+        return dir.getAbsolutePath();
     }
 
     /**
