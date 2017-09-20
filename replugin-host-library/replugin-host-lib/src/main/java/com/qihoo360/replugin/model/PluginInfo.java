@@ -22,15 +22,18 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.qihoo360.loader2.BuildCompat;
 import com.qihoo360.loader2.Constant;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
 import com.qihoo360.loader2.V5FileInfo;
+import com.qihoo360.loader2.VMRuntimeCompat;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.helper.JSONHelper;
@@ -360,7 +363,7 @@ public class PluginInfo implements Parcelable, Cloneable {
     /**
      * 插件的Dex是否已被优化（释放）了？
      *
-     * @return 是否被使用过
+     * @return
      */
     public boolean isDexExtracted() {
         File f = getDexFile();
@@ -376,6 +379,15 @@ public class PluginInfo implements Parcelable, Cloneable {
      * @return Apk所在的File对象
      */
     public File getApkFile() {
+        return new File(getApkDir(), makeInstalledFileName() + ".jar");
+    }
+
+    /**
+     * 获取APK存放目录
+     *
+     * @return
+     */
+    public String getApkDir() {
         // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
         Context context = RePluginInternal.getAppContext();
         File dir;
@@ -386,7 +398,8 @@ public class PluginInfo implements Parcelable, Cloneable {
         } else {
             dir = context.getDir(Constant.LOCAL_PLUGIN_APK_SUB_DIR, 0);
         }
-        return new File(dir, makeInstalledFileName() + ".jar");
+
+        return dir.getAbsolutePath();
     }
 
     /**
@@ -433,34 +446,67 @@ public class PluginInfo implements Parcelable, Cloneable {
 
     /**
      * 获取Dex（优化后）生成时所在的目录 <p>
+     *
+     * Android O之前：
      * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
      * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
-     * 注意：仅供框架内部使用
      *
+     * Android O：
+     * APK存放目录/oat/{cpuType}
+     *
+     * 注意：仅供框架内部使用
      * @return 优化后Dex所在目录的File对象
      */
     public File getDexParentDir() {
+
         // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
         Context context = RePluginInternal.getAppContext();
-        if (isPnPlugin()) {
-            return context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
-        } else if (getIsPendingCover()) {
-            return context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            return new File(getApkDir() + File.separator + "oat" + File.separator + getArtOatCpuType());
         } else {
-            return context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
+            if (isPnPlugin()) {
+                return context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
+            } else if (getIsPendingCover()) {
+                return context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
+            } else {
+                return context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
+            }
         }
     }
 
     /**
      * 获取Dex（优化后）所在的文件信息 <p>
+     *
+     * Android O 之前：
      * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
+     *
+     * Android O：
+     * APK存放目录/oat/{cpuType}/XXX.odex
+     *
      * 注意：仅供框架内部使用
      *
      * @return 优化后Dex所在文件的File对象
      */
     public File getDexFile() {
-        File dir = getDexParentDir();
-        return new File(dir, makeInstalledFileName() + ".dex");
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            File dir = getDexParentDir();
+            return new File(dir, makeInstalledFileName() + ".odex");
+        } else {
+            File dir = getDexParentDir();
+            return new File(dir, makeInstalledFileName() + ".dex");
+        }
+    }
+
+    /**
+     * Art虚拟机，引入AOT编译后，读取oat目录下，当前正在使用的目录
+     * TODO 目前仅支持arm
+     *
+     * @return
+     */
+    private String getArtOatCpuType() {
+        return VMRuntimeCompat.is64Bit() ? BuildCompat.ARM64 : BuildCompat.ARM;
     }
 
     /**

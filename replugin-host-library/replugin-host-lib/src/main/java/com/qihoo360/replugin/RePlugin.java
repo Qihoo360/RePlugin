@@ -40,6 +40,7 @@ import com.qihoo360.i.Factory;
 import com.qihoo360.i.Factory2;
 import com.qihoo360.i.IPluginManager;
 import com.qihoo360.loader2.CertUtils;
+import com.qihoo360.loader2.DumpUtils;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PMF;
 import com.qihoo360.loader2.PluginStatusController;
@@ -62,6 +63,8 @@ import com.qihoo360.replugin.packages.PluginRunningList;
 import com.qihoo360.replugin.packages.RePluginInstaller;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.util.List;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
@@ -889,6 +892,17 @@ public class RePlugin {
             return f.getAbsolutePath();
         }
         return null;
+    }
+
+    /**
+     * dump RePlugin框架运行时的详细信息，包括：Activity 坑位映射表，正在运行的 Service，以及详细的插件信息
+     *
+     * @param fd
+     * @param writer
+     * @param args
+     */
+    public static void dump(FileDescriptor fd, PrintWriter writer, String[] args) {
+        DumpUtils.dump(fd, writer, args);
     }
 
     /**
