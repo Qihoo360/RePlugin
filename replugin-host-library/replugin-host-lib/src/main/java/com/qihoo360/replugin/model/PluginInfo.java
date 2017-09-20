@@ -29,9 +29,11 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.qihoo360.loader2.BuildCompat;
 import com.qihoo360.loader2.Constant;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
 import com.qihoo360.loader2.V5FileInfo;
+import com.qihoo360.loader2.VMRuntimeCompat;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.helper.JSONHelper;
@@ -42,10 +44,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -366,71 +366,9 @@ public class PluginInfo implements Parcelable, Cloneable {
      * @return
      */
     public boolean isDexExtracted() {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
-            return isAOTDexExtracted();
-        } else {
-            File f = getDexFile();
-            // 文件存在，且大小不为 0 时，才返回 true。
-            return f.exists() && FileUtils.sizeOf(f) > 0;
-        }
-    }
-
-    /**
-     * 在Art虚拟机，引入AOT编译后（即全时段的编译，All-Of-the-Time compilation），判断插件的Dex是否已被优化（释放）了？
-     *
-     * @return
-     */
-    private boolean isAOTDexExtracted() {
-        String installedFileName = makeInstalledFileName();
-
-        File oatDir = getAOTDexClassLoaderOatDir();
-        List<String> oatCpuTypeList = getAOTOatCpuTypeList(oatDir);
-
-        if (oatCpuTypeList != null && oatCpuTypeList.size() > 0) {
-
-            for (String cpuType : oatCpuTypeList) {
-                File odexFile = new File(oatDir, cpuType + File.separator + installedFileName + ".odex");
-                File vdexFile = new File(oatDir, cpuType + File.separator + installedFileName + ".vdex");
-
-                if ((odexFile.exists() && FileUtils.sizeOf(odexFile) > 0) && (vdexFile.exists() && FileUtils.sizeOf(vdexFile) > 0)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Art虚拟机，引入AOT编译后，读取oat目录下所有子目录，即cpu类型列表
-     *
-     * @param oatDir
-     * @return
-     */
-    private List<String> getAOTOatCpuTypeList(File oatDir) {
-        List<String> list = new ArrayList<>();
-
-        if (oatDir != null && oatDir.exists() && oatDir.isDirectory()) {
-            File[] listFiles = oatDir.listFiles();
-
-            if (listFiles != null && listFiles.length > 0) {
-                for (File childFile : listFiles) {
-                    if (childFile != null && childFile.exists() && childFile.isDirectory()) {
-                        list.add(childFile.getName());
-                    }
-                }
-            }
-        }
-        return list;
-    }
-
-    /**
-     * Art虚拟机，引入AOT编译后，读取dex释放后的oat子目录，即APK当前目录下的oat目录
-     *
-     * @return
-     */
-    private File getAOTDexClassLoaderOatDir() {
-        return new File(getApkDir(), "oat");
+        File f = getDexFile();
+        // 文件存在，且大小不为 0 时，才返回 true。
+        return f.exists() && FileUtils.sizeOf(f) > 0;
     }
 
     /**
@@ -508,34 +446,67 @@ public class PluginInfo implements Parcelable, Cloneable {
 
     /**
      * 获取Dex（优化后）生成时所在的目录 <p>
+     *
+     * Android O之前：
      * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
      * 若支持同版本覆盖安装的话，则会位于app_p_c中； <p>
-     * 注意：仅供框架内部使用
      *
+     * Android O：
+     * APK存放目录/oat/{cpuType}
+     *
+     * 注意：仅供框架内部使用
      * @return 优化后Dex所在目录的File对象
      */
     public File getDexParentDir() {
+
         // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
         Context context = RePluginInternal.getAppContext();
-        if (isPnPlugin()) {
-            return context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
-        } else if (getIsPendingCover()) {
-            return context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            return new File(getApkDir() + File.separator + "oat" + File.separator + getArtOatCpuType());
         } else {
-            return context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
+            if (isPnPlugin()) {
+                return context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
+            } else if (getIsPendingCover()) {
+                return context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
+            } else {
+                return context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
+            }
         }
     }
 
     /**
      * 获取Dex（优化后）所在的文件信息 <p>
+     *
+     * Android O 之前：
      * 若为"纯APK"插件，则会位于app_p_od中；若为"p-n"插件，则会位于"app_plugins_v3_odex"中 <p>
+     *
+     * Android O：
+     * APK存放目录/oat/{cpuType}/XXX.odex
+     *
      * 注意：仅供框架内部使用
      *
      * @return 优化后Dex所在文件的File对象
      */
     public File getDexFile() {
-        File dir = getDexParentDir();
-        return new File(dir, makeInstalledFileName() + ".dex");
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            File dir = getDexParentDir();
+            return new File(dir, makeInstalledFileName() + ".odex");
+        } else {
+            File dir = getDexParentDir();
+            return new File(dir, makeInstalledFileName() + ".dex");
+        }
+    }
+
+    /**
+     * Art虚拟机，引入AOT编译后，读取oat目录下，当前正在使用的目录
+     * TODO 目前仅支持arm
+     *
+     * @return
+     */
+    private String getArtOatCpuType() {
+        return VMRuntimeCompat.is64Bit() ? BuildCompat.ARM64 : BuildCompat.ARM;
     }
 
     /**
