@@ -25,7 +25,6 @@ import android.util.Log;
 import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
-
 import com.qihoo360.replugin.utils.FileUtils;
 
 import java.io.DataInputStream;
@@ -280,12 +279,18 @@ public class PackageFilesUtil {
             return;
         }
         try {
-            FileUtils.forceDelete(info.getApkFile());
-            FileUtils.forceDelete(info.getDexFile());
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            if (info.getApkFile().exists()) {
+                FileUtils.forceDelete(info.getApkFile());
+            }
+            if (info.getDexFile().exists()) {
+                FileUtils.forceDelete(info.getDexFile());
+            }
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP && info.getExtraOdexDir().exists()) {
                 FileUtils.forceDelete(info.getExtraOdexDir());
             }
-            FileUtils.forceDelete(info.getNativeLibsDir());
+            if (info.getNativeLibsDir().exists()) {
+                FileUtils.forceDelete(info.getNativeLibsDir());
+            }
         } catch (IOException e) {
             if (LogRelease.LOGR) {
                 e.printStackTrace();
