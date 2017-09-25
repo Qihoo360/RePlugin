@@ -34,6 +34,7 @@ package com.qihoo360.replugin.utils;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -250,6 +251,11 @@ public class FileUtils {
      * @throws IOException           in case deletion is unsuccessful
      */
     public static void forceDelete(final File file) throws IOException {
+
+        if (!file.exists()) {
+            return;
+        }
+
         if (file.isDirectory()) {
             deleteDirectory(file);
         } else {
@@ -703,5 +709,31 @@ public class FileUtils {
         } else {
             return file.length(); // will be 0 if file does not exist
         }
+    }
+
+    /**
+     * 得到文件名字（不包含扩展名）
+     * <p>
+     * 例：/sdcard/test/abc.zxy/ -> abc
+     *
+     * @param filePath
+     * @return
+     */
+    public static String getFileNameWithoutExt(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return filePath;
+        }
+
+        int extensionPosition = filePath.lastIndexOf(".");
+        int filePosition = filePath.lastIndexOf(File.separator);
+        if (filePosition == -1) {
+            return (extensionPosition == -1 ? filePath : filePath.substring(0, extensionPosition));
+        }
+
+        if (extensionPosition == -1) {
+            return filePath.substring(filePosition + 1);
+        }
+
+        return (filePosition < extensionPosition ? filePath.substring(filePosition + 1, extensionPosition) : filePath.substring(filePosition + 1));
     }
 }

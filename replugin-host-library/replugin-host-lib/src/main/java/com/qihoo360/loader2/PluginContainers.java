@@ -27,8 +27,12 @@ import com.qihoo360.mobilesafe.api.Pref;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.component.process.PluginProcessHost;
 import com.qihoo360.replugin.helper.HostConfigHelper;
+import com.qihoo360.replugin.helper.JSONHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -41,6 +45,7 @@ import static android.content.pm.ActivityInfo.LAUNCH_MULTIPLE;
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_INSTANCE;
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TASK;
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP;
+import static com.qihoo360.loader2.PluginContainers.ActivityState.toName;
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
@@ -770,5 +775,29 @@ a 流程完成
         }
 
         return null;
+    }
+
+    final String dump() {
+
+        JSONArray activityArr = new JSONArray();
+        JSONObject activityObj;
+
+        for (Map.Entry<String, ActivityState> entry : mStates.entrySet()) {
+            String container = entry.getKey();
+            ActivityState state = entry.getValue();
+
+            if (!TextUtils.isEmpty(state.plugin) && !TextUtils.isEmpty(state.activity)) {
+                activityObj = new JSONObject();
+                JSONHelper.putNoThrows(activityObj, "process", IPC.getCurrentProcessName());
+                JSONHelper.putNoThrows(activityObj, "className", container);
+                JSONHelper.putNoThrows(activityObj, "plugin", state.plugin);
+                JSONHelper.putNoThrows(activityObj, "realClassName", state.activity);
+                JSONHelper.putNoThrows(activityObj, "state", toName(state.state));
+                JSONHelper.putNoThrows(activityObj, "refs", state.refs != null ? state.refs.size() : 0);
+                activityArr.put(activityObj);
+            }
+        }
+
+        return activityArr.toString();
     }
 }

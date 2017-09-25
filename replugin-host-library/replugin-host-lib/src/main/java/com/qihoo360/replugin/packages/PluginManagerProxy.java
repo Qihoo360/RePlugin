@@ -103,32 +103,6 @@ public class PluginManagerProxy {
     }
 
     /**
-     * 常驻进程进行插件卸载
-     *
-     * @param pi
-     */
-    public static boolean uninstall(PluginInfo pi) throws RemoteException {
-        if (pi == null) {
-            // 不太可能到这里
-            return false;
-        }
-        if (pi.isPnPlugin()) {
-            // 是常驻进程？老逻辑直接走dex文件存在判断，也无需做处理
-            return false;
-        }
-
-        if (sRemote == null) {
-            // 常驻已挂掉，可以认为无需处理
-            if (LogRelease.LOGR) {
-                LogRelease.e(PLUGIN_TAG, "pmc.uuin: s=null");
-            }
-            return false;
-        }
-
-        return sRemote.uninstall(pi);
-    }
-
-    /**
      * 去常驻进程更新isUsed状态，并发送到所有进程中更新
      *
      * @param pluginName

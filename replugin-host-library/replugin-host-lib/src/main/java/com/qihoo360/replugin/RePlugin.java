@@ -40,6 +40,7 @@ import com.qihoo360.i.Factory;
 import com.qihoo360.i.Factory2;
 import com.qihoo360.i.IPluginManager;
 import com.qihoo360.loader2.CertUtils;
+import com.qihoo360.loader2.DumpUtils;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PMF;
 import com.qihoo360.loader2.PluginStatusController;
@@ -62,6 +63,8 @@ import com.qihoo360.replugin.packages.PluginRunningList;
 import com.qihoo360.replugin.packages.RePluginInstaller;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.util.List;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
@@ -810,9 +813,9 @@ public class RePlugin {
 
     /**
      * 注册一个“跳转”类。一旦系统或自身想调用指定类时，将自动跳转到插件里的另一个类。 <p>
-     * 例如，系统想访问CallShowService类，但此类在宿主中不存在，只在CallShow中有，则： <p>
+     * 例如，系统想访问CallShowService类，但此类在宿主中不存在，只在callshow插件中有，则： <p>
      * 未注册“跳转类”时：直接到宿主中寻找CallShowService类，找到后就加载，找不到就崩溃（若不Catch） <p>
-     * 注册“挑转类”后，直接将CallShowService的调用“跳转到”插件的CallShowService类中（名字可以不同）。这种情况下，需要调用： <p>
+     * 注册“挑转类”后，直接将CallShowService的调用“跳转到”callshow插件的CallShowService2类中（名字可以不同）。这种情况下，需要调用： <p>
      * <code>
      * RePlugin.registerHookingClass("com.qihoo360.mobilesafe.CallShowService", <p>
      * 　　　　　　　　　　　　RePlugin.createComponentName("callshow", "com.qihoo360.callshow.CallShowService2"), <p>
@@ -889,6 +892,17 @@ public class RePlugin {
             return f.getAbsolutePath();
         }
         return null;
+    }
+
+    /**
+     * dump RePlugin框架运行时的详细信息，包括：Activity 坑位映射表，正在运行的 Service，以及详细的插件信息
+     *
+     * @param fd
+     * @param writer
+     * @param args
+     */
+    public static void dump(FileDescriptor fd, PrintWriter writer, String[] args) {
+        DumpUtils.dump(fd, writer, args);
     }
 
     /**

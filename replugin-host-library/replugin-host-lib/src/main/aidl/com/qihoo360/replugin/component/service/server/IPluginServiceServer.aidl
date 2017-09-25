@@ -17,4 +17,6 @@ interface IPluginServiceServer {
 
     int bindService(in Intent intent, in IServiceConnection conn, int flags, in Messenger client);
     boolean unbindService(in IServiceConnection conn);
+
+    String dump();
 }

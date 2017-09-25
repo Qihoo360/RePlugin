@@ -62,6 +62,8 @@ interface IPluginHost {
 
     PluginInfo pluginDownloaded(String path);
 
+    boolean pluginUninstalled(in PluginInfo info);
+
     boolean pluginExtracted(String path);
 
     oneway void sendIntent2Process(String target, in Intent intent);
@@ -109,4 +111,9 @@ interface IPluginHost {
      * 通过PID来获取进程名
      */
     String getProcessNameByPid(int pid);
+
+    /**
+     * dump详细的运行时信息
+     */
+    String dump();
 }

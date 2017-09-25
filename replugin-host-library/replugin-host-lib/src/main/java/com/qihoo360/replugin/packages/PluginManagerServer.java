@@ -418,6 +418,9 @@ public class PluginManagerServer {
 
         if (covered) {
             curInfo.setPendingCover(null);
+            newInfo.setIsPendingCover(false);
+            //修改isPendingCover属性后必须同时修改json中的path路径
+            newInfo.setPath(newInfo.getApkFile().getPath());
         } else {
             curInfo.update(newInfo);
             curInfo.setPendingUpdate(null);
@@ -425,6 +428,9 @@ public class PluginManagerServer {
     }
 
     private void move(@NonNull PluginInfo curPi, @NonNull PluginInfo newPi) {
+        if (LogDebug.LOG) {
+            LogDebug.i(TAG, "move. curPi=" + curPi.getPath() + "; newPi=" + newPi.getPath());
+        }
         try {
             FileUtils.copyFile(newPi.getApkFile(), curPi.getApkFile());
 
@@ -526,21 +532,6 @@ public class PluginManagerServer {
         mList.remove(info.getName());
         mList.save(mContext);
 
-        // 3. 给各进程发送广播，同步更新
-        final Intent intent = new Intent(PluginInfoUpdater.ACTION_UNINSTALL_PLUGIN);
-        intent.putExtra("obj", info);
-        // 注意：若在attachBaseContext中调用此方法，则由于此时getApplicationContext为空，导致发送广播时会出现空指针异常。
-        // 则应该Post一下，待getApplicationContext有值后再发送广播。
-        if (RePluginInternal.getAppContext().getApplicationContext() != null) {
-            IPC.sendLocalBroadcast2AllSync(RePluginInternal.getAppContext(), intent);
-        } else {
-            Tasks.post2UI(new Runnable() {
-                @Override
-                public void run() {
-                    IPC.sendLocalBroadcast2All(RePluginInternal.getAppContext(), intent);
-                }
-            });
-        }
         return true;
     }
 
