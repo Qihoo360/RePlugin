@@ -284,15 +284,21 @@ public class PackageFilesUtil {
 
         try {
             // 删除插件APK
-            FileUtils.forceDelete(info.getApkFile());
-            if (BuildConfig.DEBUG) {
-                Log.i(TAG, "delete " + info.getApkFile());
+            final File apkFile = info.getApkFile();
+            if (apkFile.exists()) {
+                FileUtils.forceDelete(apkFile);
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "delete " + info.getApkFile());
+                }
             }
 
             // 删除释放后的odex
-            FileUtils.forceDelete(info.getDexFile());
-            if (BuildConfig.DEBUG) {
-                Log.i(TAG, "delete " + info.getDexFile());
+            final File dexFile = info.getDexFile();
+            if (dexFile.exists()) {
+                FileUtils.forceDelete(dexFile);
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "delete " + info.getDexFile());
+                }
             }
 
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
@@ -323,9 +329,12 @@ public class PackageFilesUtil {
             }
 
             // 删除Native文件
-            FileUtils.forceDelete(info.getNativeLibsDir());
-            if (BuildConfig.DEBUG) {
-                Log.i(TAG, "delete " + info.getNativeLibsDir());
+            final File libsFile = info.getNativeLibsDir();
+            if (libsFile.exists()) {
+                FileUtils.forceDelete(info.getNativeLibsDir());
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "delete " + info.getNativeLibsDir());
+                }
             }
 
             // 删除进程锁文件

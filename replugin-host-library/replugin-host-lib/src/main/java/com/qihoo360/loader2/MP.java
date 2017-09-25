@@ -283,7 +283,7 @@ public class MP {
         }
 
         try {
-            PluginProcessMain.getPluginHost().pluginUninstalled(pi);
+            return PluginProcessMain.getPluginHost().pluginUninstalled(pi);
         } catch (Throwable e) {
             if (LOGR) {
                 LogRelease.e(PLUGIN_TAG, "uninstall. error: " + e.getMessage(), e);
