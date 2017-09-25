@@ -22,10 +22,11 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.qihoo360.loader2.Constant;
 import com.qihoo360.mobilesafe.core.BuildConfig;
+import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
-
 import com.qihoo360.replugin.utils.FileUtils;
 
 import java.io.DataInputStream;
@@ -271,7 +272,8 @@ public class PackageFilesUtil {
     }
 
     /**
-     *  移除插件及其已释放的Dex、Native库等文件
+     * 移除插件及其已释放的Dex、Native库等文件
+     * <p>
      *
      * @param info 插件信息
      */
@@ -279,13 +281,69 @@ public class PackageFilesUtil {
         if (info == null) {
             return;
         }
+
         try {
-            FileUtils.forceDelete(info.getApkFile());
-            FileUtils.forceDelete(info.getDexFile());
+            // 删除插件APK
+            final File apkFile = info.getApkFile();
+            if (apkFile.exists()) {
+                FileUtils.forceDelete(apkFile);
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "delete " + info.getApkFile());
+                }
+            }
+
+            // 删除释放后的odex
+            final File dexFile = info.getDexFile();
+            if (dexFile.exists()) {
+                FileUtils.forceDelete(dexFile);
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "delete " + info.getDexFile());
+                }
+            }
+
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+
+                // 删除释放后的vdex
+                File dexParent = info.getDexParentDir();
+                String fileNameWithoutExt = FileUtils.getFileNameWithoutExt(info.getDexFile().getAbsolutePath());
+
+                File vdexFile = new File(dexParent, fileNameWithoutExt + ".vdex");
+                FileUtils.forceDelete(vdexFile);
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "delete " + vdexFile);
+                }
+
+                // 删除 XXX.jar.prof 文件
+                File profFile = new File(info.getApkFile().getAbsolutePath() + ".prof");
+                FileUtils.forceDelete(profFile);
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "delete " + profFile);
+                }
+            }
+
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 FileUtils.forceDelete(info.getExtraOdexDir());
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "delete " + info.getExtraOdexDir());
+                }
             }
-            FileUtils.forceDelete(info.getNativeLibsDir());
+
+            // 删除Native文件
+            final File libsFile = info.getNativeLibsDir();
+            if (libsFile.exists()) {
+                FileUtils.forceDelete(info.getNativeLibsDir());
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "delete " + info.getNativeLibsDir());
+                }
+            }
+
+            // 删除进程锁文件
+            String lockFileName = String.format(Constant.LOAD_PLUGIN_LOCK, info.getApkFile().getName());
+            File lockFile = new File(RePluginInternal.getAppContext().getFilesDir(), lockFileName);
+            FileUtils.forceDelete(lockFile);
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, "delete " + lockFile);
+            }
         } catch (IOException e) {
             if (LogRelease.LOGR) {
                 e.printStackTrace();

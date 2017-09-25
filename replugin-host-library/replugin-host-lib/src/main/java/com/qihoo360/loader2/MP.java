@@ -282,13 +282,11 @@ public class MP {
             return true;
         }
 
-        // 插件已安装
         try {
-            return PluginManagerProxy.uninstall(pi);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            if (LOG) {
-                e.printStackTrace();
+            return PluginProcessMain.getPluginHost().pluginUninstalled(pi);
+        } catch (Throwable e) {
+            if (LOGR) {
+                LogRelease.e(PLUGIN_TAG, "uninstall. error: " + e.getMessage(), e);
             }
         }
 

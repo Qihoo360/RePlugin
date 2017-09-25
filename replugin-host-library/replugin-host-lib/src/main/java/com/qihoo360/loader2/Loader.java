@@ -189,6 +189,10 @@ class Loader {
                 mPackageInfo.applicationInfo.sourceDir = mPath;
                 mPackageInfo.applicationInfo.publicSourceDir = mPath;
 
+                if (TextUtils.isEmpty(mPackageInfo.applicationInfo.processName)) {
+                    mPackageInfo.applicationInfo.processName = mPackageInfo.applicationInfo.packageName;
+                }
+
                 // 添加针对SO库的加载
                 // 此属性最终用于ApplicationLoaders.getClassLoader，在创建PathClassLoader时成为其参数
                 // 这样findLibrary可不用覆写，即可直接实现SO的加载
