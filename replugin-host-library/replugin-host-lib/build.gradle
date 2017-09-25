@@ -19,7 +19,7 @@
  */
 apply plugin: 'com.android.library'
 
-version = "2.2.0"
+version = "2.2.1"
 group = 'com.qihoo360.replugin'  // 组名
 
 android {
