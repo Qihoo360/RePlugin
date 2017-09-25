@@ -23,6 +23,10 @@ import android.os.Build;
  */
 public class BuildCompat {
 
+    public static final String ARM = "arm";
+
+    public static final String ARM64 = "arm64";
+
     public static final String[] SUPPORTED_ABIS;
 
     public static final String[] SUPPORTED_32_BIT_ABIS;
