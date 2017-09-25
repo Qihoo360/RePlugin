@@ -27,9 +27,11 @@ import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
+import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginConstants;
 import com.qihoo360.replugin.RePluginEventCallbacks;
+import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.base.LocalBroadcastHelper;
 import com.qihoo360.replugin.component.ComponentList;
@@ -42,6 +44,7 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.packages.IPluginManagerServer;
+import com.qihoo360.replugin.packages.PluginInfoUpdater;
 import com.qihoo360.replugin.packages.PluginManagerServer;
 
 import java.io.File;
@@ -329,13 +332,29 @@ class PmHostSvc extends IPluginHost.Stub {
 
         if (pi != null) {
             // 通常到这里，表示“安装已成功”，这时不管处于什么状态，都应该通知外界更新插件内存表
-            syncPluginInfo2All(pi);
+            syncInstalledPluginInfo2All(pi);
+
         }
 
         return pi;
     }
 
-    private void syncPluginInfo2All(PluginInfo pi) {
+    @Override
+    public boolean pluginUninstalled(PluginInfo info) throws RemoteException {
+        if (LOG) {
+            LogDebug.d(PLUGIN_TAG, "pluginUninstalled： pn=" + info.getName());
+        }
+        final boolean result = mManager.getService().uninstall(info);
+
+        // 卸载完成
+        if (result) {
+            syncUninstalledPluginInfo2All(info);
+        }
+
+        return result;
+    }
+
+    private void syncInstalledPluginInfo2All(PluginInfo pi) {
         // PS：若更新了“正在运行”的插件（属于“下次重启进程后更新”），则由于install返回的是“新的PluginInfo”，为防止出现“错误更新”，需要使用原来的
         //
         // 举例，有一个正在运行的插件A（其Info为PluginInfoOld）升级到新版（其Info为PluginInfoNew），则：
@@ -363,7 +382,30 @@ class PmHostSvc extends IPluginHost.Stub {
         IPC.sendLocalBroadcast2AllSync(mContext, intent);
 
         if (LOG) {
-            LogDebug.d(TAG, "syncPluginInfo2All: Sync complete! syncPi=" + needToSyncPi);
+            LogDebug.d(TAG, "syncInstalledPluginInfo2All: Sync complete! syncPi=" + needToSyncPi);
+        }
+    }
+
+
+    private void syncUninstalledPluginInfo2All(PluginInfo pi) {
+
+        // 在常驻进程内更新插件内存表
+        mPluginMgr.pluginUninstalled(pi);
+
+        // 给各进程发送广播，同步更新
+        final Intent intent = new Intent(PluginInfoUpdater.ACTION_UNINSTALL_PLUGIN);
+        intent.putExtra("obj", pi);
+        // 注意：若在attachBaseContext中调用此方法，则由于此时getApplicationContext为空，导致发送广播时会出现空指针异常。
+        // 则应该Post一下，待getApplicationContext有值后再发送广播。
+        if (RePluginInternal.getAppContext().getApplicationContext() != null) {
+            IPC.sendLocalBroadcast2AllSync(RePluginInternal.getAppContext(), intent);
+        } else {
+            Tasks.post2UI(new Runnable() {
+                @Override
+                public void run() {
+                    IPC.sendLocalBroadcast2All(RePluginInternal.getAppContext(), intent);
+                }
+            });
         }
     }
 

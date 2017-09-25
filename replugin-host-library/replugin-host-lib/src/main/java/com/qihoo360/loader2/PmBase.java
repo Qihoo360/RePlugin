@@ -581,9 +581,8 @@ class PmBase {
         if (!IPC.isPersistentProcess()) {
             // 由于常驻进程已经在内部做了相关的处理，此处仅需要在UI进程注册并更新即可
             registerReceiverAction(ACTION_NEW_PLUGIN);
+            registerReceiverAction(ACTION_UNINSTALL_PLUGIN);
         }
-        // 由于常驻进程内未做处理，因此需要在常驻和UI进程同时注册并更新缓存信息
-        registerReceiverAction(ACTION_UNINSTALL_PLUGIN);
     }
 
     /**

@@ -62,6 +62,8 @@ interface IPluginHost {
 
     PluginInfo pluginDownloaded(String path);
 
+    boolean pluginUninstalled(in PluginInfo info);
+
     boolean pluginExtracted(String path);
 
     oneway void sendIntent2Process(String target, in Intent intent);
