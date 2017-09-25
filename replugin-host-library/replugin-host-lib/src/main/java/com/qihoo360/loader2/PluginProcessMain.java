@@ -264,20 +264,24 @@ public class PluginProcessMain {
                 }
 
                 String activityDumpInfo = pluginClient.dumpActivities();
-                JSONArray activityList = new JSONArray(activityDumpInfo);
-                int activityCount = activityList.length();
-                if (activityCount > 0) {
-                    for (int i = 0; i < activityCount; i++) {
-                        activityArr.put(activityList.getJSONObject(i));
+                if (!TextUtils.isEmpty(activityDumpInfo)) {
+                    JSONArray activityList = new JSONArray(activityDumpInfo);
+                    int activityCount = activityList.length();
+                    if (activityCount > 0) {
+                        for (int i = 0; i < activityCount; i++) {
+                            activityArr.put(activityList.getJSONObject(i));
+                        }
                     }
                 }
 
                 String serviceDumpInfo = pluginClient.dumpServices();
-                JSONArray serviceList = new JSONArray(serviceDumpInfo);
-                int serviceCount = serviceList.length();
-                if (serviceCount > 0) {
-                    for (int i = 0; i < serviceCount; i++) {
-                        serviceArr.put(serviceList.getJSONObject(i));
+                if (!TextUtils.isEmpty(serviceDumpInfo)) {
+                    JSONArray serviceList = new JSONArray(serviceDumpInfo);
+                    int serviceCount = serviceList.length();
+                    if (serviceCount > 0) {
+                        for (int i = 0; i < serviceCount; i++) {
+                            serviceArr.put(serviceList.getJSONObject(i));
+                        }
                     }
                 }
             } catch (Throwable e) {
