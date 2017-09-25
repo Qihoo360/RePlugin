@@ -93,16 +93,6 @@ public class PluginInfo implements Parcelable, Cloneable {
     public static final int TYPE_PN_JAR = 3;
 
     /**
-     * PN类型的插件
-     */
-    public static final int PLUGIN_TYPE_PN = 1;
-
-    /**
-     * APK类型的插件
-     */
-    public static final int PLUGIN_TYPE_APK = 2;
-
-    /**
      * 表示“不确定的框架版本号”，只有旧P-n插件才需要在Load期间得到框架版本号
      *
      * @deprecated 只用于旧的P-n插件，可能会废弃
@@ -509,19 +499,6 @@ public class PluginInfo implements Parcelable, Cloneable {
     public void setType(int type) {
         JSONHelper.putNoThrows(mJson, "type", type);
     }
-
-    /**
-     * 返回插件类型，详见PLUGIN_TYPE_XXX
-     * @return
-     */
-    public int getPluginType() {
-        if (isPnPlugin()) {
-            return PLUGIN_TYPE_PN;
-        } else {
-            return PLUGIN_TYPE_APK;
-        }
-    }
-
 
     /**
      * 是否已准备好了新版本？

@@ -61,6 +61,12 @@ import static com.qihoo360.replugin.helper.LogDebug.LOG;
 public class PluginManagerServer {
 
     private static final String TAG = "PluginManagerServer";
+    /*** 非法类型的插件*/
+    public static final int PLUGIN_TYPE_INVALID = 0;
+    /*** PN类型的插件*/
+    public static final int PLUGIN_TYPE_PN = 1;
+    /*** APK类型的插件*/
+    public static final int PLUGIN_TYPE_APK = 2;
 
     private static final byte[] LOCKER_PROCESS_KILLED = new byte[0];
     private static final byte[] LOCKER = new byte[0];
@@ -161,7 +167,7 @@ public class PluginManagerServer {
             if (checkResult < 0) {
                 RePlugin.getConfig().getEventCallbacks().onInstallPluginFailed(path, RePluginEventCallbacks.InstallResult.VERIFY_VER_FAIL);
                 return null;
-            } else if (checkResult == 0){
+            } else if (checkResult == 0) {
                 instPli.setIsPendingCover(true);
             }
         }
@@ -207,7 +213,7 @@ public class PluginManagerServer {
     private int checkVersion(PluginInfo instPli, PluginInfo curPli) {
         // 支持插件同版本覆盖安装？
         // 若现在要安装的，与之前的版本相同，则覆盖掉之前的版本；
-        if (instPli.getVersion() == curPli.getVersion() && instPli.getPluginType() == curPli.getPluginType()) {
+        if (instPli.getVersion() == curPli.getVersion() && getPluginType(instPli) == getPluginType(curPli)) {
             if (LogDebug.LOG) {
                 LogDebug.d(TAG, "isSameVersion: same version. " +
                         "inst_ver=" + instPli.getVersion() + "; cur_ver=" + curPli.getVersion());
@@ -297,7 +303,7 @@ public class PluginManagerServer {
                 LogDebug.w(TAG, "updateOrLater: Plugin is running. Later. pn=" + curPli.getName());
             }
             if (instPli.getVersion() > curPli.getVersion() ||
-                    instPli.getVersion() == curPli.getVersion() && instPli.getPluginType() != curPli.getPluginType()) {
+                    instPli.getVersion() == curPli.getVersion() && getPluginType(instPli) != getPluginType(curPli)) {
                 // 高版本升级
                 curPli.setPendingUpdate(instPli);
                 curPli.setPendingDelete(null);
@@ -305,7 +311,7 @@ public class PluginManagerServer {
                 if (LogDebug.LOG) {
                     LogDebug.w(TAG, "updateOrLater: Plugin need update high version. clear PendingDelete and PendingCover.");
                 }
-            } else if (instPli.getVersion() == curPli.getVersion()){
+            } else if (instPli.getVersion() == curPli.getVersion()) {
                 // 同版本覆盖
                 curPli.setPendingCover(instPli);
                 curPli.setPendingDelete(null);
@@ -323,6 +329,10 @@ public class PluginManagerServer {
             }
             updateNow(curPli, instPli);
         }
+    }
+
+    private static int getPluginType(PluginInfo pluginInfo) {
+        return pluginInfo == null ? PLUGIN_TYPE_INVALID : pluginInfo.isPnPlugin() ? PLUGIN_TYPE_PN : PLUGIN_TYPE_APK;
     }
 
     private void updatePendingUpdate(PluginInfo curPli, PluginInfo instPli, PluginInfo curUpdatePli) {
@@ -602,7 +612,7 @@ public class PluginManagerServer {
         l.add(pluginName);
 
         if (LogDebug.LOG) {
-            LogDebug.d(TAG, "addToRunningPluginsLocked: Added! pl =" + l +"; map=" + mProcess2PluginsMap);
+            LogDebug.d(TAG, "addToRunningPluginsLocked: Added! pl =" + l + "; map=" + mProcess2PluginsMap);
         }
     }
 
