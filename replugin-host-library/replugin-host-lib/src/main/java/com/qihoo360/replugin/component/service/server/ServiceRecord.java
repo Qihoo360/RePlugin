@@ -30,7 +30,7 @@ import java.util.ArrayList;
 /**
  * 用来表示一个Service对象的信息
  * 包含绑定此Service的连接信息、Intent绑定信息等
- *
+ * <p>
  * NOTE 类似于Android的ServiceRecord
  *
  * @author RePlugin Team
@@ -110,7 +110,7 @@ class ServiceRecord {
 
     @Override
     public String toString() {
-        return "[srv=" + service.getClass().getName() + "; startRequested=" + startRequested + "; bindings=(" + bindings.size() + ") " + bindings + "]";
+        return "[srv=" + service == null ? "null" : service.getClass().getName() + "; startRequested=" + startRequested + "; bindings=(" + bindings.size() + ") " + bindings + "]";
     }
 
     public String getPlugin() {
