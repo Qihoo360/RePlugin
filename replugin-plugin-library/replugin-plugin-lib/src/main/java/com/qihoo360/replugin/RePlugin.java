@@ -980,7 +980,9 @@ public class RePlugin {
 
         try {
             Object obj = ProxyRePluginVar.registerGlobalBinderDelayed.call(null, name, getter);
-
+            if (obj != null) {
+                return (Boolean) obj;
+            }
         } catch (Exception e) {
             if (LogDebug.LOG) {
                 e.printStackTrace();
