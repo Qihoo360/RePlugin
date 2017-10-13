@@ -49,6 +49,8 @@ import com.qihoo360.replugin.sample.demo1.service.PluginDemoService1;
 import com.qihoo360.replugin.sample.demo2.IDemo2;
 import com.qihoo360.replugin.sample.library.LibMainActivity;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -321,6 +323,30 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), LibMainActivity.class);
                 v.getContext().startActivity(intent);
+            }
+        }));
+
+        // dump
+        mItems.add(new TestItem("dump Detail", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // 打印RePlugin版本号
+                String version = RePlugin.getVersion();
+                Toast.makeText(MainActivity.this, "RePlugin v:" + version, Toast.LENGTH_SHORT).show();
+
+                // dump详细的运行信息到PrintWriter
+                PrintWriter writer = null;
+                try {
+                    writer = new PrintWriter("/sdcard/dump.txt");
+                    RePlugin.dump(null, writer, null);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (writer != null) {
+                        writer.close();
+                    }
+                }
             }
         }));
     }
