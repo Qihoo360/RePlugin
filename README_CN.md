@@ -118,8 +118,8 @@ RePlugin的使用方法非常简单，大部分情况下和“单品”开发无
         <td><b><a href="http://www.jielem.com/">借了吗</a></b></td>
     </tr>
     <tr align="center">
-        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/os.png" width="80" height="80"/></td>
-        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jietiao.png" width="80" height="80"/></td>
+        <td><img src="https://raw.githubusercontent.com/wiki/Qihoo360/RePlugin/img/apps/qihoo_os.jpg" width="80" height="80"/></td>
+        <td><img src="https://raw.githubusercontent.com/wiki/Qihoo360/RePlugin/img/apps/qihoo_jietiao.jpg" width="80" height="80"/></td>
         <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
         <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
         <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
