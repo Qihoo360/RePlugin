@@ -106,8 +106,8 @@ If you **have any question, please [click here to read FAQ(Chinese Version)](htt
         <td><b><a href="http://www.jielem.com/">JieLeMa</a></b></td>
     </tr>
     <tr align="center">
-        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/os.png" width="80" height="80"/></td>
-        <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/jietiao.png" width="80" height="80"/></td>
+        <td><img src="https://raw.githubusercontent.com/wiki/Qihoo360/RePlugin/img/apps/qihoo_os.jpg" width="80" height="80"/></td>
+        <td><img src="https://raw.githubusercontent.com/wiki/Qihoo360/RePlugin/img/apps/qihoo_jietiao.jpg" width="80" height="80"/></td>
         <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
         <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
         <td><img src="https://github.com/Qihoo360/RePlugin/wiki/img/apps/yourapps.png" width="80" height="80"/></td>
