@@ -21,6 +21,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.CancellationSignal;
 
 import com.qihoo360.replugin.RePluginFramework;
@@ -215,7 +216,8 @@ public class PluginProviderClient {
             //
             String rePluginProviderClient = "com.qihoo360.loader2.mgr.PluginProviderClient";
             query = new MethodInvoker(classLoader, rePluginProviderClient, "query", new Class<?>[]{Context.class, Uri.class, String[].class, String.class, String[].class, String.class});
-            query2 = new MethodInvoker(classLoader, rePluginProviderClient, "query", new Class<?>[]{Context.class, Uri.class, String[].class, String.class, String[].class, String.class, CancellationSignal.class});
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+                query2 = new MethodInvoker(classLoader, rePluginProviderClient, "query", new Class<?>[]{Context.class, Uri.class, String[].class, String.class, String[].class, String.class, CancellationSignal.class});
             insert = new MethodInvoker(classLoader, rePluginProviderClient, "insert", new Class<?>[]{Context.class, Uri.class, ContentValues.class});
             bulkInsert = new MethodInvoker(classLoader, rePluginProviderClient, "bulkInsert", new Class<?>[]{Context.class, Uri.class, ContentValues[].class});
             delete = new MethodInvoker(classLoader, rePluginProviderClient, "delete", new Class<?>[]{Context.class, Uri.class, String.class, String[].class});
