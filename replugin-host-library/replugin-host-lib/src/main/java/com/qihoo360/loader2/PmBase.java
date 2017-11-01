@@ -25,6 +25,7 @@ import android.content.IntentFilter;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ServiceInfo;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
@@ -381,12 +382,47 @@ class PmBase {
         }
     }
 
+    /**
+     * 把插件Add到插件列表
+     *
+     * @param info   待add插件的PluginInfo对象
+     * @param plugin 待add插件的Plugin对象
+     */
     private void putPluginObject(PluginInfo info, Plugin plugin) {
-        // 同时加入PackageName和Alias（如有）
-        mPlugins.put(info.getPackageName(), plugin);
-        if (!TextUtils.isEmpty(info.getAlias())) {
-            // 即便Alias和包名相同也可以再Put一次，反正只是覆盖了相同Value而已
-            mPlugins.put(info.getAlias(), plugin);
+        if (mPlugins.containsKey(info.getAlias()) || mPlugins.containsKey(info.getPackageName())) {
+            if (LOG) {
+                LogDebug.d(PLUGIN_TAG, "当前内置插件列表中已经有" + info.getName() + "，需要看看谁的版本号大。");
+            }
+
+            // 找到已经存在的
+            Plugin existedPlugin = mPlugins.get(info.getPackageName());
+            if (existedPlugin == null) {
+                existedPlugin = mPlugins.get(info.getAlias());
+            }
+
+            if (existedPlugin.mInfo.getVersion() < info.getVersion()) {
+                if (LOG) {
+                    LogDebug.d(PLUGIN_TAG, "新传入的纯APK插件, name=" + info.getName() + ", 版本号比较大,ver=" + info.getVersion() + ",以TA为准。");
+                }
+
+                // 同时加入PackageName和Alias（如有）
+                mPlugins.put(info.getPackageName(), plugin);
+                if (!TextUtils.isEmpty(info.getAlias())) {
+                    // 即便Alias和包名相同也可以再Put一次，反正只是覆盖了相同Value而已
+                    mPlugins.put(info.getAlias(), plugin);
+                }
+            } else {
+                if (LOG) {
+                    LogDebug.d(PLUGIN_TAG, "新传入的纯APK插件" + info.getName() + "版本号还没有内置的大，什么都不做。");
+                }
+            }
+        } else {
+            // 同时加入PackageName和Alias（如有）
+            mPlugins.put(info.getPackageName(), plugin);
+            if (!TextUtils.isEmpty(info.getAlias())) {
+                // 即便Alias和包名相同也可以再Put一次，反正只是覆盖了相同Value而已
+                mPlugins.put(info.getAlias(), plugin);
+            }
         }
     }
 
@@ -1133,7 +1169,7 @@ class PmBase {
 
         // 通知本进程：通知给外部使用者
         Intent intent = new Intent(RePluginConstants.ACTION_NEW_PLUGIN);
-        intent.putExtra(RePluginConstants.KEY_PLUGIN_INFO, info);
+        intent.putExtra(RePluginConstants.KEY_PLUGIN_INFO, (Parcelable) info);
         intent.putExtra(RePluginConstants.KEY_PERSIST_NEED_RESTART, persistNeedRestart);
         intent.putExtra(RePluginConstants.KEY_SELF_NEED_RESTART, mNeedRestart);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
