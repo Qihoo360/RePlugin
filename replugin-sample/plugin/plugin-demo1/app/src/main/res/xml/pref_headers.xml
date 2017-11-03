@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="group1">
+        <CheckBoxPreference
+            android:key="group11"
+            android:summary="summarysummary"
+            android:title="titletitletitletitle" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="group2">
+        <EditTextPreference
+            android:dialogTitle="lalala"
+            android:key="group12"
+            android:summary="summarysummary"
+            android:title="titletitle" />
+    </PreferenceCategory>
+</PreferenceScreen>
