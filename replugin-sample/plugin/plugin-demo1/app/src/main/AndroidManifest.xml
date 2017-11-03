@@ -140,6 +140,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".activity.preference.PrefActivity1"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.preference.PrefActivity2"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:screenOrientation="portrait"/>
+
         <provider
             android:name=".provider.Provider2"
             android:authorities="com.qihoo360.replugin.sample.demo1.provider2" />

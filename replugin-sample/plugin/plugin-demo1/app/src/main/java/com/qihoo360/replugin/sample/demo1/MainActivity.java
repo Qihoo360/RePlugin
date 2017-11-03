@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.common.utils.TimeUtils;
+import com.qihoo360.replugin.sample.demo1.activity.preference.PrefActivity2;
 import com.qihoo360.replugin.sample.demo1.activity.single_instance.TIActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.single_top.SingleTopActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.standard.StandardActivity;
@@ -347,6 +348,15 @@ public class MainActivity extends Activity {
                         writer.close();
                     }
                 }
+            }
+        }));
+
+        // PreferenceActivity
+        mItems.add(new TestItem("Preference Activity", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), PrefActivity2.class);
+                v.getContext().startActivity(intent);
             }
         }));
     }
