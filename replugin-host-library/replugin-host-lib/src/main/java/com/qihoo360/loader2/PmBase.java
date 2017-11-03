@@ -230,6 +230,9 @@ class PmBase {
     }
 
     void init() {
+
+        RePlugin.getConfig().getCallbacks().initPnPluginOverride();
+
         if (HostConfigHelper.PERSISTENT_ENABLE) {
             // （默认）“常驻进程”作为插件管理进程，则常驻进程作为Server，其余进程作为Client
             if (IPC.isPersistentProcess()) {
