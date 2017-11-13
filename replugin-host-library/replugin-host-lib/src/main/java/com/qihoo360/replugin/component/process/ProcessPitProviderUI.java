@@ -16,9 +16,22 @@
 
 package com.qihoo360.replugin.component.process;
 
+import android.database.Cursor;
+import android.net.Uri;
+
+import com.qihoo360.loader2.PluginProviderStub;
+import com.qihoo360.replugin.helper.HostConfigHelper;
+
 /**
  * @author RePlugin Team
  */
 public class ProcessPitProviderUI extends ProcessPitProviderBase {
 
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        if (HostConfigHelper.PERSISTENT_ENABLE) {
+            return super.query(uri, projection, selection, selectionArgs, sortOrder);
+        }
+        return PluginProviderStub.stubMain(uri, projection, selection, selectionArgs, sortOrder);
+    }
 }
