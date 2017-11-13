@@ -25,11 +25,14 @@ import android.os.IBinder.DeathRecipient;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import com.qihoo360.i.IPluginManager;
 import com.qihoo360.loader2.sp.IPref;
 import com.qihoo360.loader2.sp.PrefImpl;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.component.process.ProcessPitProviderBase;
 import com.qihoo360.replugin.component.process.ProcessPitProviderPersist;
+import com.qihoo360.replugin.component.process.ProcessPitProviderUI;
+import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.utils.CloseableUtils;
 
@@ -50,7 +53,7 @@ public class PluginProviderStub {
     private static final String URL_PARAM_KEY_LOADED = "loaded";
 
     private static final String PROJECTION_MAIN[] = {
-        "main"
+            "main"
     };
 
     private static final String SELECTION_MAIN_BINDER = "main_binder";
@@ -90,6 +93,7 @@ public class PluginProviderStub {
 
     /**
      * 在目标插件进程中运行
+     *
      * @param uri
      * @param values
      * @return
@@ -159,10 +163,15 @@ public class PluginProviderStub {
      * @return
      */
     private static final IBinder proxyFetchHostBinder(Context context, String selection) {
-        //
         Cursor cursor = null;
+        Uri uri;
+        if (HostConfigHelper.PERSISTENT_ENABLE) {
+            uri = ProcessPitProviderPersist.URI;
+        } else {
+            uri = ProcessPitProviderUI.buildUri(IPluginManager.PROCESS_UI);
+        }
         try {
-            Uri uri = ProcessPitProviderPersist.URI;
+
             cursor = context.getContentResolver().query(uri, PROJECTION_MAIN, selection, null, null);
             if (cursor == null) {
                 if (LOG) {
