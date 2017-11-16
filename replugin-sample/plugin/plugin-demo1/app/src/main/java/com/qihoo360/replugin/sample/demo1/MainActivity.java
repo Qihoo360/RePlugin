@@ -46,6 +46,7 @@ import com.qihoo360.replugin.sample.demo1.activity.task_affinity.TAActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarActivity;
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarFullscreenActivity;
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeDialogActivity;
+import com.qihoo360.replugin.sample.demo1.activity.webview.WebViewActivity;
 import com.qihoo360.replugin.sample.demo1.service.PluginDemoService1;
 import com.qihoo360.replugin.sample.demo2.IDemo2;
 import com.qihoo360.replugin.sample.library.LibMainActivity;
@@ -332,22 +333,22 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                // 打印RePlugin版本号
-                String version = RePlugin.getVersion();
-                Toast.makeText(MainActivity.this, "RePlugin v:" + version, Toast.LENGTH_SHORT).show();
-
-                // dump详细的运行信息到PrintWriter
-                PrintWriter writer = null;
-                try {
-                    writer = new PrintWriter("/sdcard/dump.txt");
-                    RePlugin.dump(null, writer, null);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (writer != null) {
-                        writer.close();
-                    }
-                }
+//                // 打印RePlugin版本号
+//                String version = RePlugin.getVersion();
+//                Toast.makeText(MainActivity.this, "RePlugin v:" + version, Toast.LENGTH_SHORT).show();
+//
+//                // dump详细的运行信息到PrintWriter
+//                PrintWriter writer = null;
+//                try {
+//                    writer = new PrintWriter("/sdcard/dump.txt");
+//                    RePlugin.dump(null, writer, null);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } finally {
+//                    if (writer != null) {
+//                        writer.close();
+//                    }
+//                }
             }
         }));
 
@@ -356,6 +357,15 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), PrefActivity2.class);
+                v.getContext().startActivity(intent);
+            }
+        }));
+
+        // WebView
+        mItems.add(new TestItem("WebView Activity", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), WebViewActivity.class);
                 v.getContext().startActivity(intent);
             }
         }));
