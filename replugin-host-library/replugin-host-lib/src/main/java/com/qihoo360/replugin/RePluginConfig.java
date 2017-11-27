@@ -51,6 +51,8 @@ public final class RePluginConfig {
     private String hostVersionName = "";
     private String hostBuildID = "";
 
+    private boolean optimizeArtLoadDex = false;
+
     /**
      * 获取插件回调方法。通常无需调用此方法。
      *
@@ -336,5 +338,29 @@ public final class RePluginConfig {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 是否在Art上对首次加载插件速度做优化
+     *
+     * @return
+     */
+    public boolean isOptimizeArtLoadDex() {
+        return optimizeArtLoadDex;
+    }
+
+    /**
+     * 是否在Art上对首次加载插件速度做优化，默认为false
+     *
+     * @param optimizeArtLoadDex
+     * @return
+     * @since 2.2.2
+     */
+    public RePluginConfig setOptimizeArtLoadDex(boolean optimizeArtLoadDex) {
+        if (!checkAllowModify()) {
+            return this;
+        }
+        this.optimizeArtLoadDex = optimizeArtLoadDex;
+        return this;
     }
 }
