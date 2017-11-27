@@ -20,11 +20,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.qihoo360.replugin.PluginDexClassLoader;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginApplication;
 import com.qihoo360.replugin.RePluginCallbacks;
 import com.qihoo360.replugin.RePluginConfig;
 import com.qihoo360.replugin.RePluginEventCallbacks;
+import com.qihoo360.replugin.model.PluginInfo;
+import com.qihoo360.replugin.utils.Dex2OatUtils;
+import com.qihoo360.replugin.utils.InterpretDex2OatHelper;
+
+import java.io.File;
 
 /**
  * @author RePlugin Team
@@ -62,6 +68,8 @@ public class SampleApplication extends RePluginApplication {
         // FIXME 若宿主为Release，则此处应加上您认为"合法"的插件的签名，例如，可以写上"宿主"自己的。
         // RePlugin.addCertSignature("AAAAAAAAA");
 
+        // 在Art上，优化第一次loadDex的速度
+        c.setOptimizeArtLoadDex(true);
         return c;
     }
 
@@ -89,6 +97,25 @@ public class SampleApplication extends RePluginApplication {
                 Log.d(TAG, "onPluginNotExistsForActivity: Start download... p=" + plugin + "; i=" + intent);
             }
             return super.onPluginNotExistsForActivity(context, plugin, intent, process);
+        }
+
+        @Override
+        public PluginDexClassLoader createPluginClassLoader(PluginInfo pi, String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
+            String odexName = pi.makeInstalledFileName() + ".dex";
+            if (RePlugin.getConfig().isOptimizeArtLoadDex()) {
+                Dex2OatUtils.injectLoadDex(dexPath, optimizedDirectory, odexName);
+            }
+
+            long being = System.currentTimeMillis();
+            PluginDexClassLoader pluginDexClassLoader = super.createPluginClassLoader(pi, dexPath, optimizedDirectory, librarySearchPath, parent);
+
+            if (BuildConfig.DEBUG) {
+                Log.d(Dex2OatUtils.TAG, "createPluginClassLoader use:" + (System.currentTimeMillis() - being));
+                String odexAbsolutePath = (optimizedDirectory + File.separator + odexName);
+                Log.d(Dex2OatUtils.TAG, "createPluginClassLoader odexSize:" + InterpretDex2OatHelper.getOdexSize(odexAbsolutePath));
+            }
+
+            return pluginDexClassLoader;
         }
     }
 
