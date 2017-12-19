@@ -20,17 +20,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.qihoo360.replugin.PluginDexClassLoader;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginApplication;
 import com.qihoo360.replugin.RePluginCallbacks;
 import com.qihoo360.replugin.RePluginConfig;
 import com.qihoo360.replugin.RePluginEventCallbacks;
-import com.qihoo360.replugin.model.PluginInfo;
-import com.qihoo360.replugin.utils.Dex2OatUtils;
-import com.qihoo360.replugin.utils.InterpretDex2OatHelper;
-
-import java.io.File;
 
 /**
  * @author RePlugin Team
@@ -69,7 +63,7 @@ public class SampleApplication extends RePluginApplication {
         // RePlugin.addCertSignature("AAAAAAAAA");
 
         // 在Art上，优化第一次loadDex的速度
-        c.setOptimizeArtLoadDex(true);
+        // c.setOptimizeArtLoadDex(true);
         return c;
     }
 
@@ -99,6 +93,7 @@ public class SampleApplication extends RePluginApplication {
             return super.onPluginNotExistsForActivity(context, plugin, intent, process);
         }
 
+        /*
         @Override
         public PluginDexClassLoader createPluginClassLoader(PluginInfo pi, String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
             String odexName = pi.makeInstalledFileName() + ".dex";
@@ -117,6 +112,7 @@ public class SampleApplication extends RePluginApplication {
 
             return pluginDexClassLoader;
         }
+        */
     }
 
     private class HostEventCallbacks extends RePluginEventCallbacks {
