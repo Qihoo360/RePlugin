@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.common.utils.TimeUtils;
+import com.qihoo360.replugin.sample.demo1.activity.file_provider.FileProviderActivity;
 import com.qihoo360.replugin.sample.demo1.activity.preference.PrefActivity2;
 import com.qihoo360.replugin.sample.demo1.activity.single_instance.TIActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.single_top.SingleTopActivity1;
@@ -51,8 +52,6 @@ import com.qihoo360.replugin.sample.demo1.service.PluginDemoService1;
 import com.qihoo360.replugin.sample.demo2.IDemo2;
 import com.qihoo360.replugin.sample.library.LibMainActivity;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -366,6 +365,15 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), WebViewActivity.class);
+                v.getContext().startActivity(intent);
+            }
+        }));
+
+        // FileProvider
+        mItems.add(new TestItem("FileProvider Activity", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), FileProviderActivity.class);
                 v.getContext().startActivity(intent);
             }
         }));
