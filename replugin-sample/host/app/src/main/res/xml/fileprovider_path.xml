@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path path="" name="externalStorage"/>
+    <files-path path="" name="files"/>
+    <cache-path path="" name="cache"/>
+    <root-path path="" name="root"/>
+</paths>

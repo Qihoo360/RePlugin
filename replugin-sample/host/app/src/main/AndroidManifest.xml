@@ -43,6 +43,17 @@
         </activity>
 
         <activity android:name=".PluginFragmentActivity" />
+
+        <provider
+            android:name=".FileProvider"
+            android:authorities="com.qihoo360.replugin.sample.host.FILE_PROVIDER"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/fileprovider_path">
+            </meta-data>
+        </provider>
     </application>
 
 </manifest>
