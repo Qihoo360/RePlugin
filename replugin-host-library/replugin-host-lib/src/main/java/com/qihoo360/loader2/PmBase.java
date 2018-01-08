@@ -54,6 +54,7 @@ import com.qihoo360.replugin.utils.ReflectUtils;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1062,6 +1063,22 @@ class PmBase {
     final Plugin loadPackageInfoPlugin(String plugin, PluginCommImpl pm) {
         Plugin p = Plugin.cloneAndReattach(mContext, mPlugins.get(plugin), mClassLoader, pm);
         return loadPlugin(p, Plugin.LOAD_INFO, true);
+    }
+
+    /**
+     * 获取全部插件信息
+     * @param pm 宿主与插件、插件间的互通模块
+     * @return 插件信息列表
+     */
+    final List<Plugin> loadPackageInfoPluginList(PluginCommImpl pm) {
+        List<Plugin> list = new ArrayList<>();
+        Plugin p, result;
+        for (String key : mPlugins.keySet()) {
+            p = Plugin.cloneAndReattach(mContext, mPlugins.get(key), mClassLoader, pm);
+            result = loadPlugin(p, Plugin.LOAD_INFO, true);
+            list.add(result);
+        }
+        return list;
     }
 
     final Plugin loadResourcePlugin(String plugin, PluginCommImpl pm) {

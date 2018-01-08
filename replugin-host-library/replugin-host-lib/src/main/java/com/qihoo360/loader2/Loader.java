@@ -218,7 +218,7 @@ class Loader {
 
                 // 缓存表: fileName -> PackageInfo
                 synchronized (Plugin.FILENAME_2_PACKAGE_INFO) {
-                    Plugin.FILENAME_2_PACKAGE_INFO.put(mPath, new WeakReference<PackageInfo>(mPackageInfo));
+                    Plugin.FILENAME_2_PACKAGE_INFO.put(mPath, mPackageInfo);
                 }
             }
 
@@ -244,7 +244,7 @@ class Loader {
 
                 // 缓存表：ComponentList
                 synchronized (Plugin.FILENAME_2_COMPONENT_LIST) {
-                    Plugin.FILENAME_2_COMPONENT_LIST.put(mPath, new WeakReference<>(mComponents));
+                    Plugin.FILENAME_2_COMPONENT_LIST.put(mPath, mComponents);
                 }
 
                 /* 只调整一次 */
@@ -289,7 +289,7 @@ class Loader {
 
                 // 缓存表: Resources
                 synchronized (Plugin.FILENAME_2_RESOURCES) {
-                    Plugin.FILENAME_2_RESOURCES.put(mPath, new WeakReference<>(mPkgResources));
+                    Plugin.FILENAME_2_RESOURCES.put(mPath, mPkgResources);
                 }
             }
             if (load == Plugin.LOAD_RESOURCES) {
@@ -326,7 +326,7 @@ class Loader {
 
                 // 缓存表：ClassLoader
                 synchronized (Plugin.FILENAME_2_DEX) {
-                    Plugin.FILENAME_2_DEX.put(mPath, new WeakReference<>(mClassLoader));
+                    Plugin.FILENAME_2_DEX.put(mPath, mClassLoader);
                 }
             }
             if (load == Plugin.LOAD_DEX) {

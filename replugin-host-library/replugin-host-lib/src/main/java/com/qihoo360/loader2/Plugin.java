@@ -44,9 +44,10 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.MAIN_TAG;
@@ -90,22 +91,22 @@ class Plugin {
     /**
      *
      */
-    static final HashMap<String, WeakReference<ClassLoader>> FILENAME_2_DEX = new HashMap<>();
+    static final HashMap<String, ClassLoader> FILENAME_2_DEX = new HashMap<>();
 
     /**
      *
      */
-    static final HashMap<String, WeakReference<Resources>> FILENAME_2_RESOURCES = new HashMap<>();
+    static final HashMap<String, Resources> FILENAME_2_RESOURCES = new HashMap<>();
 
     /**
      *
      */
-    static final HashMap<String, WeakReference<PackageInfo>> FILENAME_2_PACKAGE_INFO = new HashMap<>();
+    static final HashMap<String, PackageInfo> FILENAME_2_PACKAGE_INFO = new HashMap<>();
 
     /**
      *
      */
-    static final HashMap<String, WeakReference<ComponentList>> FILENAME_2_COMPONENT_LIST = new HashMap<>();
+    static final HashMap<String, ComponentList> FILENAME_2_COMPONENT_LIST = new HashMap<>();
 
     /**
      * 调试用
@@ -215,20 +216,15 @@ class Plugin {
         return filename;
     }
 
+    static final Map<String, String> queryCachedFilenames() {
+        return PLUGIN_NAME_2_FILENAME;
+    }
+
     static final ClassLoader queryCachedClassLoader(String filename) {
         ClassLoader dex = null;
         if (!TextUtils.isEmpty(filename)) {
             synchronized (FILENAME_2_DEX) {
-                WeakReference<ClassLoader> ref = FILENAME_2_DEX.get(filename);
-                if (ref != null) {
-                    dex = ref.get();
-                    if (dex == null) {
-                        FILENAME_2_DEX.remove(filename);
-                    }
-                    if (LOG) {
-                        LogDebug.d(PLUGIN_TAG, "cached Dex " + filename + " -> " + dex);
-                    }
-                }
+                return FILENAME_2_DEX.get(filename);
             }
         }
         return dex;
@@ -238,16 +234,7 @@ class Plugin {
         Resources resources = null;
         if (!TextUtils.isEmpty(filename)) {
             synchronized (FILENAME_2_RESOURCES) {
-                WeakReference<Resources> ref = FILENAME_2_RESOURCES.get(filename);
-                if (ref != null) {
-                    resources = ref.get();
-                    if (resources == null) {
-                        FILENAME_2_RESOURCES.remove(filename);
-                    }
-                    if (LOG) {
-                        LogDebug.d(PLUGIN_TAG, "cached Resources " + filename + " -> " + resources);
-                    }
-                }
+                return FILENAME_2_RESOURCES.get(filename);
             }
         }
         return resources;
@@ -257,38 +244,31 @@ class Plugin {
         PackageInfo packageInfo = null;
         if (!TextUtils.isEmpty(filename)) {
             synchronized (FILENAME_2_PACKAGE_INFO) {
-                WeakReference<PackageInfo> ref = FILENAME_2_PACKAGE_INFO.get(filename);
-                if (ref != null) {
-                    packageInfo = ref.get();
-                    if (packageInfo == null) {
-                        FILENAME_2_PACKAGE_INFO.remove(filename);
-                    }
-                    if (LOG) {
-                        LogDebug.d(PLUGIN_TAG, "cached packageInfo " + filename + " -> " + packageInfo);
-                    }
-                }
+                return FILENAME_2_PACKAGE_INFO.get(filename);
             }
         }
         return packageInfo;
     }
 
     static final ComponentList queryCachedComponentList(String filename) {
-        ComponentList cl = null;
         if (!TextUtils.isEmpty(filename)) {
             synchronized (FILENAME_2_COMPONENT_LIST) {
-                WeakReference<ComponentList> ref = FILENAME_2_COMPONENT_LIST.get(filename);
-                if (ref != null) {
-                    cl = ref.get();
-                    if (cl == null) {
-                        FILENAME_2_COMPONENT_LIST.remove(filename);
-                    }
-                    if (LOG) {
-                        LogDebug.d(PLUGIN_TAG, "cached componentList " + filename + " -> " + cl);
-                    }
-                }
+                return FILENAME_2_COMPONENT_LIST.get(filename);
+            }
+        } else {
+            return null;
+        }
+    }
+
+
+    static final List<ComponentList> queryCachedComponentListAll() {
+        List<ComponentList> result = new ArrayList<>();
+        synchronized (FILENAME_2_COMPONENT_LIST) {
+            for (String key : FILENAME_2_COMPONENT_LIST.keySet()) {
+                result.add(FILENAME_2_COMPONENT_LIST.get(key));
             }
         }
-        return cl;
+        return result;
     }
 
     static final void clearCachedPlugin(String filename) {
@@ -298,50 +278,22 @@ class Plugin {
 
         ClassLoader dex = null;
         synchronized (FILENAME_2_DEX) {
-            WeakReference<ClassLoader> ref = FILENAME_2_DEX.get(filename);
-            if (ref != null) {
-                dex = ref.get();
                 FILENAME_2_DEX.remove(filename);
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "clear Cached Dex " + filename + " -> " + dex);
-                }
-            }
         }
 
         Resources resources = null;
         synchronized (FILENAME_2_RESOURCES) {
-            WeakReference<Resources> ref = FILENAME_2_RESOURCES.get(filename);
-            if (ref != null) {
-                resources = ref.get();
                 FILENAME_2_RESOURCES.remove(filename);
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "clear Cached Resources " + filename + " -> " + resources);
-                }
-            }
         }
 
         PackageInfo packageInfo = null;
         synchronized (FILENAME_2_PACKAGE_INFO) {
-            WeakReference<PackageInfo> ref = FILENAME_2_PACKAGE_INFO.get(filename);
-            if (ref != null) {
-                packageInfo = ref.get();
                 FILENAME_2_PACKAGE_INFO.remove(filename);
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "clear Cached packageInfo " + filename + " -> " + packageInfo);
-                }
-            }
         }
 
         ComponentList cl = null;
         synchronized (FILENAME_2_COMPONENT_LIST) {
-            WeakReference<ComponentList> ref = FILENAME_2_COMPONENT_LIST.get(filename);
-            if (ref != null) {
-                cl = ref.get();
                 FILENAME_2_COMPONENT_LIST.remove(filename);
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "clear Cached componentList " + filename + " -> " + cl);
-                }
-            }
         }
 
     }
