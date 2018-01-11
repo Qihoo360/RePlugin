@@ -43,7 +43,7 @@ class PluginDebugger {
         String archivesBaseName = globalScope.getArchivesBaseName();
         String apkBaseName = archivesBaseName + "-" + variantConfiguration.getBaseName()
 
-        File apkDir = new File(globalScope.getBuildDir(), "outputs/apk")
+        File apkDir = new File(globalScope.getBuildDir(), "outputs" + File.separator + "apk")
 
         String unsigned = (variantConfiguration.getSigningConfig() == null
                 ? "-unsigned.apk"
@@ -51,6 +51,10 @@ class PluginDebugger {
         String apkName = apkBaseName + unsigned
 
         apkFile = new File(apkDir, apkName)
+
+        if (!apkFile.exists() || apkFile.length() == 0) {
+            apkFile = new File(apkDir, variantConfiguration.getBaseName() + File.separator + apkName)
+        }
 
         adbFile = globalScope.androidBuilder.sdkInfo.adb;
 
