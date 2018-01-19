@@ -18,8 +18,12 @@ package com.qihoo360.replugin.sample.demo1.activity.webview;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.Toast;
 
 import com.qihoo360.replugin.sample.demo1.R;
+import com.qihoo360.replugin.sample.demo1.webview.WebPageProxy;
 
 /**
  * @author RePlugin Team
@@ -28,14 +32,31 @@ import com.qihoo360.replugin.sample.demo1.R;
  */
 public class WebViewActivity extends Activity {
 
-    private RePluginWebView mWebView;
+    static final String testUrl = "https://github.com/Qihoo360/RePlugin";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.simple_3);
 
-        mWebView = (RePluginWebView) findViewById(R.id.web);
-        mWebView.loadUrl("https://github.com/qihoo360/RePlugin");
+        // 从WebView插件获取WebrViewPage的代理
+        WebPageProxy viewProxy = WebPageProxy.create(this);
+        if (viewProxy == null) {
+            Toast.makeText(this, " WebPageProxy create error!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        View contentView = viewProxy.getView();
+        if (contentView == null) {
+            Toast.makeText(this, " WebPageProxy get View error!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        setContentView(contentView);
+
+        WebView simpleWebPage = viewProxy.getWebView();
+        simpleWebPage.loadUrl(testUrl);
+
     }
 }

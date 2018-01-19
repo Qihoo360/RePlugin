@@ -14,33 +14,31 @@
  * the License.
  */
 
-package com.qihoo360.replugin.sample.demo1.activity.webview;
+package com.qihoo360.replugin.sample.webview.env;
 
-import android.content.Context;
-import android.util.AttributeSet;
+import android.os.Build;
 import android.webkit.WebView;
+
+import java.lang.reflect.Method;
 
 /**
  * @author RePlugin Team
  */
-public class RePluginWebView extends WebView {
+public class Env {
+    public static final boolean DEBUG = true;
+    public static final String TAG = "webview_demo";
 
-    public RePluginWebView(Context context) {
-        super(context);
-        init(context);
-    }
-
-    public RePluginWebView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
-    }
-
-    public RePluginWebView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context);
-    }
-
-    private void init(Context context) {
-        WebViewResourceHelper.addChromeResourceIfNeeded(context);
+    private static void setWebContentsDebuggingEnabled(boolean b) {
+        if (Build.VERSION.SDK_INT < 19) {
+            return;
+        }
+        try {
+            Method m = WebView.class.getMethod("setWebContentsDebuggingEnabled", boolean.class);
+            m.invoke(null, b);
+        } catch (Exception e) {
+            if (Env.DEBUG) {
+                e.printStackTrace();
+            }
+        }
     }
 }

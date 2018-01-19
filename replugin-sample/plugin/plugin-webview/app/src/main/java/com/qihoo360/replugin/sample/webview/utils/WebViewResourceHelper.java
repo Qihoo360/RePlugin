@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.qihoo360.replugin.sample.demo1.activity.webview;
+package com.qihoo360.replugin.sample.webview.utils;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -22,6 +22,9 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
+
+import com.qihoo360.replugin.sample.webview.env.Env;
 
 import java.lang.reflect.Method;
 
@@ -29,7 +32,6 @@ import java.lang.reflect.Method;
  * @author RePlugin Team
  */
 public class WebViewResourceHelper {
-
     private static boolean sInitialed = false;
 
     public static boolean addChromeResourceIfNeeded(Context context) {
@@ -37,20 +39,22 @@ public class WebViewResourceHelper {
             return true;
         }
 
-        String resourceDir = getWebViewResourceDir(context);
-        if (TextUtils.isEmpty(resourceDir)) {
+        String dir = getWebViewResourceDir(context);
+        if (TextUtils.isEmpty(dir)) {
             return false;
         }
 
         try {
             Method m = getAddAssetPathMethod();
             if (m != null) {
-                int ret = (int) m.invoke(context.getAssets(), resourceDir);
+                int ret = (int) m.invoke(context.getAssets(), dir);
                 sInitialed = ret > 0;
                 return sInitialed;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            if (Env.DEBUG) {
+                Log.d(Env.TAG, "[init webview res] : invoke method error ! ", e);
+            }
         }
 
         return false;
@@ -75,6 +79,7 @@ public class WebViewResourceHelper {
             m = c.getDeclaredMethod("addAssetPath", String.class);
             m.setAccessible(true);
         } catch (NoSuchMethodException e) {
+            // Do Nothing
             e.printStackTrace();
         }
 
@@ -91,9 +96,11 @@ public class WebViewResourceHelper {
             PackageInfo pi = context.getPackageManager().getPackageInfo(getWebViewPackageName(), PackageManager.GET_SHARED_LIBRARY_FILES);
             return pi.applicationInfo.sourceDir;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            if (Env.DEBUG) {
+                Log.e(Env.TAG, "get webview application info failed! ", e);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            // Do Nothing
         }
 
         return null;
@@ -124,9 +131,8 @@ public class WebViewResourceHelper {
         try {
             return (String) ReflectUtil.invokeStaticMethod("android.webkit.WebViewFactory", "getWebViewPackageName", null);
         } catch (Throwable e) {
-            e.printStackTrace();
+            //
         }
-
         return "com.google.android.webview";
     }
 
@@ -139,7 +145,7 @@ public class WebViewResourceHelper {
             Context c = (Context) ReflectUtil.invokeStaticMethod("android.webkit.WebViewFactory", "getWebViewContextAndSetProvider", null);
             return c.getApplicationInfo().packageName;
         } catch (Throwable e) {
-            e.printStackTrace();
+            //
         }
         return "com.google.android.webview";
     }

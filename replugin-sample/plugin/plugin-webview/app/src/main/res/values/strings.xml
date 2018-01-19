@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright (C) 2005-2017 Qihoo 360 Inc.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -14,14 +14,6 @@
   ~ the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <com.qihoo360.replugin.sample.demo1.activity.webview.RePluginWebView
-        android:id="@+id/web"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-</LinearLayout>
+<resources>
+    <string name="app_name">Webview</string>
+</resources>
