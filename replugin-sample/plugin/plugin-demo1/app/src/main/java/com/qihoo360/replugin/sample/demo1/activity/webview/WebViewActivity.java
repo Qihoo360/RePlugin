@@ -28,7 +28,7 @@ import com.qihoo360.replugin.sample.demo1.webview.WebPageProxy;
 /**
  * @author RePlugin Team
  *
- * WebView 示例
+ * WebView 示例，具体业务逻辑由webView插件来实现
  */
 public class WebViewActivity extends Activity {
 

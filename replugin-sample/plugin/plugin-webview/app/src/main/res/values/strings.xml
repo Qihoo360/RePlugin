@@ -15,5 +15,5 @@
   -->
 
 <resources>
-    <string name="app_name">Webview</string>
+    <string name="app_name">WebView</string>
 </resources>
