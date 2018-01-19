@@ -86,6 +86,8 @@ public class MainActivity extends Activity {
         findViewById(R.id.btn_start_demo4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 示例：直接通过宿主打开WebView插件中的Activity
+                // FIXME: 后续可以将webview MainActivity URL 改为动态传入
                 // 若没有安装，则直接提示“错误”
                 if (RePlugin.isPluginInstalled("webview")) {
                     RePlugin.startActivity(MainActivity.this, RePlugin.createIntent("webview", "com.qihoo360.replugin.sample.webview.MainActivity"));
