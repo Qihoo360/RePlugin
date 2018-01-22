@@ -48,6 +48,11 @@ public final class RePluginConfig {
     private boolean printDetailLog = false;
     private int defaultFrameworkVersion = 4;
 
+    private String hostVersionName = "";
+    private String hostBuildID = "";
+
+    private boolean optimizeArtLoadDex = false;
+
     /**
      * 获取插件回调方法。通常无需调用此方法。
      *
@@ -200,6 +205,66 @@ public final class RePluginConfig {
     }
 
     /**
+     * 获取宿主的 BuildID
+     *
+     * @return 宿主的BuildID
+     * @since 2.2.2
+     */
+    public String getHostBuildID() {
+        return hostBuildID;
+    }
+
+    /**
+     * 设置宿主的 BuildID <p>
+     * BuildID 是一个比 VersionName 和 VersionCode 更细的维度（例如：服务器每 build 一次，版本号加 1)
+     *
+     * @param buildID 宿主的BuildID
+     * @return RePluginConfig自己。这样可以连环调用set方法
+     * @since 2.2.2
+     */
+    public RePluginConfig setHostBuild(String buildID) {
+        if (!checkAllowModify()) {
+            return this;
+        }
+        hostBuildID = buildID;
+        return this;
+    }
+
+    /**
+     * 获取宿主的 VersionName
+     *
+     * @since 2.2.2
+     */
+    public String getHostVersionName() {
+        return hostVersionName;
+    }
+
+    /**
+     * 设置宿主的 VersionName
+     *
+     * @param versionName 宿主的VersionName
+     * @return RePluginConfig自己。这样可以连环调用set方法
+     * @since 2.2.2
+     */
+    public RePluginConfig setHostVersionName(String versionName) {
+        if (!checkAllowModify()) {
+            return this;
+        }
+        hostVersionName = versionName;
+        return this;
+    }
+
+    /**
+     * 获取宿主的VersionBuild号
+     *
+     * @return
+     * @since 2.2.2
+     */
+    public String getHostVersionBuild() {
+        return RePlugin.getConfig().getHostVersionName() + "." + RePlugin.getConfig().getHostBuildID();
+    }
+
+    /**
      * 是否打印更详细的日志？
      *
      * @return 是否打印？
@@ -273,5 +338,29 @@ public final class RePluginConfig {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 是否在Art上对首次加载插件速度做优化
+     *
+     * @return
+     */
+    public boolean isOptimizeArtLoadDex() {
+        return optimizeArtLoadDex;
+    }
+
+    /**
+     * 是否在Art上对首次加载插件速度做优化，默认为false
+     *
+     * @param optimizeArtLoadDex
+     * @return
+     * @since 2.2.2
+     */
+    public RePluginConfig setOptimizeArtLoadDex(boolean optimizeArtLoadDex) {
+        if (!checkAllowModify()) {
+            return this;
+        }
+        this.optimizeArtLoadDex = optimizeArtLoadDex;
+        return this;
     }
 }

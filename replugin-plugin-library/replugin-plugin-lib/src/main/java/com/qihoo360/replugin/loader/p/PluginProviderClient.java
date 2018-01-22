@@ -21,17 +21,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.CancellationSignal;
 
-import com.qihoo360.replugin.RePluginFramework;
 import com.qihoo360.replugin.MethodInvoker;
+import com.qihoo360.replugin.RePluginFramework;
 import com.qihoo360.replugin.helper.LogDebug;
 
 /**
- * 一种能够对【插件】的服务进行：启动、停止、绑定、解绑等功能的类
- * 所有针对插件命令的操作，均从此类开始。
- * <p>
- * 外界可直接使用此类
+ * 一种能够对【插件】的Provider做增加、删除、改变、查询的接口。
+ * 就像使用ContentResolver一样
  *
  * @author RePlugin Team
  */
@@ -67,7 +66,7 @@ public class PluginProviderClient {
      *
      * @see android.content.ContentResolver#query(Uri, String[], String, String[], String, CancellationSignal)
      */
-    @TargetApi(16)
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static Cursor query(Context c, Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder, CancellationSignal cancellationSignal) {
         if (c == null) {
             return null;
@@ -215,7 +214,11 @@ public class PluginProviderClient {
             //
             String rePluginProviderClient = "com.qihoo360.loader2.mgr.PluginProviderClient";
             query = new MethodInvoker(classLoader, rePluginProviderClient, "query", new Class<?>[]{Context.class, Uri.class, String[].class, String.class, String[].class, String.class});
-            query2 = new MethodInvoker(classLoader, rePluginProviderClient, "query", new Class<?>[]{Context.class, Uri.class, String[].class, String.class, String[].class, String.class, CancellationSignal.class});
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                query2 = new MethodInvoker(classLoader, rePluginProviderClient, "query", new Class<?>[]{Context.class, Uri.class, String[].class, String.class, String[].class, String.class, CancellationSignal.class});
+            }
+
             insert = new MethodInvoker(classLoader, rePluginProviderClient, "insert", new Class<?>[]{Context.class, Uri.class, ContentValues.class});
             bulkInsert = new MethodInvoker(classLoader, rePluginProviderClient, "bulkInsert", new Class<?>[]{Context.class, Uri.class, ContentValues[].class});
             delete = new MethodInvoker(classLoader, rePluginProviderClient, "delete", new Class<?>[]{Context.class, Uri.class, String.class, String[].class});

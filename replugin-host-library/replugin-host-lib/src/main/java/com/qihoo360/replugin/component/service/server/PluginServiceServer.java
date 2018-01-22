@@ -105,14 +105,13 @@ public class PluginServiceServer {
                     Bundle data = msg.getData();
                     Intent intent = data.getParcelable("intent");
 
-                    if (intent != null) {
-                        ServiceRecord sr = retrieveServiceLocked(intent);
-                        if (sr != null) {
-                            sr.service.onStartCommand(intent, 0, 0);
-                        } else {
-                            if (LOG) {
-                                LogDebug.e(PLUGIN_TAG, "pss.onStartCommand fail.");
-                            }
+                    ServiceRecord sr = (ServiceRecord)msg.obj;
+
+                    if (intent != null && sr != null) {
+                        sr.service.onStartCommand(intent, 0, 0);
+                    }else{
+                        if (LOG) {
+                            LogDebug.e(PLUGIN_TAG, "pss.onStartCommand fail.");
                         }
                     }
                     break;
@@ -152,7 +151,7 @@ public class PluginServiceServer {
         Bundle data = new Bundle();
         data.putParcelable("intent", intent);
         message.setData(data);
-
+        message.obj = sr;
         mHandler.sendMessage(message);
 
         return cn;

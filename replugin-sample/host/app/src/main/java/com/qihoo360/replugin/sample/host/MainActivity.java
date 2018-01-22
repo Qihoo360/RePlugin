@@ -83,6 +83,20 @@ public class MainActivity extends Activity {
             }
         });
 
+        findViewById(R.id.btn_start_demo4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 示例：直接通过宿主打开WebView插件中的Activity
+                // FIXME: 后续可以将webview MainActivity URL 改为动态传入
+                // 若没有安装，则直接提示“错误”
+                if (RePlugin.isPluginInstalled("webview")) {
+                    RePlugin.startActivity(MainActivity.this, RePlugin.createIntent("webview", "com.qihoo360.replugin.sample.webview.MainActivity"));
+                } else {
+                    Toast.makeText(MainActivity.this, "You must install webview first!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         findViewById(R.id.btn_install_apk_from_assets).setOnClickListener(new View.OnClickListener() {
 
             @Override

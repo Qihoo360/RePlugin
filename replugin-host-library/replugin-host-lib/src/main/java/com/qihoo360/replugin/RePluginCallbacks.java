@@ -167,4 +167,14 @@ public class RePluginCallbacks {
         // Nothing, allow all
         return false;
     }
+
+    /**
+     * 为了p-n插件初始化PluginOverride逻辑，只有老插件方案使用
+     * 可以通过该回调，在进程初始化时，设置插件的override逻辑（每个进程都会调到）
+     *
+     * @since 2.2.2
+     */
+    public void initPnPluginOverride() {
+        // default, do Nothing
+    }
 }

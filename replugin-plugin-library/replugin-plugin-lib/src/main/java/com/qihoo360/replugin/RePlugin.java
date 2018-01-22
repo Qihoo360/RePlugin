@@ -36,6 +36,8 @@ import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.packages.PluginRunningList;
 import com.qihoo360.replugin.utils.ParcelUtils;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -363,18 +365,18 @@ public class RePlugin {
     }
 
     /**
-     * 获取SDK的版本信息
+     * 获取当前版本
      *
-     * @return SDK的版本，如2.0.0等
-     * @since 2.0.0
+     * @return 版本号，如2.2.2等
+     * @since 2.2.2
      */
-    public static String getSDKVersion() {
+    public static String getVersion() {
         if (!RePluginFramework.mHostInitialized) {
             return null;
         }
 
         try {
-            return (String) ProxyRePluginVar.getSDKVersion.call(null);
+            return (String) ProxyRePluginVar.getVersion.call(null);
         } catch (Exception e) {
             if (LogDebug.LOG) {
                 e.printStackTrace();
@@ -382,6 +384,17 @@ public class RePlugin {
         }
 
         return null;
+    }
+
+    /**
+     * 获取SDK的版本信息
+     *
+     * @return SDK的版本，如2.0.0等
+     * @since 2.0.0
+     * @deprecated 已废弃，请使用 getVersion() 方法
+     */
+    public static String getSDKVersion() {
+        return getVersion();
     }
 
     /**
@@ -980,7 +993,9 @@ public class RePlugin {
 
         try {
             Object obj = ProxyRePluginVar.registerGlobalBinderDelayed.call(null, name, getter);
-
+            if (obj != null) {
+                return (Boolean) obj;
+            }
         } catch (Exception e) {
             if (LogDebug.LOG) {
                 e.printStackTrace();
@@ -1156,6 +1171,28 @@ public class RePlugin {
         return RePluginFramework.isHostInitialized();
     }
 
+    /**
+     * dump RePlugin框架运行时的详细信息，包括：Activity 坑位映射表，正在运行的 Service，以及详细的插件信息
+     *
+     * @param fd
+     * @param writer
+     * @param args
+     * @since 2.2.2
+     */
+    public static void dump(FileDescriptor fd, PrintWriter writer, String[] args) {
+        if (!RePluginFramework.mHostInitialized) {
+            return;
+        }
+
+        try {
+            ProxyRePluginVar.dump.call(null, fd, writer, args);
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     static class ProxyRePluginVar {
 
         private static MethodInvoker install;
@@ -1178,7 +1215,7 @@ public class RePlugin {
 
         private static MethodInvoker isForDev;
 
-        private static MethodInvoker getSDKVersion;
+        private static MethodInvoker getVersion;
 
         private static MethodInvoker fetchPackageInfo;
 
@@ -1232,6 +1269,8 @@ public class RePlugin {
 
         private static MethodInvoker unregisterHookingClass;
 
+        private static MethodInvoker dump;
+
         static void initLocked(final ClassLoader classLoader) {
 
             // 初始化Replugin的相关方法
@@ -1255,7 +1294,7 @@ public class RePlugin {
             createIntent = new MethodInvoker(classLoader, rePlugin, "createIntent", new Class<?>[]{String.class, String.class});
             createComponentName = new MethodInvoker(classLoader, rePlugin, "createComponentName", new Class<?>[]{String.class, String.class});
             isForDev = new MethodInvoker(classLoader, rePlugin, "isForDev", new Class<?>[]{});
-            getSDKVersion = new MethodInvoker(classLoader, rePlugin, "getSDKVersion", new Class<?>[]{});
+            getVersion = new MethodInvoker(classLoader, rePlugin, "getVersion", new Class<?>[]{});
             fetchPackageInfo = new MethodInvoker(classLoader, rePlugin, "fetchPackageInfo", new Class<?>[]{String.class});
             fetchResources = new MethodInvoker(classLoader, rePlugin, "fetchResources", new Class<?>[]{String.class});
             fetchClassLoader = new MethodInvoker(classLoader, rePlugin, "fetchClassLoader", new Class<?>[]{String.class});
@@ -1290,6 +1329,7 @@ public class RePlugin {
             registerHookingClass = new MethodInvoker(classLoader, rePlugin, "registerHookingClass", new Class<?>[]{String.class, ComponentName.class, Class.class});
             isHookingClass = new MethodInvoker(classLoader, rePlugin, "isHookingClass", new Class<?>[]{ComponentName.class});
             unregisterHookingClass = new MethodInvoker(classLoader, rePlugin, "unregisterHookingClass", new Class<?>[]{String.class});
+            dump = new MethodInvoker(classLoader, rePlugin, "dump", new Class<?>[]{FileDescriptor.class, PrintWriter.class, (new String[0]).getClass()});
         }
     }
 }

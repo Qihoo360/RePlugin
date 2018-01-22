@@ -1,0 +1,55 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
+
+    defaultConfig {
+        applicationId "com.qihoo360.replugin.fresco.plugin"
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+}
+
+apply plugin: 'replugin-plugin-gradle'
+
+dependencies {
+    compile 'com.qihoo360.replugin:replugin-plugin-lib:2.2.1'
+
+    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
+
+    /** provided or compile */
+    if (rootProject.ext.isPlugin) {
+        // 作为插件，provided 方式引入
+        provided "com.parse.bolts:bolts-android:1.4.0"
+        provided files('libs/drawee-modified-1.7.1.jar')
+        provided files('libs/fbcore-1.7.1.jar')
+        provided files('libs/fresco-1.7.1.jar')
+        provided files('libs/imagepipeline-1.7.1.jar')
+        provided files('libs/imagepipeline-base-1.7.1.jar')
+    } else {
+        // 作为单品，compile 进 APK
+        compile "com.parse.bolts:bolts-android:1.4.0"
+
+        compile files('libs/fresco-1.7.1.jar')
+        compile files('libs/fbcore-1.7.1.jar')
+        compile files('libs/drawee-modified-1.7.1.jar')
+        compile files('libs/imagepipeline-1.7.1.jar')
+        compile files('libs/imagepipeline-base-1.7.1.jar')
+    }
+}

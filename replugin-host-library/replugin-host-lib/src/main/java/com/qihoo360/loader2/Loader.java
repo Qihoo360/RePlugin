@@ -601,7 +601,11 @@ class Loader {
     private void adjustPluginProcess(ApplicationInfo appInfo) {
         HashMap<String, String> processMap = getConfigProcessMap(appInfo);
         if (processMap == null || processMap.isEmpty()) {
-            processMap = genDynamicProcessMap();
+
+            PluginInfo pi = MP.getPlugin(mPluginName, false);
+            if (pi != null && pi.getFrameworkVersion() >= 4) {
+                processMap = genDynamicProcessMap();
+            }
         }
 
         if (LOG) {
