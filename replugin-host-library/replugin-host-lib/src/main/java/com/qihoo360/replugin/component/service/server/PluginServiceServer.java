@@ -104,6 +104,7 @@ public class PluginServiceServer {
                 case WHAT_ON_START_COMMAND:
                     Bundle data = msg.getData();
                     Intent intent = data.getParcelable("intent");
+
                     ServiceRecord sr = (ServiceRecord)msg.obj;
 
                     if (intent != null && sr != null) {
