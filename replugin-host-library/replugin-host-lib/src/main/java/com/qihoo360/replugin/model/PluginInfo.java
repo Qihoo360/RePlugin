@@ -846,6 +846,21 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
 
             if (pluginInfo != null && !TextUtils.isEmpty(this.mJsonText)) {
                 pluginInfo.mJson = new JSONObject(this.mJsonText);
+
+                JSONObject ujo = pluginInfo.mJson.optJSONObject("upinfo");
+                if (ujo != null) {
+                    pluginInfo.mPendingUpdate = new PluginInfo(ujo);
+                }
+
+                JSONObject djo = pluginInfo.mJson.optJSONObject("delinfo");
+                if (djo != null) {
+                    pluginInfo.mPendingDelete = new PluginInfo(djo);
+                }
+
+                JSONObject cjo = pluginInfo.mJson.optJSONObject("coverinfo");
+                if (cjo != null) {
+                    pluginInfo.mPendingCover = new PluginInfo(cjo);
+                }
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
