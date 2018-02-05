@@ -290,10 +290,6 @@ public class PluginManagerServer {
 
             // 由于"打算要更新"的前提是插件正在被运行，且下次重启时会清空这个信息，既然这次只是替换"打算要更新"的插件信息
             // 则不必再做后面诸如"插件是否存在"等判断，直接返回即可
-
-            // FIXME 检查是否应该Use
-            // instPli.setType(PluginInfo.TYPE_LATER_UPDATE);
-            // curPli.setPendingUpdate(instPli);
             return;
         }
 
