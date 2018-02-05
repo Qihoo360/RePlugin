@@ -344,6 +344,9 @@ public class PluginManagerServer {
                         "cur_ver=" + curPli.getVersion() + "; old_ver=" + curUpdatePli.getVersion() + "; new_ver=" + instPli.getVersion());
             }
 
+            // 设置待更新版本至最大版本
+            curPli.setPendingUpdate(instPli);
+
             // 删除“夹心层”插件文件
             try {
                 FileUtils.forceDelete(new File(curUpdatePli.getPath()));
