@@ -18,10 +18,12 @@ package com.qihoo360.replugin.sample.demo1;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -39,6 +41,7 @@ import android.widget.Toast;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.common.utils.TimeUtils;
 import com.qihoo360.replugin.sample.demo1.activity.file_provider.FileProviderActivity;
+import com.qihoo360.replugin.sample.demo1.activity.notify_test.NotifyActivity;
 import com.qihoo360.replugin.sample.demo1.activity.preference.PrefActivity2;
 import com.qihoo360.replugin.sample.demo1.activity.single_instance.TIActivity1;
 import com.qihoo360.replugin.sample.demo1.activity.single_top.SingleTopActivity1;
@@ -49,12 +52,17 @@ import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeBlackNoTitleBarFul
 import com.qihoo360.replugin.sample.demo1.activity.theme.ThemeDialogActivity;
 import com.qihoo360.replugin.sample.demo1.activity.webview.WebViewActivity;
 import com.qihoo360.replugin.sample.demo1.service.PluginDemoService1;
+import com.qihoo360.replugin.sample.demo1.support.NotifyUtils;
 import com.qihoo360.replugin.sample.demo2.IDemo2;
 import com.qihoo360.replugin.sample.library.LibMainActivity;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.qihoo360.replugin.sample.demo1.support.NotifyUtils.ACTION_START_NOTIFY_UI;
+import static com.qihoo360.replugin.sample.demo1.support.NotifyUtils.NOTIFY_KEY;
+import static com.qihoo360.replugin.sample.demo1.support.NotifyUtils.TAG;
 
 /**
  * @author RePlugin Team
@@ -67,6 +75,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_START_NOTIFY_UI);
+        registerReceiver(mIntentReceiver, filter);
 
         initData();
 
@@ -386,6 +398,14 @@ public class MainActivity extends Activity {
                 v.getContext().startActivity(intent);
             }
         }));
+
+        // Notification
+        mItems.add(new TestItem("Send Notification", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NotifyUtils.sendNotification(v.getContext().getApplicationContext());
+            }
+        }));
     }
 
     private static final int REQUEST_CODE_DEMO2 = 0x021;
@@ -396,6 +416,12 @@ public class MainActivity extends Activity {
         if (requestCode == REQUEST_CODE_DEMO2 && resultCode == RESULT_CODE_DEMO2) {
             Toast.makeText(this, data.getStringExtra("data"), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(mIntentReceiver);
+        super.onDestroy();
     }
 
     private class TestAdapter extends BaseAdapter {
@@ -426,5 +452,32 @@ public class MainActivity extends Activity {
             convertView.setOnClickListener(item.mClickListener);
             return convertView;
         }
+    }
+
+    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context ctx, Intent intent) {
+            if (intent == null || TextUtils.isEmpty(intent.getAction())) {
+                return;
+            }
+            String action = intent.getAction();
+            if (TextUtils.isEmpty(action)) {
+                return;
+            }
+
+            Log.d(TAG, "onReceive. action:" + action);
+
+            if (ACTION_START_NOTIFY_UI.equals(action)) {
+                StartNotifyUI(ctx, intent.getStringExtra(NOTIFY_KEY));
+            }
+        }
+    };
+
+    private void StartNotifyUI(Context ctx, String extra) {
+        Toast.makeText(ctx, extra, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(MainActivity.this, NotifyActivity.class);
+        intent.putExtra(NOTIFY_KEY, extra);
+        startActivity(intent);
     }
 }
