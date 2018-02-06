@@ -290,10 +290,6 @@ public class PluginManagerServer {
 
             // 由于"打算要更新"的前提是插件正在被运行，且下次重启时会清空这个信息，既然这次只是替换"打算要更新"的插件信息
             // 则不必再做后面诸如"插件是否存在"等判断，直接返回即可
-
-            // FIXME 检查是否应该Use
-            // instPli.setType(PluginInfo.TYPE_LATER_UPDATE);
-            // curPli.setPendingUpdate(instPli);
             return;
         }
 
@@ -343,6 +339,9 @@ public class PluginManagerServer {
                 LogDebug.i(TAG, "updatePendingUpdate: Found newer plugin, replace. pn=" + curPli.getName() + "; " +
                         "cur_ver=" + curPli.getVersion() + "; old_ver=" + curUpdatePli.getVersion() + "; new_ver=" + instPli.getVersion());
             }
+
+            // 设置待更新版本至最大版本
+            curPli.setPendingUpdate(instPli);
 
             // 删除“夹心层”插件文件
             try {
