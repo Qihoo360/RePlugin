@@ -219,10 +219,14 @@ public class PluginContext extends ContextThemeWrapper {
         return mCacheDir;
     }
 
+/*
+    为了适配 Android 8.1 及后续版本，该方法不再重写，因此，需要各插件之间约定，防止出现重名数据库。
+    by cundong
     @Override
     public File getDatabasePath(String name) {
         return validateFilePath(name, false);
     }
+*/
 
     @Override
     public File getFileStreamPath(String name) {
