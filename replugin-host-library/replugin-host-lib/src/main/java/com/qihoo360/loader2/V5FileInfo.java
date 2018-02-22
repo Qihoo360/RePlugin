@@ -330,7 +330,7 @@ public class V5FileInfo {
                 LogDebug.d(PLUGIN_TAG, "update v5 plugin: extract ..." + " name=" + mName);
             }
             //
-            File tmpfile = new File(dir, "plugin.tmp");
+            File tmpfile = new File(dir, String.format("%s_plugin.tmp", mName));
             FileUtils.copyInputStreamToFile(dis, tmpfile);
 
             // 检查结果，如果不成功就删除该文件
