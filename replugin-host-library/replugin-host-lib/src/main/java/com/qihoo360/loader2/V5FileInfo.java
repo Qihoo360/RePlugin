@@ -417,6 +417,11 @@ public class V5FileInfo {
             if (LOG) {
                 LogDebug.d(PLUGIN_TAG, "update v5 plugin: extract success" + " name=" + mName);
             }
+
+            if (target.exists()) {
+                FileUtils.forceDelete(target);
+            }
+            
             // 更名
             FileUtils.moveFile(tmpfile, target);
             return pi;
