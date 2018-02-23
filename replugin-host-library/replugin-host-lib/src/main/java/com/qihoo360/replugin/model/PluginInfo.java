@@ -29,7 +29,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.qihoo360.loader2.BuildCompat;
 import com.qihoo360.loader2.Constant;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
 import com.qihoo360.loader2.V5FileInfo;
@@ -450,7 +449,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
         Context context = RePluginInternal.getAppContext();
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
-            return new File(getApkDir() + File.separator + "oat" + File.separator + getArtOatCpuType());
+            return new File(getApkDir() + File.separator + "oat" + File.separator + VMRuntimeCompat.getArtOatCpuType());
         } else {
             if (isPnPlugin()) {
                 return context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
@@ -484,16 +483,6 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
             File dir = getDexParentDir();
             return new File(dir, makeInstalledFileName() + ".dex");
         }
-    }
-
-    /**
-     * Art虚拟机，引入AOT编译后，读取oat目录下，当前正在使用的目录
-     * TODO 目前仅支持arm
-     *
-     * @return
-     */
-    private String getArtOatCpuType() {
-        return VMRuntimeCompat.is64Bit() ? BuildCompat.ARM64 : BuildCompat.ARM;
     }
 
     /**
@@ -797,7 +786,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     // Parcelable and Cloneable
     // -------------------------
 
-    public static final Parcelable.Creator<PluginInfo> CREATOR = new Parcelable.Creator<PluginInfo>() {
+    public static final Creator<PluginInfo> CREATOR = new Creator<PluginInfo>() {
 
         @Override
         public PluginInfo createFromParcel(Parcel source) {

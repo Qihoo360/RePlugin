@@ -17,6 +17,7 @@
 package com.qihoo360.loader2;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.model.PluginInfo;
@@ -221,16 +222,48 @@ public class Builder {
         // 构建数据
     }
 
+    private static File getDexDir(Context context) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            return new File(context.getDir(Constant.LOCAL_PLUGIN_SUB_DIR, 0) + File.separator + "oat" + File.separator + VMRuntimeCompat.getArtOatCpuType());
+        } else {
+            return context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
+        }
+    }
+
     private static void deleteUnknownDexs(Context context, PxAll all) {
         HashSet<String> names = new HashSet<>();
         for (PluginInfo p : all.getPlugins()) {
             names.add(p.getDexFile().getName());
+
+            if (LOG) {
+                LogDebug.d(PLUGIN_TAG, "dexFile:" + p.getDexFile().getName());
+            }
+
+            // add vdex for Android O
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+                String fileNameWithoutExt = FileUtils.getFileNameWithoutExt(p.getDexFile().getAbsolutePath());
+
+                if (LOG) {
+                    LogDebug.d(PLUGIN_TAG, "vdexFile:" + (fileNameWithoutExt + ".vdex"));
+                }
+
+                names.add(fileNameWithoutExt + ".vdex");
+            }
         }
-        File dir = context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
-        File files[] = dir.listFiles();
+
+        File dexDir = getDexDir(context);
+
+        if (LOG) {
+            LogDebug.d(PLUGIN_TAG, "to delete dex dir:" + dexDir);
+        }
+
+        File files[] = dexDir.listFiles();
         if (files != null) {
             for (File f : files) {
                 if (names.contains(f.getName())) {
+                    if (LOG) {
+                        LogDebug.d(PLUGIN_TAG, "no need delete " + f.getAbsolutePath());
+                    }
                     continue;
                 }
                 if (LOG) {
