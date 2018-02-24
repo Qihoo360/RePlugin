@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) 2005-2017 Qihoo 360 Inc.
   ~
@@ -15,11 +16,6 @@
   -->
 
 <resources>
-    <string name="app_name">RePlugin Sample</string>
-    <string name="startDemo1">Start plugin demo1</string>
-    <string name="startDemo3">Start Kotlin Plugin (demo3) </string>
-    <string name="startDemo4">Start plugin webview</string>
-    <string name="startDemo1ForResult">Start plugin demo1(forResult)</string>
-    <string name="startDemo1LoadFragment">Start plugin demo1(Fragment from demo1)</string>
-    <string name="installPluginFromAssets">Install or update external plugin</string>
+    <!-- 通知栏图标 -->
+    <public id="0x7f030002" name="notification_out" type="drawable" />
 </resources>

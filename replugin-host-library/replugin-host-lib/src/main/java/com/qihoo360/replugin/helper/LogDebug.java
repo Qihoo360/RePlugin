@@ -264,4 +264,9 @@ public class LogDebug {
      * @deprecated 为兼容卫士，以后干掉
      */
     public static final String MISC_TAG = "ws002";
+
+    /**
+     * createClassLoader TAG
+     */
+    public static final String LOADER_TAG = "createClassLoader";
 }

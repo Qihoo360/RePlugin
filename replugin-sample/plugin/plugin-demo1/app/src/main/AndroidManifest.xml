@@ -162,6 +162,8 @@
 
         <activity android:name=".activity.file_provider.FileProviderActivity"/>
 
+        <activity android:name=".activity.notify_test.NotifyActivity"/>
+
         <!-- 以下provider，作为插件时，可注释掉；作为单独APK时需要声明-->
         <provider
             android:name="com.qihoo360.replugin.sample.demo1.provider.FileProvider"

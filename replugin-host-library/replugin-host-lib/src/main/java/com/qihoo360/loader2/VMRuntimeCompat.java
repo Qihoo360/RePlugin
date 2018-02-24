@@ -87,4 +87,14 @@ public class VMRuntimeCompat {
         }
         return false;
     }
+
+    /**
+     * Art虚拟机，引入AOT编译后，读取oat目录下当前正在使用的目录
+     * TODO 目前仅支持arm
+     *
+     * @return
+     */
+    public static String getArtOatCpuType() {
+        return VMRuntimeCompat.is64Bit() ? BuildCompat.ARM64 : BuildCompat.ARM;
+    }
 }
