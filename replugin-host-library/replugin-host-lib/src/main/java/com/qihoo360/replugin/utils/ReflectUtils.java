@@ -174,16 +174,16 @@ public final class ReflectUtils {
     // Method
     // ----------------
 
-    public static Method getMethod(Class<?> cls, String fieldName, Class<?>... parameterTypes) {
+    public static Method getMethod(Class<?> cls, String methodName, Class<?>... parameterTypes) {
         // check up the superclass hierarchy
         for (Class<?> acls = cls; acls != null; acls = acls.getSuperclass()) {
             try {
-                final Method field = acls.getDeclaredMethod(fieldName, parameterTypes);
+                final Method method = acls.getDeclaredMethod(methodName, parameterTypes);
                 // getDeclaredField checks for non-public scopes as well
                 // and it returns accurate results
-                setAccessible(field, true);
+                setAccessible(method, true);
 
-                return field;
+                return method;
             } catch (final NoSuchMethodException ex) { // NOPMD
                 // ignore
             }
@@ -194,9 +194,9 @@ public final class ReflectUtils {
         Method match = null;
         for (final Class<?> class1 : cls.getInterfaces()) {
             try {
-                final Method test = class1.getMethod(fieldName, parameterTypes);
+                final Method test = class1.getMethod(methodName, parameterTypes);
                 Validate.isTrue(match == null, "Reference to field %s is ambiguous relative to %s"
-                        + "; a matching field exists on two or more implemented interfaces.", fieldName, cls);
+                        + "; a matching field exists on two or more implemented interfaces.", methodName, cls);
                 match = test;
             } catch (final NoSuchMethodException ex) { // NOPMD
                 // ignore
