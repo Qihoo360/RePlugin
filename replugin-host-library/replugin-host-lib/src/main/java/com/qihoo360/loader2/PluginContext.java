@@ -26,6 +26,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.InflateException;
 import android.view.LayoutInflater;
@@ -105,6 +106,7 @@ public class PluginContext extends ContextThemeWrapper {
 
     @Override
     public Resources getResources() {
+        Log.d("LZC", "animation---:getResource()" );
         if (mNewResources != null) {
             return mNewResources;
         }

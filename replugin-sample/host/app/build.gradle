@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId "com.qihoo360.replugin.sample.host"
         minSdkVersion 9
-        targetSdkVersion 22
+        targetSdkVersion 20
         versionCode 1
         versionName "1.0"
     }
@@ -37,7 +37,7 @@ android {
 apply plugin: 'replugin-host-gradle'
 repluginHostConfig {
     useAppCompat = true
-
+//    persistentEnable = false
     // 可以在这里自定义常驻进程的名字
     // persistentName = ":XXXXService"
 }
@@ -45,5 +45,6 @@ repluginHostConfig {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.qihoo360.replugin:replugin-host-lib:2.2.2'
+    compile project(':replugin-host-library:replugin-host-lib')
+    compile 'com.qihoo360.accounts:qihoo-account-plugin:1.0.3'
 }

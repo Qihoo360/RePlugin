@@ -43,6 +43,8 @@
         </activity>
 
         <activity android:name=".PluginFragmentActivity" />
+        <activity android:name=".OtherProcessActivity"
+            android:process=":test"/>
     </application>
 
 </manifest>

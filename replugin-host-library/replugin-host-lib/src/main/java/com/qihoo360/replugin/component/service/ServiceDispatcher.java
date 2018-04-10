@@ -68,6 +68,7 @@ final class ServiceDispatcher {
             mDispatcher = new WeakReference<ServiceDispatcher>(sd);
         }
 
+        @Override
         public void connected(ComponentName name, IBinder service) throws RemoteException {
             ServiceDispatcher sd = mDispatcher.get();
             if (sd != null) {

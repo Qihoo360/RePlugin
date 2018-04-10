@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2005-2017 Qihoo 360 Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed To in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
-
 package com.qihoo360.replugin.sample.host;
 
 import android.app.Activity;
@@ -27,7 +11,6 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.Toast;
 
-import com.qihoo360.accounts.plugin.QihooAccountsPlugin;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.utils.FileUtils;
@@ -37,10 +20,11 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 
 /**
- * @author RePlugin Team
+ * @author knero
+ * @date 11/14/17 created.
  */
-public class MainActivity extends Activity {
 
+public class OtherProcessActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +33,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 // 刻意以“包名”来打开
-                RePlugin.startActivity(MainActivity.this, RePlugin.createIntent("com.qihoo360.replugin.sample.demo1", "com.qihoo360.replugin.sample.demo1.MainActivity"));
+                RePlugin.startActivity(OtherProcessActivity.this, RePlugin.createIntent("com.qihoo360.replugin.sample.demo1", "com.qihoo360.replugin.sample.demo1.OtherProcessActivity"));
             }
         });
 
@@ -59,7 +43,7 @@ public class MainActivity extends Activity {
                 // 刻意以“Alias（别名）”来打开
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName("demo1", "com.qihoo360.replugin.sample.demo1.activity.for_result.ForResultActivity"));
-                RePlugin.startActivityForResult(MainActivity.this, intent, REQUEST_CODE_DEMO1, null);
+                RePlugin.startActivityForResult(OtherProcessActivity.this, intent, REQUEST_CODE_DEMO1, null);
             }
         });
 
@@ -67,7 +51,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, PluginFragmentActivity.class));
+                startActivity(new Intent(OtherProcessActivity.this, PluginFragmentActivity.class));
             }
         });
 
@@ -77,9 +61,9 @@ public class MainActivity extends Activity {
                 // 若没有安装，则直接提示“错误”
                 // TODO 将来把回调串联上
                 if (RePlugin.isPluginInstalled("demo3")) {
-                    RePlugin.startActivity(MainActivity.this, RePlugin.createIntent("demo3", "com.qihoo360.replugin.sample.demo3.MainActivity"));
+                    RePlugin.startActivity(OtherProcessActivity.this, RePlugin.createIntent("demo3", "com.qihoo360.replugin.sample.demo3.OtherProcessActivity"));
                 } else {
-                    Toast.makeText(MainActivity.this, "You must install demo3 first!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OtherProcessActivity.this, "You must install demo3 first!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -88,7 +72,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                final ProgressDialog pd = ProgressDialog.show(MainActivity.this, "Installing...", "Please wait...", true, true);
+                final ProgressDialog pd = ProgressDialog.show(OtherProcessActivity.this, "Installing...", "Please wait...", true, true);
                 // FIXME: 仅用于安装流程演示 2017/7/24
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
@@ -100,26 +84,8 @@ public class MainActivity extends Activity {
             }
         });
 
-        findViewById(R.id.start_process).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                QihooAccountsPlugin.toLogin(MainActivity.this);
-//                Intent intent = RePlugin.createIntent("sdk.quc.test", "com.example.demo.UCActivity");
-//                RePlugin.startActivity(MainActivity.this, intent);
-//                Intent intent = new Intent(MainActivity.this, OtherProcessActivity.class);
-//                startActivity(intent);
-            }
-        });
         // 刻意使用Thread的ClassLoader来测试效果
         testThreadClassLoader();
-
-        try {
-            Class clazz = getClass().getClassLoader()
-                    .loadClass("com.example.demo.MainActivity");
-            Activity activity = (Activity) clazz.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void testThreadClassLoader() {
@@ -164,9 +130,9 @@ public class MainActivity extends Activity {
         }
 
         if (info != null) {
-            RePlugin.startActivity(MainActivity.this, RePlugin.createIntent(info.getName(), "com.qihoo360.replugin.sample.demo3.MainActivity"));
+            RePlugin.startActivity(OtherProcessActivity.this, RePlugin.createIntent(info.getName(), "com.qihoo360.replugin.sample.demo3.OtherProcessActivity"));
         } else {
-            Toast.makeText(MainActivity.this, "install external plugin failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(OtherProcessActivity.this, "install external plugin failed", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -313,6 +313,9 @@ class Loader {
                     // 线上环境保持不变
                     parent = getClass().getClassLoader().getParent(); // TODO: 这里直接用父类加载器
                 }
+
+                Log.d("LZC", "      ======：" + parent);
+
                 String soDir = mPackageInfo.applicationInfo.nativeLibraryDir;
                 mClassLoader = RePlugin.getConfig().getCallbacks().createPluginClassLoader(mPluginObj.mInfo, mPath, out, soDir, parent);
                 Log.i("dex", "load " + mPath + " = " + mClassLoader);

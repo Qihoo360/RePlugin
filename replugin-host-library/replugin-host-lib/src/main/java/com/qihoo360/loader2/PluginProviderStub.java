@@ -24,6 +24,7 @@ import android.os.IBinder;
 import android.os.IBinder.DeathRecipient;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.qihoo360.i.IPluginManager;
 import com.qihoo360.loader2.sp.IPref;
@@ -170,6 +171,7 @@ public class PluginProviderStub {
         } else {
             uri = ProcessPitProviderUI.buildUri(IPluginManager.PROCESS_UI);
         }
+        Log.d("LZC", "uri:" + uri + "  currentProcess:" + IPC.getCurrentProcessName());
         try {
 
             cursor = context.getContentResolver().query(uri, PROJECTION_MAIN, selection, null, null);

@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.qihoo360.accounts.plugin.QihooAccountsPlugin;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginApplication;
 import com.qihoo360.replugin.RePluginCallbacks;
@@ -37,6 +38,13 @@ public class SampleApplication extends RePluginApplication {
 
         // FIXME 允许接收rpRunPlugin等Gradle Task，发布时请务必关掉，以免出现问题
         RePlugin.enableDebugger(base, BuildConfig.DEBUG);
+        QihooAccountsPlugin.App.attachBaseContext(this);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        QihooAccountsPlugin.App.onCreate();
     }
 
     // ----------

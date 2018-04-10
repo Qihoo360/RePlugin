@@ -1,0 +1,47 @@
+[
+  {
+    "id": "qihoo_accounts_green",
+    "type": "color",
+    "value": "#FF0000"
+  },
+  {
+    "id": "qihoo_accounts_dialog_account_color",
+    "type": "color",
+    "value": "#FF0000"
+  },
+  {
+    "id": "qihoo_accounts_btn_main_selector",
+    "type": "selector",
+    "value": "#FF0000"
+  },
+  {
+    "id": "qihoo_accounts_checkbox_selector",
+    "type": "tint_drawable",
+    "value": "#FF0000"
+  },
+  {
+    "id": "qihoo_accounts_country_touch_value_bg",
+    "type": "tint_drawable",
+    "value": "#FF0000"
+  },
+  {
+    "id": "qihoo_accounts_dialog_background",
+    "type": "tint_drawable",
+    "value": "#FF0000"
+  },
+  {
+    "id": "qihoo_accounts_dialog_logining",
+    "type": "tint_drawable",
+    "value": "#FF0000"
+  },
+  {
+    "id": "qrcode_scan_line",
+    "type": "tint_drawable",
+    "value": "#FF0000"
+  },
+  {
+    "id": "qihoo_accounts_webview_dskin",
+    "type": "string",
+    "value": "#FF0000_#FF0000_#FF0000_#FF0000"
+  }
+]
