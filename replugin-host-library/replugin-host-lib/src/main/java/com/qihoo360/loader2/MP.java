@@ -26,12 +26,13 @@ import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
-import com.qihoo360.replugin.packages.PluginManagerProxy;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.MAIN_TAG;
@@ -313,21 +314,29 @@ public class MP {
 
     /**
      * 获取当前所有插件信息快照。内部框架使用
+     *
+     * @param clone true：深拷贝 false：浅拷贝
      * @return
      */
     public static final List<PluginInfo> getPlugins(boolean clone) {
-        ArrayList<PluginInfo> array = new ArrayList<PluginInfo>();
+        ArrayList<PluginInfo> array = new ArrayList<>();
+        Set<String> pathSet = new HashSet<>();
+
         synchronized (PluginTable.PLUGINS) {
             for (PluginInfo info : PluginTable.PLUGINS.values()) {
-                PluginInfo addTo;
-                if (clone) {
-                    addTo = (PluginInfo) info.clone();
-                } else {
-                    addTo = info;
-                }
+                String path = info.getPath();
 
                 // 避免加了两次，毕竟包名和别名都会加进来
-                if (!array.contains(addTo)) {
+                if (!pathSet.contains(path)) {
+                    pathSet.add(path);
+
+                    PluginInfo addTo;
+                    if (clone) {
+                        addTo = (PluginInfo) info.clone();
+                    } else {
+                        addTo = info;
+                    }
+
                     array.add(addTo);
                 }
             }
