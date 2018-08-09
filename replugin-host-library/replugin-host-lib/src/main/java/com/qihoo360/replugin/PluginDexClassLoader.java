@@ -53,6 +53,8 @@ public class PluginDexClassLoader extends DexClassLoader {
 
     private static Method sLoadClassMethod;
 
+    private String mPluginName;
+
     /**
      * 初始化插件的DexClassLoader的构造函数。插件化框架会调用此函数。
      *
@@ -69,6 +71,8 @@ public class PluginDexClassLoader extends DexClassLoader {
      */
     public PluginDexClassLoader(PluginInfo pi, String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
         super(dexPath, optimizedDirectory, librarySearchPath, parent);
+
+        mPluginName = pi.getName();
 
         installMultiDexesBeforeLollipop(pi, dexPath, parent);
 
@@ -104,6 +108,23 @@ public class PluginDexClassLoader extends DexClassLoader {
         } catch (ClassNotFoundException e) {
             // Do not throw "e" now
             cnfException = e;
+
+            if (PluginDexClassLoaderPatch.need2LoadFromHost(className)) {
+                try {
+                    return loadClassFromHost(className, resolve);
+                } catch (ClassNotFoundException e1) {
+                    // Do not throw "e1" now
+                    cnfException = e1;
+
+                    if (LogDebug.LOG) {
+                        LogDebug.e(TAG, "loadClass ClassNotFoundException, from HostClassLoader&&PluginClassLoader, cn=" + className + ", pluginName=" + mPluginName);
+                    }
+                }
+            } else {
+                if (LogDebug.LOG) {
+                    LogDebug.e(TAG, "loadClass ClassNotFoundException, from PluginClassLoader, cn=" + className + ", pluginName=" + mPluginName);
+                }
+            }
         }
 
         // 若插件里没有此类，则会从宿主ClassLoader中找，找到了则直接返回
