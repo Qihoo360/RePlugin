@@ -874,13 +874,15 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
 
     @Override
     public String toString() {
-        StringBuilder b = new StringBuilder();
+        synchronized (this) {
+            StringBuilder b = new StringBuilder();
 
-        b.append("PInfo { ");
-        toContentString(b);
-        b.append(" }");
+            b.append("PInfo { ");
+            toContentString(b);
+            b.append(" }");
 
-        return b.toString();
+            return b.toString();
+        }
     }
 
     private void toContentString(StringBuilder b) {

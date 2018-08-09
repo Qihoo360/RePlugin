@@ -28,7 +28,6 @@ import android.text.TextUtils;
 
 import com.qihoo360.i.IModule;
 import com.qihoo360.i.IPlugin;
-import com.qihoo360.replugin.utils.AssetsUtils;
 import com.qihoo360.loader.utils.ProcessLocker;
 import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.replugin.RePlugin;
@@ -38,6 +37,7 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.packages.PluginManagerProxy;
+import com.qihoo360.replugin.utils.AssetsUtils;
 import com.qihoo360.replugin.utils.FileUtils;
 
 import java.io.File;
@@ -664,8 +664,7 @@ class Plugin {
                 LogRelease.w(PLUGIN_TAG, logTag + ": failed to lock: can't wait plugin ready");
             }
         }
-        // 清空数据对象
-        mLoader = null;
+
         // 删除优化dex文件
         File odex = mInfo.getDexFile();
         if (odex.exists()) {
@@ -682,11 +681,14 @@ class Plugin {
                 FileUtils.forceDelete(mInfo.getExtraOdexDir());
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (IllegalArgumentException e2) {
+                e2.printStackTrace();
             }
         }
 
         t1 = System.currentTimeMillis();
-        rc = doLoad(logTag, context, parent, manager, load);
+        // 尝试再次加载该插件
+        rc = tryLoadAgain(logTag, context, parent, manager, load);
         if (LOG) {
             LogDebug.i(PLUGIN_TAG, "load2 " + mInfo.getPath() + " " + hashCode() + " c=" + load + " rc=" + rc + " delta=" + (System.currentTimeMillis() - t1));
         }
@@ -733,6 +735,14 @@ class Plugin {
             }
         }
         return null;
+    }
+
+    /**
+     * 抽出方法，将mLoader设置为null与doload中mLoader的使用添加同步锁，解决在多线程下导致mLoader为空指针的问题。
+     */
+    private synchronized boolean tryLoadAgain(String tag, Context context, ClassLoader parent, PluginCommImpl manager, int load) {
+        mLoader = null;
+        return doLoad(tag, context, parent, manager, load);
     }
 
     private final boolean doLoad(String tag, Context context, ClassLoader parent, PluginCommImpl manager, int load) {

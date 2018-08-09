@@ -5,7 +5,9 @@
 </p>
 
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
-[![Release Version](https://img.shields.io/badge/release-2.2.4-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/wiki/%E5%8F%91%E8%A1%8C%E6%B3%A8%E8%AE%B0)
+
+[![Release Version](https://img.shields.io/badge/release-2.2.4-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
+
 
 
 ## RePlugin —— 历经三年多考验，数亿设备使用的，稳定占坑类插件化方案
@@ -80,6 +82,26 @@ RePlugin的使用方法非常简单，大部分情况下和“单品”开发无
 若您想**看下RePlugin的Sample工程，进而了解框架的具体用法，则[请点击这里查看Sample源代码](https://github.com/Qihoo360/RePlugin/blob/master/replugin-sample)**。
 
 若您在接入RePlugin中**遇到了任何问题，则[请点击这里阅读《FAQ》](https://github.com/Qihoo360/RePlugin/wiki/FAQ)**，相信会有您想要的答案。
+
+## 插件管理服务—与RePlugin配套的插件管理、下发、统计服务
+
+至今为止有数不清的用户联系我们让做配套的插件管理功能，所以 RePlugin 团队联合 360 Web 平台部，合力推出 RePlugin 插件管理服务，再次大幅降低了用户使用RePlugin的门槛，插件管理服务功能介绍如下：
+
+* **插件版本管理**：对APK插件包名、别名和版本号的交集限制，防止下发出错。
+
+* **打点统计**：上报即显示下发量、下载量、安装量和错误量数据。
+
+* **升版管理**：严格要求用户新建下发任务为面向虚拟用户或部分真实用户的“测试版”下发任务（适用于内测、AB和灰度），测试没问题以后才能切换到面对所有真实用户的“线上版”下发任务，防止出错。
+
+* **下发限速**：开发者可自定义自己想要的插件下发速度。
+
+* **运营商和厂商限制**：开发者可自定义自己想下发的运营商和目标终端厂商。
+
+* **灵活的下发条件设置**：根据用户群体对下发条件的要求程度，我们提供了4种条件设置功能，对下发条件要求不高的用户可直接使用便捷条件下发（包括按人数和指定设备下发）；对下发条件要求高的用户可使用自定义条件下发（包括文字条件编辑器和代码条件编辑器）。
+
+**PS**：我们原创的文字版条件编辑器很有意思哦，它能将复杂繁琐的条件代码还原成有语法有逻辑的中国话，真的是能让非技术人员第一次使用就看得懂会操作的优秀功能，目前为止我们应该是第一个将体验做到如此细腻的产品。
+
+使用地址：[360移动开发者-RePlugin插件管理](https://dc.360.cn/)
 
 ## 已接入RePlugin的应用
 
@@ -158,7 +180,7 @@ RePlugin的使用方法非常简单，大部分情况下和“单品”开发无
 
 微信群已超过上限，请进入我们的QQ群
 
-QQ群：**653205923**
+QQ群 1：**653205923** QQ群 2：**589652294**
 
 ## License
 

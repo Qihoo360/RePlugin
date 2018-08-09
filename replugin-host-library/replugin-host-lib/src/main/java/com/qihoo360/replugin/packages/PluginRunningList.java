@@ -53,8 +53,10 @@ public class PluginRunningList implements Parcelable, Iterable<String>, Cloneabl
     }
 
     void add(String s) {
-        if (!isRunning(s)) {
-            mList.add(s);
+        synchronized (this) {
+            if (!isRunning(s)) {
+                mList.add(s);
+            }
         }
     }
 
