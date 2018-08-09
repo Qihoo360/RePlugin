@@ -17,7 +17,6 @@
 package com.qihoo360.replugin.packages;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -28,11 +27,9 @@ import android.text.TextUtils;
 import com.qihoo360.loader2.CertUtils;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
-import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginEventCallbacks;
 import com.qihoo360.replugin.RePluginInternal;
-import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;

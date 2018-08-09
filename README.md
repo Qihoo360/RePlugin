@@ -8,6 +8,7 @@
 [![Release Version](https://img.shields.io/badge/release-2.2.4-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
 
 
+
 ## RePlugin —— A flexible, stable, easy-to-use Android Plug-in Framework
 
 RePlugin is a complete Android plug-in solution which is suitable for general use.
