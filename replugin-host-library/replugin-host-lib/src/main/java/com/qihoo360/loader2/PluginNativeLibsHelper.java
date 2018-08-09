@@ -19,6 +19,7 @@ package com.qihoo360.loader2;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.mobilesafe.core.BuildConfig;
 import com.qihoo360.replugin.helper.LogDebug;
@@ -112,6 +113,10 @@ public class PluginNativeLibsHelper {
         } catch (IOException e) {
             // IOException：有可能是IO，如权限出现问题等，打出日志
             e.printStackTrace();
+        } catch (IllegalArgumentException e2) {
+            if (LogRelease.LOGR) {
+                e2.printStackTrace();
+            }
         }
     }
 
