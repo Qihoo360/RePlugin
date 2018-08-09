@@ -1,9 +1,9 @@
 package com.qihoo360.replugin;
 
 /**
- * Created by liucundong on 2018/6/5.
- * <p>
  * PluginDexClassLoader's Patch
+ *
+ * @author RePlugin Team
  */
 public class PluginDexClassLoaderPatch {
 
