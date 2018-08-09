@@ -468,6 +468,10 @@ public class PluginManagerServer {
                 if (LogRelease.LOGR) {
                     e.printStackTrace();
                 }
+            } catch (IllegalArgumentException e2) {
+                if (LogRelease.LOGR) {
+                    e2.printStackTrace();
+                }
             }
         }
     }
@@ -483,6 +487,10 @@ public class PluginManagerServer {
         } catch (IOException e) {
             if (LogRelease.LOGR) {
                 e.printStackTrace();
+            }
+        } catch (IllegalArgumentException e2) {
+            if (LogRelease.LOGR) {
+                e2.printStackTrace();
             }
         }
     }

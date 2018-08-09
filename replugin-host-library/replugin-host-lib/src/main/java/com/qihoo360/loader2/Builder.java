@@ -21,7 +21,6 @@ import android.os.Build;
 
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.model.PluginInfo;
-
 import com.qihoo360.replugin.utils.FileUtils;
 
 import java.io.File;
@@ -275,6 +274,10 @@ public class Builder {
                     if (LOG) {
                         LogDebug.d(PLUGIN_TAG, "can't delete unknown dex=" + f.getAbsolutePath(), e);
                     }
+                } catch (IllegalArgumentException e2) {
+                    if (LOG) {
+                        e2.printStackTrace();
+                    }
                 }
             }
         }
@@ -301,6 +304,10 @@ public class Builder {
                 } catch (IOException e) {
                     if (LOG) {
                         LogDebug.d(PLUGIN_TAG, "can't delete unknown libs=" + f.getAbsolutePath(), e);
+                    }
+                } catch (IllegalArgumentException e2) {
+                    if (LOG) {
+                        e2.printStackTrace();
                     }
                 }
             }

@@ -682,6 +682,8 @@ class Plugin {
                 FileUtils.forceDelete(mInfo.getExtraOdexDir());
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (IllegalArgumentException e2) {
+                e2.printStackTrace();
             }
         }
 

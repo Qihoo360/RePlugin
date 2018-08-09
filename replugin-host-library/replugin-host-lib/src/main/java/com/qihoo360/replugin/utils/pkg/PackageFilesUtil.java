@@ -348,6 +348,10 @@ public class PackageFilesUtil {
             if (LogRelease.LOGR) {
                 e.printStackTrace();
             }
+        } catch (IllegalArgumentException e2) {
+            if (LogRelease.LOGR) {
+                e2.printStackTrace();
+            }
         }
     }
 }
