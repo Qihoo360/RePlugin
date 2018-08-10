@@ -62,5 +62,5 @@ repluginPluginConfig {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.qihoo360.replugin:replugin-plugin-lib:2.2.4'
+    compile 'com.qihoo360.replugin:replugin-plugin-lib:2.3.0'
 }
