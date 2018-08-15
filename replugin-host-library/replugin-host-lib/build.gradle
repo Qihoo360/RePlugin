@@ -51,7 +51,7 @@ dependencies {
 
     // 以“占位符”（Provided）的方式来引用support-v4，不会编入AAR
     // 但宿主需要支持Support-v4（至少应支持LocalBroadcastManager）
-    provided 'com.android.support:support-v4:25.2.0'
+    api 'com.android.support:support-v4:25.2.0'
 }
 
 apply from: 'bintray.gradle'
