@@ -22,7 +22,10 @@
         <!-- 注意：此文件不要写入与'坑位'配置相关的组件（Activity、Provider），它们由 gradle 插件自动生成） -->
         <!-- 注意：此文件不要写入与'坑位'配置相关的组件（Activity、Provider），它们由 gradle 插件自动生成） -->
         <!-- 注意：此文件不要写入与'坑位'配置相关的组件（Activity、Provider），它们由 gradle 插件自动生成） -->
-
+        
+        <!-- org.apache.http is depracated since Android M. use this for adding the lib to the project for Android P -->
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        
         <!-- ======================================================================== -->
         <!-- 开始：插件stub -->
         <!-- Activity坑中的screenSize属性 7.3.0以上才支持 -->
