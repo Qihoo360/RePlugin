@@ -6,7 +6,7 @@
 
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
 
-[![Release Version](https://img.shields.io/badge/release-2.2.4-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
+[![Release Version](https://img.shields.io/badge/release-2.3.0-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
 
 
 
