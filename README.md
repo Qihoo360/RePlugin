@@ -55,6 +55,9 @@ At present, almost **all Apps with hundreds of millions users from 360, and many
 ## Our Vision
 Make RePlugin be used in all kinds of ordinary Apps; and provide stable, flexible, liberal plug-ins which adopt for both large and small projects.
 
+## Our Vision
+Solved the Android P (Android 9.0) related adaptation issues, fully support the official version of Android P (Android 9.0).
+
 ## RePlugin Architecture
 
 <p align="center">
