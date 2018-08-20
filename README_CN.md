@@ -57,6 +57,10 @@ RePlugin是一套完整的、稳定的、适合全面使用的，占坑类插件
 
 让插件化能**飞入寻常应用家**，做到稳定、灵活、自由，大小项目兼用。
 
+## 最新特性
+
+解决了Android P（Android 9.0）相关适配问题，全面支持Android P（Android 9.0）正式版。
+
 ## RePlugin 架构图
 
 <p align="center">
