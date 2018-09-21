@@ -93,6 +93,7 @@ public class ReClassTransform extends Transform {
         } else {
             doTransform(inputs, outputProvider, config, injectors) // 执行 reclass
         }
+        InjectHistory.save(project)
     }
 
     /**
@@ -182,6 +183,7 @@ public class ReClassTransform extends Transform {
 
             // println ">>> 删除目录 $dirAfterUnzip"
             FileUtils.deleteDirectory(new File(dirAfterUnzip))
+            InjectHistory.put(project, JarAfterzip)
         }
     }
 

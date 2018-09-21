@@ -32,7 +32,8 @@ public enum Injectors {
     LOCAL_BROADCAST_INJECTOR('LocalBroadcastInjector', new LocalBroadcastInjector(), '替换 LocalBroadcast 调用'),
     PROVIDER_INJECTOR('ProviderInjector', new ProviderInjector(), '替换 Provider 调用'),
     PROVIDER_INJECTOR2('ProviderInjector2', new ProviderInjector2(), '替换 ContentProviderClient 调用'),
-    GET_IDENTIFIER_INJECTOR('GetIdentifierInjector', new GetIdentifierInjector(), '替换 Resource.getIdentifier 调用')
+    GET_IDENTIFIER_INJECTOR('GetIdentifierInjector', new GetIdentifierInjector(), '替换 Resource.getIdentifier 调用'),
+    HISTORY_INJECTOR('HistoryInjector', new HistoryInjector(), '记录处理过的class文件')
 
     IClassInjector injector
     String nickName

@@ -22,17 +22,20 @@ import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInput
 import com.android.build.gradle.internal.scope.GlobalScope
 import com.android.sdklib.IAndroidTarget
-import org.apache.commons.io.FileUtils
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
+import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 
+import java.nio.file.FileVisitResult
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.zip.ZipFile
 
-import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES;
-
+import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES
 /**
  * @author RePlugin Team
  */
@@ -79,6 +82,14 @@ public class Util {
             input.jarInputs.each { JarInput jarInput ->
                 File jar = jarInput.file
                 def jarPath = jar.absolutePath
+                println("getProjectClassPth--jarPath=" + jarPath)
+                //todo jar只需要处理一次，以后忽略
+                if (InjectHistory.contains(project, jarPath)){
+                    //虽然忽略jar，但仍然要添加到classpath里
+                    classPath << jarPath
+                    println("ignore jar " + jarPath)
+                    return
+                }
 
                 if (!jarPath.contains(projectDir)) {
 
@@ -113,6 +124,20 @@ public class Util {
                     FileUtils.forceDelete(jar)
                 }
             }
+        }
+
+        //fixme 先写死，以后读取gradle配置
+        File providedDir = new File(project.projectDir, "provided")
+        if (providedDir.exists() && providedDir.isDirectory()) {
+            Files.walkFileTree(Paths.get(providedDir.absolutePath), new SimpleFileVisitor<Path>(){
+                @Override
+                FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (!classPath.contains(file.toString())) {
+                        classPath << file.toString()
+                    }
+                    return super.visitFile(file, attrs)
+                }
+            })
         }
         return classPath
     }

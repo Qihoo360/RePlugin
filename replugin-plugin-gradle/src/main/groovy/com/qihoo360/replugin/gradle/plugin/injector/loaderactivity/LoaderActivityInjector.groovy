@@ -19,6 +19,7 @@ package com.qihoo360.replugin.gradle.plugin.injector.loaderactivity
 
 import com.qihoo360.replugin.gradle.plugin.injector.BaseInjector
 import com.qihoo360.replugin.gradle.plugin.inner.CommonData
+import com.qihoo360.replugin.gradle.plugin.inner.InjectHistory
 import com.qihoo360.replugin.gradle.plugin.manifest.ManifestAPI
 import javassist.CannotCompileException
 import javassist.ClassPool
@@ -77,6 +78,9 @@ public class LoaderActivityInjector extends BaseInjector {
         }
 
         println ">>> Handle $activity"
+        if (InjectHistory.contains(project, clsFilePath)) {
+            return
+        }
 
         def stream, ctCls
         try {
