@@ -86,7 +86,7 @@ public class PluginManager {
     @Deprecated
     static final void init(Context context) {
         // 初始化操作，方便后面执行任务，不必担心Handler为空的情况
-        Tasks.init();
+        // Tasks.init();
         //
         sUid = android.os.Process.myUid();
 
