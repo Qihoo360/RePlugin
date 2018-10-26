@@ -185,12 +185,9 @@ public class PluginNativeLibsHelper {
     }
 
     private static String findSoPathWithAbiList(Set<String> soPaths, String soName, String[] supportAbis) {
-        Arrays.sort(supportAbis);
-        for (String soPath : soPaths) {
-            String abi = soPath.replaceFirst("lib/", "");
-            abi = abi.replace("/" + soName, "");
-
-            if (!TextUtils.isEmpty(abi) && Arrays.binarySearch(supportAbis, abi) >= 0) {
+        for (String abi : supportAbis) {
+            String soPath = "lib/" + abi + "/" + soName;
+            if (soPaths.contains(soPath)) {
                 return soPath;
             }
         }
