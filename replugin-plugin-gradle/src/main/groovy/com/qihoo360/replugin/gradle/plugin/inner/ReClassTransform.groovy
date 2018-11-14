@@ -240,6 +240,10 @@ public class ReClassTransform extends Transform {
             jar = new File(jarPath)
         }
 
+        if(!jar.exists()){
+            return
+        }
+
         String destName = input.name
         def hexName = DigestUtils.md5Hex(jar.absolutePath)
         if (destName.endsWith('.jar')) {
