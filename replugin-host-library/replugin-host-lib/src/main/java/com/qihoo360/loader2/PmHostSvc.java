@@ -177,9 +177,7 @@ class PmHostSvc extends IPluginHost.Stub {
 
     @Override
     public IPluginClient startPluginProcess(String plugin, int process, PluginBinderInfo info) throws RemoteException {
-        synchronized (this) {
-            return mPluginMgr.startPluginProcessLocked(plugin, process, info);
-        }
+        return mPluginMgr.startPluginProcessLocked(plugin, process, info);
     }
 
     @Override
@@ -340,7 +338,6 @@ class PmHostSvc extends IPluginHost.Stub {
             syncInstalledPluginInfo2All(pi);
 
         }
-
         return pi;
     }
 
@@ -484,26 +481,25 @@ class PmHostSvc extends IPluginHost.Stub {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "sendIntent2Process target=" + target + " intent=" + intent);
         }
-
         if (TextUtils.equals(target, IPC.getPluginHostProcessName())) {
-            intent.setExtrasClassLoader(getClass().getClassLoader());
-            if (sync) {
-                LocalBroadcastHelper.sendBroadcastSyncUi(mContext, intent);
-            } else {
-                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-            }
+            sendIntent2PluginHostProcess(intent, sync);
             return;
         }
 
         if (TextUtils.isEmpty(target)) {
-            intent.setExtrasClassLoader(getClass().getClassLoader());
-            if (sync) {
-                LocalBroadcastHelper.sendBroadcastSyncUi(mContext, intent);
-            } else {
-                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-            }
+            sendIntent2PluginHostProcess(intent, sync);
         }
+
         PluginProcessMain.sendIntent2Process(target, intent, sync);
+    }
+
+    private void sendIntent2PluginHostProcess(Intent intent, boolean sync) {
+        intent.setExtrasClassLoader(getClass().getClassLoader());
+        if (sync) {
+            LocalBroadcastHelper.sendBroadcastSyncUi(mContext, intent);
+        } else {
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        }
     }
 
     @Override

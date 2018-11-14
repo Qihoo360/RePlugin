@@ -66,6 +66,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 
@@ -915,6 +916,8 @@ public class RePlugin {
 
         static boolean sAttached;
 
+        static AtomicBoolean sCreated = new AtomicBoolean(false);
+
         /**
          * 当Application的attachBaseContext调用时需调用此方法 <p>
          * 使用插件框架默认的方案
@@ -995,6 +998,10 @@ public class RePlugin {
         public static void onCreate() {
             if (!sAttached) {
                 throw new IllegalStateException();
+            }
+
+            if (!sCreated.compareAndSet(false, true)) {
+                return;
             }
 
             Tasks.init();
