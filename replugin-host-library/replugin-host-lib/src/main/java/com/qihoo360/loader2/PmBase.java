@@ -174,6 +174,34 @@ class PmBase {
     private static final byte[] LOCKER = new byte[0];
 
     /**
+     * 广播接收器，声明为成员变量以避免重复创建
+     */
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (TextUtils.isEmpty(action)) {
+                return;
+            }
+
+            if (action.equals(intent.getAction())) {
+                PluginInfo info = intent.getParcelableExtra("obj");
+                if (info != null) {
+                    switch (action) {
+                        case ACTION_NEW_PLUGIN:
+                            // 非常驻进程上下文
+                            newPluginFound(info, intent.getBooleanExtra(RePluginConstants.KEY_PERSIST_NEED_RESTART, false));
+                            break;
+                        case ACTION_UNINSTALL_PLUGIN:
+                            pluginUninstalled(info);
+                            break;
+                    }
+                }
+            }
+        }
+    };
+
+    /**
      * 类映射
      */
     private static class DynamicClass {
@@ -619,36 +647,15 @@ class PmBase {
 
         if (!IPC.isPersistentProcess()) {
             // 由于常驻进程已经在内部做了相关的处理，此处仅需要在UI进程注册并更新即可
-            registerReceiverAction(ACTION_NEW_PLUGIN);
-            registerReceiverAction(ACTION_UNINSTALL_PLUGIN);
-        }
-    }
-
-    /**
-     * @param action
-     */
-    private final void registerReceiverAction(final String action) {
-        IntentFilter filter = new IntentFilter(action);
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (action.equals(intent.getAction())) {
-                    PluginInfo info = intent.getParcelableExtra("obj");
-                    if (info != null) {
-                        switch (action) {
-                            case ACTION_NEW_PLUGIN:
-                                // 非常驻进程上下文
-                                newPluginFound(info, intent.getBooleanExtra(RePluginConstants.KEY_PERSIST_NEED_RESTART, false));
-                                break;
-                            case ACTION_UNINSTALL_PLUGIN:
-                                pluginUninstalled(info);
-                                break;
-                        }
-                    }
-                }
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(ACTION_NEW_PLUGIN);
+            intentFilter.addAction(ACTION_UNINSTALL_PLUGIN);
+            try {
+                LocalBroadcastManager.getInstance(mContext).registerReceiver(mBroadcastReceiver, intentFilter);
+            } catch (Exception e) {
+                //
             }
-        }, filter);
+        }
     }
 
     /**
