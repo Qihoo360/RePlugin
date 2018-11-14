@@ -17,6 +17,7 @@
 package com.qihoo360.loader2;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ComponentInfo;
@@ -382,12 +383,18 @@ class Loader {
     private void regReceivers() throws android.os.RemoteException {
         String plugin = mPluginObj.mInfo.getName();
 
+        Map<String, List<IntentFilter>> map = ManifestParser.INS.getReceiverFilterMap(plugin);
+
+        if (map == null || map.size() == 0) {
+            return;
+        }
+
         if (mPluginHost == null) {
             mPluginHost = getPluginHost();
         }
 
         if (mPluginHost != null) {
-            mPluginHost.regReceiver(plugin, ManifestParser.INS.getReceiverFilterMap(plugin));
+            mPluginHost.regReceiver(plugin, map);
         }
     }
 
