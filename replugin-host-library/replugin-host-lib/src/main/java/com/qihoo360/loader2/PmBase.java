@@ -308,7 +308,7 @@ class PmBase {
 
         mHostSvc = new PmHostSvc(mContext, this);
         PluginProcessMain.installHost(mHostSvc);
-        PluginProcessMain.schedulePluginProcessLoop(PluginProcessMain.CHECK_STAGE1_DELAY);
+        StubProcessManager.schedulePluginProcessLoop(StubProcessManager.CHECK_STAGE1_DELAY);
 
         // 兼容即将废弃的p-n方案 by Jiongxuan Zhang
         mAll = new Builder.PxAll();
@@ -1224,7 +1224,7 @@ class PmBase {
         }
 
         //
-        PluginProcessMain.schedulePluginProcessLoop(PluginProcessMain.CHECK_STAGE1_DELAY);
+        StubProcessManager.schedulePluginProcessLoop(StubProcessManager.CHECK_STAGE1_DELAY);
 
         // 获取
         IPluginClient client = PluginProcessMain.probePluginClient(plugin, process, info);
@@ -1247,7 +1247,7 @@ class PmBase {
                 LogRelease.e(PLUGIN_TAG, "a.p.p: " + e.getMessage(), e);
             }
         }
-        // 分配的坑位不属于UI、和自定义进程，就返回。
+        // 分配的坑位不属于UI、自定义进程或Stub坑位进程，就返回。（没找到有效进程）
         if (!(index == IPluginManager.PROCESS_UI
                 || PluginProcessHost.isCustomPluginProcess(index)
                 || PluginManager.isPluginProcess(index))) {
