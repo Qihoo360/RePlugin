@@ -479,7 +479,7 @@ public class PluginProcessMain {
                         continue;
                     }
 
-                /* 是否是用户自定义进程 */
+                    /* 是否是用户自定义进程 */
                 } else if (PluginProcessHost.isCustomPluginProcess(process)) {
                     if (!TextUtils.equals(r.plugin, getProcessStringByIndex(process))) {
                         continue;
@@ -543,6 +543,7 @@ public class PluginProcessMain {
      * @param intent
      */
     static final void sendIntent2Process(String target, Intent intent, boolean sync) {
+        Map<String, ProcessClientRecord> map = new HashMap<>();
         synchronized (PROCESSES) {
             for (ProcessClientRecord r : ALL.values()) {
                 if (target == null || target.length() <= 0) {
@@ -555,20 +556,24 @@ public class PluginProcessMain {
                 if (!isBinderAlive(r)) {
                     continue;
                 }
+                map.put(r.name, r);
+            }
+        }
+
+        for (ProcessClientRecord r : map.values()) {
+            if (!isBinderAlive(r)) {
+                continue;
+            }
+            try {
                 if (LOG) {
                     LogDebug.d(PLUGIN_TAG, "sendIntent2Process name=" + r.name);
                 }
-                try {
-                    if (sync) {
-                        r.client.sendIntentSync(intent);
-                    } else {
-                        r.client.sendIntent(intent);
-                    }
-                } catch (Throwable e) {
-                    if (LOGR) {
-                        LogRelease.e(PLUGIN_TAG, "s.i2pr e: n=" + r.name + ": " + e.getMessage(), e);
-                    }
+                if (sync) {
+                    r.client.sendIntentSync(intent);
+                } else {
+                    r.client.sendIntent(intent);
                 }
+            } catch (Throwable e) {
             }
         }
     }
@@ -581,6 +586,7 @@ public class PluginProcessMain {
         if (target == null || target.length() <= 0) {
             return;
         }
+        Map<String, ProcessClientRecord> map = new HashMap<>();
         synchronized (PROCESSES) {
             for (ProcessClientRecord r : ALL.values()) {
                 if (TextUtils.equals(r.plugin, target)) {
@@ -591,16 +597,22 @@ public class PluginProcessMain {
                 if (!isBinderAlive(r)) {
                     continue;
                 }
-                try {
-                    if (sync) {
-                        r.client.sendIntentSync(intent);
-                    } else {
-                        r.client.sendIntent(intent);
-                    }
-                } catch (Throwable e) {
-                    if (LOGR) {
-                        LogRelease.e(PLUGIN_TAG, "s.i2pl e: " + e.getMessage(), e);
-                    }
+                map.put(r.name, r);
+            }
+        }
+        for (ProcessClientRecord r : map.values()) {
+            if (!isBinderAlive(r)) {
+                continue;
+            }
+            try {
+                if (sync) {
+                    r.client.sendIntentSync(intent);
+                } else {
+                    r.client.sendIntent(intent);
+                }
+            } catch (Throwable e) {
+                if (LOGR) {
+                    LogRelease.e(PLUGIN_TAG, "s.i2pl e: " + e.getMessage(), e);
                 }
             }
         }
@@ -660,11 +672,11 @@ public class PluginProcessMain {
     }
 
     /**
-     * @deprecated 待优化
-     * 插件进程调度
      * @param plugin
      * @param process
      * @return
+     * @deprecated 待优化
+     * 插件进程调度
      */
     @Deprecated
     static final int allocProcess(String plugin, int process) {
@@ -691,6 +703,7 @@ public class PluginProcessMain {
 
     /**
      * 常驻进程调用
+     *
      * @param pid
      * @param process
      * @param index
@@ -863,9 +876,9 @@ public class PluginProcessMain {
     }
 
     /**
-     * @deprecated 待优化
      * @param plugin
      * @return
+     * @deprecated 待优化
      */
     @Deprecated
     private static final int allocProcessLocked(String plugin) {
@@ -942,7 +955,7 @@ public class PluginProcessMain {
                     LogDebug.d(PLUGIN_TAG, "alloc plugin process: found stoped plugin process: index=" + r.index);
                     LogDebug.i(PLUGIN_TAG, "stoped st=" + r.state + " i=" + r.index + " orig.p=" + r.plugin);
                 }
-               // 标记为分配状态
+                // 标记为分配状态
                 r.allocate(plugin);
                 // 确保进程为空
                 int pid = lookupPluginProcess(processes, r.index);
