@@ -653,7 +653,9 @@ class PmBase {
             try {
                 LocalBroadcastManager.getInstance(mContext).registerReceiver(mBroadcastReceiver, intentFilter);
             } catch (Exception e) {
-                //
+                if (LOGR) {
+                    LogRelease.e(PLUGIN_TAG, "p m hlc a r e: " + e.getMessage(), e);
+                }
             }
         }
     }
