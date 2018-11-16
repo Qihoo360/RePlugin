@@ -1,0 +1,194 @@
+// utilities
+
+def static replaceVariables(File file, String key, String value) {
+    if(!file.exists()) return
+    def regex = '\\$\\{' + key + '\\}'
+    file.write((file.text =~ /${regex}/).replaceAll(value))
+}
+
+def isAndroid(){ return project.hasProperty("android"); }
+
+def getPropertySafe(name, defaultValue = ''){
+	if(hasProperty(name) && getProperty(name).trim() != '') return getProperty(name)
+	return defaultValue
+}
+
+def getPropertyExt(name, defaultValue = ''){
+    if ( project.ext.has(name) && project.ext[name] != null ) return project.ext[name]
+    return getPropertySafe(name, defaultValue)
+}
+
+// def pbHelp(){
+// 	println(">>> Please make sure MUST-HVAE Properties defined in 'project.ext' or gradle.properties."
+// 		+ "\ne.g.: " 
+// 		+ "\n PB_USER = hyongbai"
+// 		+ "\n PB_ARTIFACT_ID = HelloWorld"
+// 	)
+// }
+
+def pbUpdateVariables(){
+    [
+        "src/main/groovy/com/qihoo360/replugin/gradle/host/AppConstant.groovy",
+        "src/main/groovy/com/qihoo360/replugin/gradle/plugin/AppConstant.groovy"
+    ].forEach { replaceVariables(project.file(it), "RP_VERSION", version) }
+}
+
+// pbHelp()
+
+///// CONFIG
+
+apply from: "${buildscript.sourceFile.parent}/rp-config.gradle"
+
+group = getPropertyExt('RP_GROUP')
+
+version = getPropertyExt('RP_VERSION')
+
+def pbArtifactId = getPropertyExt('RP_ARTIFACT_ID')
+
+pbUpdateVariables()
+
+//
+
+def pbUser = getPropertyExt('RP_USER')
+
+def pbRepo = getPropertyExt('RP_REPO', 'maven')
+
+def pbEmail = getPropertyExt('RP_EMAIL', pbUser)
+
+def pbUserId = getPropertyExt('RP_USER_ID', pbUser)
+
+def pbBintayKey = getPropertyExt('RP_BINTRAY_KEY', System.getenv('RP_BINTRAY_KEY'))
+
+//
+
+def pbDesc = getPropertyExt('RP_DESC', 'DONT BE EVIL')
+
+def pbLicense = getPropertyExt('RP_LICENSES_NAME', 'The Apache Software License, Version 2.0')
+
+def pbLicenseUrl = getPropertyExt('RP_LICENSES_URL', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
+
+//
+
+def pbSiteUrl = getPropertyExt('RP_SITE', "https://github.com")
+
+def pbGitUrl = getPropertyExt('RP_GIT_URL', pbSiteUrl)
+
+def pbIssueUrl = getPropertyExt('RP_ISSUE_URL', pbSiteUrl)
+
+println(
+	">>>「publish.gradle」 CONFIGURATIONS:"
+    + "\n ${group}:${pbArtifactId}:${version}"
+    + "\n ${pbDesc}"
+    + "\n Android = ${project.hasProperty("android")}"
+    + "\n pbUser = ${pbUser}:${pbEmail}"
+	+ "\n pbSite = ${pbSiteUrl}"
+	+ "\n pbGitUrl = ${pbGitUrl}"
+	+ "\n pbIssueUrl = ${pbIssueUrl}"
+    + "\n License = ${pbLicense}(${pbLicenseUrl})"
+	+ "\n pbBintayKey = ${pbBintayKey}"
+)
+
+//// task
+
+if (isAndroid()) { // Android libraries
+    task sourcesJar(overwrite: true, type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.java.srcDirs
+    }
+    task javadoc(overwrite: true, type: Javadoc) {
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    }
+} else { // Java libraries
+    task sourcesJar(overwrite: true, type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+}
+
+task javadocJar(overwrite: true, type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    // archives javadocJar
+    archives sourcesJar
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+/////// publish to BINTRAY
+
+apply plugin: 'com.jfrog.bintray'
+if (isAndroid()) {
+    apply plugin: 'com.github.dcendents.android-maven'
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name pbArtifactId
+                url pbSiteUrl
+                licenses {
+                    license {
+                        name pbLicense
+                        url pbLicenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                        id pbUser
+                        name pbUserId
+                        email pbEmail
+                    }
+                }
+                scm {
+                    connection pbGitUrl
+                    developerConnection pbGitUrl
+                    url pbSiteUrl
+                }
+            }
+        }
+    }
+}
+
+// config bintray
+
+if ( pbBintayKey == null ){
+	System.err.println("bintray access key is EMPTY!!!")
+} else {
+	bintray {
+	    user = pbUser
+	    key = pbBintayKey
+	    configurations = ['archives']
+	    pkg {
+            desc = pbDesc
+	        repo = pbRepo
+	        name = pbArtifactId
+	        vcsUrl = pbGitUrl
+            userOrg = 'qihoo360'
+	        websiteUrl = pbSiteUrl
+	    	issueTrackerUrl = pbIssueUrl
+	        licenses = [pbLicense]
+	        publish = true
+	    }
+	}
+}
+
+/////// publish to LOCAL
+
+// apply plugin: 'maven'
+
+// uploadArchives {
+//     repositories.mavenDeployer {
+//         repository(url: "file://${System.getenv('HOME')}/.m2")
+//         pom.groupId = group
+//         pom.version = version
+//         pom.artifactId = pbArtifactId
+//     }
+// }

@@ -30,6 +30,7 @@ buildscript {
         jcenter()
         mavenCentral()
     }
+
     dependencies {
 //        classpath 'com.android.tools.build:gradle:2.1.0'
         // 将项目发布到JCenter 所需要的jar   添加依赖
@@ -37,14 +38,6 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-plugin:1.2'
     }
 }
-
-group = 'com.qihoo360.replugin'  // 组名
-String classPath = ".src.main.groovy.com.qihoo360.replugin.gradle.host.AppConstant".replace(".", java.io.File.separator)
-String verPath = "${project.projectDir}" + classPath + ".groovy"
-String verLine = new File(verPath).filterLine { it =~ /def static final VER =/ }
-version = "${verLine.split("\"")[1]}" // 版本
-//红色醒目打印显示版本号
-java.lang.System.err.println "version=${version}"
 
 dependencies {
     compile 'com.android.tools.build:gradle:2.1.3'
@@ -57,60 +50,7 @@ dependencies {
 
     compile 'com.google.gradle:osdetector-gradle-plugin:1.2.1'
     compile 'net.dongliu:apk-parser:2.2.0'
-    
 }
 
-
-
-if (project.hasProperty("android")) { // Android libraries
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from android.sourceSets.main.java.srcDirs
-    }
-
-    task javadoc(type: Javadoc) {
-        source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    }
-} else { // Java libraries
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-}
-
-// 强制 Java/JavaDoc 等的编码为 UTF-8
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-
-
-// add javadoc/source jar tasks as artifacts
-artifacts {
-    archives sourcesJar, javadocJar
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            if (plugins.hasPlugin('war')) {
-                from components.web
-            } else {
-                from components.java
-            }
-
-            artifact sourcesJar
-            artifact javadocJar
-        }
-    }
-}
-
-apply from: 'bintray.gradle'
-
-
+project.ext.RP_ARTIFACT_ID = 'replugin-host-gradle'
+apply from: '../rp-publish.gradle'

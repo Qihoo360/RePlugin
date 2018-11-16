@@ -19,11 +19,6 @@
  */
 apply plugin: 'com.android.library'
 
-
-version = "2.3.0"
-
-group = 'com.qihoo360.replugin'  // 组名
-
 android {
     compileSdkVersion 25
     buildToolsVersion '25.0.2'
@@ -54,4 +49,5 @@ dependencies {
     provided 'com.android.support:support-v4:25.2.0'
 }
 
-apply from: 'bintray.gradle'
+project.ext.RP_ARTIFACT_ID = 'replugin-host-lib'
+apply from: '../../rp-publish.gradle'

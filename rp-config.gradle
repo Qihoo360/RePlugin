@@ -1,0 +1,14 @@
+project.ext{
+	RP_USER = 'qihoo360'
+	RP_REPO = 'replugin'
+	//
+	RP_SITE = 'https://github.com/Qihoo360/Replugin'
+	RP_DESC = 'RePlugin - A flexible, stable, easy-to-use Android Plug-in Framework'
+	RP_EMAIL = 'replugin@gmail.com'
+	RP_GIT_URL = 'https://github.com/Qihoo360/RePlugin'
+	RP_LICENSES_URL = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+	RP_LICENSES_NAME = 'Apache-2.0'
+	//
+	RP_GROUP = 'com.qihoo360.replugin'
+	RP_VERSION = '2.3.1'
+}
