@@ -16,17 +16,15 @@
 
 package com.qihoo360.loader2;
 
-import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.qihoo360.i.IPluginManager;
-import com.qihoo360.mobilesafe.api.Tasks;
-import com.qihoo360.replugin.RePluginInternal;
-import com.qihoo360.replugin.base.AMSUtils;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.component.process.PluginProcessHost;
 import com.qihoo360.replugin.helper.LogDebug;
@@ -44,6 +42,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.MAIN_TAG;
@@ -51,179 +50,66 @@ import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
 
 /**
+ * 进程管理类
  * @author RePlugin Team
  */
 public class PluginProcessMain {
 
-    private static final int STATE_UNUSED = 0;
-
-    private static final int STATE_ALLOCATED = 1;
-
-    private static final int STATE_RUNNING = 2;
-
-//    private static final int STATE_MARKED = 3;
-
-    private static final int STATE_STOPED = 4;
-
+    public static final String TAG = PluginProcessMain.class.getSimpleName();
     /**
-     *
+     * 常驻进程使用，非常驻进程为null buyuntao
      */
     private static IPluginHost sPluginHostLocal;
 
     /**
-     *
+     * 非常驻进程使用，常驻进程为null，用于非常驻进程连接常驻进程  buyuntao
      */
     private static IPluginHost sPluginHostRemote;
-
     /**
-     *
+     * 提供binder保存功能，无其他逻辑
      */
     static HashMap<String, IBinder> sBinders = new HashMap<String, IBinder>();
-
     /**
-     * TODO 待重构 PROCESSES & ALL
-     */
-    private static final ProcessRecord PROCESSES[] = new ProcessRecord[Constant.STUB_PROCESS_COUNT];
-
-    /**
-     * TODO 待重构 PROCESSES & ALL
-     * processName -> ProcessClientRecord
+     * 当前运行的所有进程的列表（常驻进程除外）
      */
     private static final Map<String, ProcessClientRecord> ALL = new HashMap<String, ProcessClientRecord>();
-
-    static {
-        for (int i = 0; i < Constant.STUB_PROCESS_COUNT; i++) {
-            ProcessRecord r = new ProcessRecord(i, STATE_UNUSED);
-            PROCESSES[i] = r;
-        }
-    }
-
     /**
-     *
+     * ALL的读写锁，用于并发时的性能提升
      */
+    private static final ReentrantReadWriteLock PROCESS_CLIENT_LOCK = new ReentrantReadWriteLock();
     private static final Object COOKIE_LOCK = new Object();
-
-    /**
-     *
-     */
     private static boolean sPersisistCookieInitialized;
-
     /**
      * 常驻进程cookie，用来控制卫士进程组是否需要退出等
      */
     private static long sPersisistCookie;
 
-    static final int CHECK_STAGE1_DELAY = 17 * 1000;
-
-    private static final int CHECK_STAGE2_DELAY = 11 * 1000;
-
-    private static final int CHECK_STAGE3_DELAY = 3 * 1000;
-
-    private static final Runnable CHECK = new Runnable() {
-
-        @Override
-        public void run() {
-            doPluginProcessLoop();
-        }
-    };
-
-    private static final class ProcessRecord {
-
-        final int index;
-
-        int state;
-
-        long mobified;
-
-        String plugin;
-
-        int pid;
-
-        IBinder binder;
-
-        IPluginClient client;
-
-        int activities;
-
-        int services;
-
-        int binders;
-
-        ProcessRecord(int index, int state) {
-            this.index = index;
-            this.state = state;
-        }
-
-        void allocate(String plugin) {
-            this.state = STATE_ALLOCATED;
-            this.mobified = System.currentTimeMillis();
-            this.plugin = plugin;
-            this.pid = 0;
-            this.binder = null;
-            this.client = null;
-            this.activities = 0;
-            this.services = 0;
-            this.binders = 0;
-        }
-
-        void setRunning(int pid) {
-            this.state = STATE_RUNNING;
-            this.pid = pid;
-        }
-
-        void setClient(IBinder binder, IPluginClient client) {
-            this.binder = binder;
-            this.client = client;
-        }
-
-//        void setMarked() {
-//            this.state = STATE_MARKED;
-//        }
-
-        void setStoped() {
-            this.state = STATE_STOPED;
-            this.pid = 0;
-            this.binder = null;
-            this.client = null;
-        }
-
-        @Override
-        public String toString() {
-            if (LOG) {
-                return super.toString() + " {index=" + index + " state=" + state + " mobified=" + mobified + " plugin=" + plugin + " pid=" + pid + " binder=" + binder + " client=" + client
-                        + " activities=" + activities + " services=" + services + " binders=" + binders + "}";
-            }
-            return super.toString();
-        }
-    }
-
     /**
-     * 常驻进程使用
+     * 进程记录，用于进程及进程列表管理 buyuntao
      */
     private static final class ProcessClientRecord implements IBinder.DeathRecipient {
 
-        String name;
-
+        String name; //进程名称
         String plugin;
-
         int pid;
-
         int index;
-
         IBinder binder;
-
         IPluginClient client;
+        PluginManagerServer pluginManager; //单个进程的插件管理类
 
-        private final PluginManagerServer mManagerServer;
-
-        // FIXME 不建议这么传递，但为了在死亡周期中使用，不得已而为之
-        public ProcessClientRecord(PluginManagerServer pms) {
-            mManagerServer = pms;
+        public ProcessClientRecord(String process, String plugin, int pid, int index, IBinder binder, IPluginClient client, PluginManagerServer pms) {
+            this.name = process;
+            this.plugin = plugin;
+            this.pid = pid;
+            this.index = index;
+            this.binder = binder;
+            this.client = client;
+            this.pluginManager = pms;
         }
 
         @Override
         public void binderDied() {
-            handleBinderDied(this, mManagerServer);
+            handleBinderDied(this);
         }
 
         @Override
@@ -238,18 +124,6 @@ public class PluginProcessMain {
             return client;
         }
     }
-
-    static final void reportStatus() {
-        for (ProcessRecord r : PROCESSES) {
-            if (r.binder == null) {
-                continue;
-            }
-            if (LOG) {
-                LogDebug.i(PLUGIN_TAG, "i=" + r.index + " p=" + r.plugin + " a=" + r.activities + " s=" + r.services + " b=" + r.binders);
-            }
-        }
-    }
-
     static final String dump() {
 
         // 1.dump Activity映射表, service列表
@@ -324,10 +198,7 @@ public class PluginProcessMain {
                 writer.println(r);
             }
             writer.println();
-            writer.println("--- PROCESSES.length = " + PROCESSES.length + " ---");
-            for (ProcessRecord r : PROCESSES) {
-                writer.println(r);
-            }
+            StubProcessManager.dump(writer);
             writer.println();
 //            writer.println("--- USED_PLUGINS.size = " + USED_PLUGINS.size() + " ---");
 //            for (ProcessPluginInfo r : USED_PLUGINS.values()) {
@@ -360,8 +231,6 @@ public class PluginProcessMain {
      */
     static final void connectToHostSvc() {
         Context context = PMF.getApplicationContext();
-
-        //
         IBinder binder = PluginProviderStub.proxyFetchHostBinder(context);
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "host binder = " + binder);
@@ -373,11 +242,8 @@ public class PluginProcessMain {
             }
             System.exit(1);
         }
-
-        //
         try {
             binder.linkToDeath(new IBinder.DeathRecipient() {
-
                 @Override
                 public void binderDied() {
                     if (LOGR) {
@@ -430,8 +296,11 @@ public class PluginProcessMain {
         // 注册该进程信息到“插件管理进程”中
         PMF.sPluginMgr.attach();
     }
-
-    // @hide 内部框架使用
+    /**
+     * sPluginHostLocal 常驻进程使用，非常驻进程为null buyuntao
+     * sPluginHostRemote 非常驻进程使用，常驻进程为null，用于非常驻进程连接常驻进程  buyuntao
+     * @hide 内部框架使用
+     */
     public static final IPluginHost getPluginHost() {
         if (sPluginHostLocal != null) {
             return sPluginHostLocal;
@@ -471,36 +340,39 @@ public class PluginProcessMain {
      * @param info
      * @return
      */
-    static final IPluginClient probePluginClient(String plugin, int process, PluginBinderInfo info) {
-        synchronized (PROCESSES) {
-            for (ProcessClientRecord r : ALL.values()) {
-                if (process == IPluginManager.PROCESS_UI) {
-                    if (!TextUtils.equals(r.plugin, Constant.PLUGIN_NAME_UI)) {
-                        continue;
-                    }
+    static final IPluginClient probePluginClient(final String plugin, final int process, final PluginBinderInfo info) {
+        return readProcessClientLock(new Action<IPluginClient>() {
+            @Override
+            public IPluginClient call() {
+                for (ProcessClientRecord r : ALL.values()) {
+                    if (process == IPluginManager.PROCESS_UI) {
+                        if (!TextUtils.equals(r.plugin, Constant.PLUGIN_NAME_UI)) {
+                            continue;
+                        }
 
-                /* 是否是用户自定义进程 */
-                } else if (PluginProcessHost.isCustomPluginProcess(process)) {
-                    if (!TextUtils.equals(r.plugin, getProcessStringByIndex(process))) {
-                        continue;
+                        /* 是否是用户自定义进程 */
+                    } else if (PluginProcessHost.isCustomPluginProcess(process)) {
+                        if (!TextUtils.equals(r.plugin, getProcessStringByIndex(process))) {
+                            continue;
+                        }
+                    } else {
+                        if (!TextUtils.equals(r.plugin, plugin)) {
+                            continue;
+                        }
                     }
-                } else {
-                    if (!TextUtils.equals(r.plugin, plugin)) {
-                        continue;
+                    if (!isBinderAlive(r)) {
+                        return null;
                     }
+                    if (!r.binder.pingBinder()) {
+                        return null;
+                    }
+                    info.pid = r.pid;
+                    info.index = r.index;
+                    return r.client;
                 }
-                if (!isBinderAlive(r)) {
-                    return null;
-                }
-                if (!r.binder.pingBinder()) {
-                    return null;
-                }
-                info.pid = r.pid;
-                info.index = r.index;
-                return r.client;
+                return null;
             }
-        }
-        return null;
+        });
     }
 
     /**
@@ -518,153 +390,160 @@ public class PluginProcessMain {
      * @param info
      * @return
      */
-    static final IPluginClient probePluginClientByPid(int pid, PluginBinderInfo info) {
-        synchronized (PROCESSES) {
-            for (ProcessClientRecord r : ALL.values()) {
-                if (r.pid != pid) {
-                    continue;
+    static final IPluginClient probePluginClientByPid(final int pid, final PluginBinderInfo info) {
+        return readProcessClientLock(new Action<IPluginClient>() {
+            @Override
+            public IPluginClient call() {
+                for (ProcessClientRecord r : ALL.values()) {
+                    if (r.pid != pid) {
+                        continue;
+                    }
+                    if (!isBinderAlive(r)) {
+                        return null;
+                    }
+                    if (!r.binder.pingBinder()) {
+                        return null;
+                    }
+                    info.pid = r.pid;
+                    info.index = r.index;
+                    return r.client;
                 }
-                if (!isBinderAlive(r)) {
-                    return null;
-                }
-                if (!r.binder.pingBinder()) {
-                    return null;
-                }
-                info.pid = r.pid;
-                info.index = r.index;
-                return r.client;
+                return null;
             }
-        }
-        return null;
+        });
     }
 
     /**
+     * 发送intent给进程 buyuntao
      * @param target
      * @param intent
      */
-    static final void sendIntent2Process(String target, Intent intent, boolean sync) {
-        synchronized (PROCESSES) {
-            for (ProcessClientRecord r : ALL.values()) {
-                if (target == null || target.length() <= 0) {
-                    // 所有
-                } else if (TextUtils.equals(r.name, target)) {
-                    // 特定目标
-                } else {
-                    continue;
-                }
-                if (!isBinderAlive(r)) {
-                    continue;
-                }
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "sendIntent2Process name=" + r.name);
-                }
-                try {
-                    if (sync) {
-                        r.client.sendIntentSync(intent);
+    static final void sendIntent2Process(final String target, Intent intent, boolean sync) {
+        final Map<String, ProcessClientRecord> map = readProcessClientLock(new Action<Map<String, ProcessClientRecord>>() {
+            @Override
+            public Map<String, ProcessClientRecord> call() {
+                Map<String, ProcessClientRecord> map = new HashMap<>();
+                for (ProcessClientRecord r : ALL.values()) {
+                    if (TextUtils.isEmpty(target)) {
+                        // 所有
+                    } else if (TextUtils.equals(r.name, target)) {
+                        // 特定目标
                     } else {
-                        r.client.sendIntent(intent);
+                        continue;
                     }
-                } catch (Throwable e) {
-                    if (LOGR) {
-                        LogRelease.e(PLUGIN_TAG, "s.i2pr e: n=" + r.name + ": " + e.getMessage(), e);
-                    }
+                    map.put(r.name, r);
                 }
+                return map;
             }
-        }
+        });
+        sendIntent2Client(map, intent, sync);
     }
 
     /**
+     * 发送intent给指定插件 buyuntao
      * @param target
      * @param intent
      */
-    static final void sendIntent2Plugin(String target, Intent intent, boolean sync) {
-        if (target == null || target.length() <= 0) {
+    static final void sendIntent2Plugin(final String target, Intent intent, boolean sync) {
+        if (TextUtils.isEmpty(target)) {
             return;
         }
-        synchronized (PROCESSES) {
-            for (ProcessClientRecord r : ALL.values()) {
-                if (TextUtils.equals(r.plugin, target)) {
-                    // 特定目标
-                } else {
-                    continue;
-                }
-                if (!isBinderAlive(r)) {
-                    continue;
-                }
-                try {
-                    if (sync) {
-                        r.client.sendIntentSync(intent);
+        final Map<String, ProcessClientRecord> map = readProcessClientLock(new Action<Map<String, ProcessClientRecord>>() {
+            @Override
+            public Map<String, ProcessClientRecord> call() {
+                final Map<String, ProcessClientRecord> map = new HashMap<>(1 << 4);
+                for (ProcessClientRecord r : ALL.values()) {
+                    if (TextUtils.equals(r.plugin, target)) {
+                        // 特定目标
                     } else {
-                        r.client.sendIntent(intent);
+                        continue;
                     }
-                } catch (Throwable e) {
-                    if (LOGR) {
-                        LogRelease.e(PLUGIN_TAG, "s.i2pl e: " + e.getMessage(), e);
-                    }
+                    map.put(r.name, r);
+                }
+                return map;
+            }
+        });
+        sendIntent2Client(map, intent, sync);
+    }
+    /**
+     * 发送intent给进程Client buyuntao
+     * @param map
+     * @param intent
+     */
+    private static void sendIntent2Client(Map<String, ProcessClientRecord> map, Intent intent, boolean sync){
+        for (ProcessClientRecord r : map.values()) {
+            if (!isBinderAlive(r)) {
+                continue;
+            }
+            try {
+                if (sync) {
+                    r.client.sendIntentSync(intent);
+                } else {
+                    r.client.sendIntent(intent);
+                }
+            } catch (Throwable e) {
+                if (LOGR) {
+                    LogRelease.e(PLUGIN_TAG, "p.p sic e: " + e.getMessage(), e);
                 }
             }
         }
     }
 
     /**
+     * 判断进程是否存活 buyuntao
      * @param name
      * @return
      */
-    static final boolean isProcessAlive(String name) {
-        synchronized (PROCESSES) {
-            for (ProcessClientRecord r : ALL.values()) {
-                if (!TextUtils.equals(r.name, name)) {
-                    continue;
-                }
+    static final boolean isProcessAlive(final String name) {
+        if (TextUtils.isEmpty(name)){
+            return false;
+        }
+        return readProcessClientLock(new Action<Boolean>() {
+            @Override
+            public Boolean call() {
+                ProcessClientRecord r = ALL.get(name);
                 return isBinderAlive(r);
             }
-        }
-        return false;
+        });
     }
 
     private static boolean isBinderAlive(ProcessClientRecord r) {
-        if (r == null) {
-            return false;
-        }
-        if (r.binder == null || r.client == null) {
-            return false;
-        }
-        if (!r.binder.isBinderAlive()) {
-            return false;
-        }
-        return true;
+        return r != null && r.binder != null && r.client != null && r.binder.isBinderAlive();
     }
 
     static final int sumActivities() {
-        int sum = 0;
-        synchronized (PROCESSES) {
-            for (ProcessClientRecord r : ALL.values()) {
-                if (!isBinderAlive(r)) {
-                    continue;
-                }
-                int rc = 0;
-                try {
-                    rc = r.client.sumActivities();
-                    if (rc == -1) {
-                        return -1;
+        return readProcessClientLock(new Action<Integer>() {
+            @Override
+            public Integer call() {
+                int sum = 0;
+                for (ProcessClientRecord r : ALL.values()) {
+                    if (!isBinderAlive(r)) {
+                        continue;
                     }
-                    sum += rc;
-                } catch (Throwable e) {
-                    if (LOGR) {
-                        LogRelease.e(PLUGIN_TAG, "ppm.sa e: " + e.getMessage(), e);
+                    int rc = 0;
+                    try {
+                        rc = r.client.sumActivities();
+                        if (rc == -1) {
+                            return -1;
+                        }
+                        sum += rc;
+                    } catch (Throwable e) {
+                        if (LOGR) {
+                            LogRelease.e(PLUGIN_TAG, "ppm.sa e: " + e.getMessage(), e);
+                        }
                     }
                 }
+                return sum;
             }
-        }
-        return sum;
+        });
     }
 
     /**
-     * @deprecated 待优化
-     * 插件进程调度
      * @param plugin
      * @param process
      * @return
+     * @deprecated 待优化
+     * 插件进程调度
      */
     @Deprecated
     static final int allocProcess(String plugin, int process) {
@@ -683,43 +562,37 @@ public class PluginProcessMain {
             }
             return IPluginManager.PROCESS_AUTO;
         }
+        return StubProcessManager.allocProcess(plugin);
 
-        synchronized (PROCESSES) {
-            return allocProcessLocked(plugin);
-        }
     }
 
     /**
-     * 常驻进程调用
+     * 常驻进程调用,添加进程信息到进程管理列表
      * @param pid
      * @param process
      * @param index
      * @param binder
      * @param client
-     * @return
+     * @return 进程的默认插件名称（非框架内的进程返回null）
      */
     static final String attachProcess(int pid, String process, int index, IBinder binder, IPluginClient client, String def, PluginManagerServer pms) {
-        synchronized (PROCESSES) {
-            String plugin = attachProcessLocked(pid, process, index, binder, client, def);
-
-            ProcessClientRecord pr = new ProcessClientRecord(pms);
-            pr.name = process;
-            pr.plugin = plugin;
-            pr.pid = pid;
-            pr.index = index;
-            pr.binder = binder;
-            pr.client = client;
-            ALL.put(process, pr);
-            try {
-                pr.binder.linkToDeath(pr, 0);
-            } catch (Throwable e) {
-                if (LOGR) {
-                    LogRelease.e(PLUGIN_TAG, "ap l2d: " + e.getMessage(), e);
-                }
+        final String plugin = getDefaultPluginName(pid, index, binder, client, def);
+        final ProcessClientRecord pr = new ProcessClientRecord(process, plugin, pid, index, binder, client, pms);
+        try {
+            pr.binder.linkToDeath(pr, 0);
+        } catch (Throwable e) {
+            if (LOGR) {
+                LogRelease.e(PLUGIN_TAG, "ap l2d: " + e.getMessage(), e);
             }
-
-            return plugin;
         }
+        writeProcessClientLock(new Action<Void>() {
+            @Override
+            public Void call() {
+                ALL.put(pr.name, pr);
+                return null;
+            }
+        });
+        return plugin;
     }
 
     /**
@@ -731,9 +604,7 @@ public class PluginProcessMain {
      * @return
      */
     static final boolean attachActivity(int pid, int index, String plugin, String activity, String container) {
-        synchronized (PROCESSES) {
-            return regActivityLocked(pid, index, plugin, activity, container);
-        }
+        return StubProcessManager.attachActivity(pid, index, plugin, activity, container);
     }
 
     /**
@@ -745,9 +616,7 @@ public class PluginProcessMain {
      * @return
      */
     static final boolean detachActivity(int pid, int index, String plugin, String activity, String container) {
-        synchronized (PROCESSES) {
-            return unregActivityLocked(pid, index, plugin, activity, container);
-        }
+        return StubProcessManager.detachActivity(pid, index, plugin, activity, container);
     }
 
     /**
@@ -758,9 +627,7 @@ public class PluginProcessMain {
      * @return
      */
     static final boolean attachService(int pid, int index, String plugin, String service) {
-        synchronized (PROCESSES) {
-            return regServiceLocked(pid, index, plugin, service);
-        }
+        return StubProcessManager.attachService(pid, index, plugin, service);
     }
 
     /**
@@ -771,667 +638,159 @@ public class PluginProcessMain {
      * @return
      */
     static final boolean detachService(int pid, int index, String plugin, String service) {
-        synchronized (PROCESSES) {
-            return unregServiceLocked(pid, index, plugin, service);
-        }
+        return StubProcessManager.detachService(pid, index, plugin, service);
     }
 
     static final void attachBinder(int pid, IBinder binder) {
-        synchronized (PROCESSES) {
-            regBinderLocked(pid, binder);
-        }
+        StubProcessManager.attachBinder(pid, binder);
     }
 
     static final void detachBinder(int pid, IBinder binder) {
-        synchronized (PROCESSES) {
-            unregBinderLocked(pid, binder);
-        }
+        StubProcessManager.detachBinder(pid, binder);
     }
 
     static final int sumBinders(int index) {
-        synchronized (PROCESSES) {
-            return sumBindersLocked(index);
-        }
+        return StubProcessManager.sumBinders(index);
     }
 
-    static final void schedulePluginProcessLoop(long delayMillis) {
-        if (Constant.SIMPLE_QUIT_CONTROLLER) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "schedule plugin process quit check: delay=" + (delayMillis / 1000));
-            }
-            Tasks.cancelThreadTask(CHECK);
-            Tasks.postDelayed2Thread(CHECK, delayMillis);
+    //change by buyuntao
+    static final int getPidByProcessName(final String processName) {
+        if (TextUtils.isEmpty(processName)){
+            return -1;
         }
-    }
-
-    static final void cancelPluginProcessLoop() {
-        if (Constant.SIMPLE_QUIT_CONTROLLER) {
-            Tasks.cancelThreadTask(CHECK);
-        }
-    }
-
-    // Added by Jiongxuan Zhang
-    static final int getPidByProcessName(String processName) {
         // 获取的是常驻进程自己？直接返回
         if (TextUtils.equals(processName, IPC.getCurrentProcessName())) {
             return IPC.getCurrentProcessId();
         }
-
         // 在“进程列表”中寻找“线索”
-        synchronized (PROCESSES) {
-            for (ProcessClientRecord r : ALL.values()) {
-                if (!TextUtils.equals(r.name, processName)) {
-                    continue;
+        return readProcessClientLock(new Action<Integer>() {
+            @Override
+            public Integer call() {
+                ProcessClientRecord r = ALL.get(processName);
+                if (r != null && isBinderAlive(r)) {
+                    return r.pid;
                 }
-                if (!isBinderAlive(r)) {
-                    continue;
-                }
-                return r.pid;
+                return -1;
             }
-        }
-        return -1;
+        });
     }
 
     // Added by Jiongxuan Zhang
-    static final String getProcessNameByPid(int pid) {
+    static final String getProcessNameByPid(final int pid) {
         // 获取的是常驻进程自己？直接返回
         if (pid == IPC.getCurrentProcessId()) {
             return IPC.getCurrentProcessName();
         }
-
-        synchronized (PROCESSES) {
-            for (ProcessClientRecord r : ALL.values()) {
-                if (r.pid != pid) {
-                    continue;
+        return readProcessClientLock(new Action<String>() {
+            @Override
+            public String call() {
+                for (ProcessClientRecord r : ALL.values()) {
+                    if (r.pid != pid) {
+                        continue;
+                    }
+                    if (!isBinderAlive(r)) {
+                        continue;
+                    }
+                    return r.name;
                 }
-                if (!isBinderAlive(r)) {
-                    continue;
-                }
-                return r.name;
+                return null;
             }
-        }
-        return null;
+        });
     }
 
-    private static final void handleBinderDied(ProcessClientRecord p, PluginManagerServer pms) {
+    private static final void handleBinderDied(ProcessClientRecord p) {
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "plugin process has died: plugin=" + p.plugin + " index=" + p.index + " pid=" + p.pid);
         }
-        synchronized (PROCESSES) {
-            handleBinderDiedLocked(p, pms);
-        }
+        handleBinderDiedLocked(p);
     }
 
     /**
-     * @deprecated 待优化
-     * @param plugin
+     * 获取进程的默认插件名
+     * @param pid
+     * @param index
+     * @param binder
+     * @param client
+     * @param def
      * @return
      */
-    @Deprecated
-    private static final int allocProcessLocked(String plugin) {
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "alloc plugin process: plugin=" + plugin);
-        }
-
-        // 取运行列表
-        List<RunningAppProcessInfo> processes = AMSUtils.getRunningAppProcessesNoThrows(RePluginInternal.getAppContext());
-
-        // 取运行列表失败，则直接返回失败
-        if (processes == null || processes.isEmpty()) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "alloc plugin process: get running processes is empty");
-                LogDebug.i(PLUGIN_TAG, "get list exception p=" + plugin);
-            }
-            return IPluginManager.PROCESS_AUTO;
-        }
-
-        updateListLocked(processes);
-
-        // 找一个插件可能用过的进程
-        for (ProcessRecord r : PROCESSES) {
-            if (TextUtils.equals(plugin, r.plugin)) {
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "alloc plugin process: found saved plugin process: index=" + r.index + " p=" + plugin);
-                }
-                // 标记为分配状态
-                if (r.state == STATE_UNUSED || r.state == STATE_STOPED) {
-                    r.allocate(plugin);
-                    // 确保进程为空
-                    int pid = lookupPluginProcess(processes, r.index);
-                    if (pid > 0) {
-                        if (LOGR) {
-                            LogRelease.i(PLUGIN_TAG, "ppr k i: " + pid);
-                        }
-                        android.os.Process.killProcess(pid);
-                        waitKilled(pid);
-                    }
-                }
-                if (LOG) {
-                    LogDebug.i(PLUGIN_TAG, "used st=" + r.state + " i=" + r.index + " p=" + plugin);
-                }
-                return r.index;
-            }
-        }
-
-        // 没有找到，则找一个空闲的
-        for (ProcessRecord r : PROCESSES) {
-            if (r.state == STATE_UNUSED) {
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "alloc plugin process: found unused plugin process: index=" + r.index);
-                    LogDebug.i(PLUGIN_TAG, "free st=" + r.state + " i=" + r.index + " p=" + plugin + " orig.p=" + r.plugin);
-                }
-                // 标记为分配状态
-                r.allocate(plugin);
-                // 确保进程为空
-                int pid = lookupPluginProcess(processes, r.index);
-                if (pid > 0) {
-                    if (LOGR) {
-                        LogRelease.i(PLUGIN_TAG, "ppr k i: " + pid);
-                    }
-                    android.os.Process.killProcess(pid);
-                    waitKilled(pid);
-                }
-                return r.index;
-            }
-        }
-
-        // 没有找到，则找一个停止的
-        for (ProcessRecord r : PROCESSES) {
-            if (r.state == STATE_STOPED) {
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "alloc plugin process: found stoped plugin process: index=" + r.index);
-                    LogDebug.i(PLUGIN_TAG, "stoped st=" + r.state + " i=" + r.index + " orig.p=" + r.plugin);
-                }
-               // 标记为分配状态
-                r.allocate(plugin);
-                // 确保进程为空
-                int pid = lookupPluginProcess(processes, r.index);
-                if (pid > 0) {
-                    if (LOGR) {
-                        LogRelease.i(PLUGIN_TAG, "ppr k i: " + pid);
-                    }
-                    android.os.Process.killProcess(pid);
-                    waitKilled(pid);
-                }
-                return r.index;
-            }
-        }
-
-        // 分配之后，一定时间如果没被使用，则需要回收
-        // 没有找到，则找一个最早分配中的，且分配了很久的
-        {
-            int i = -1;
-            long mod = Long.MAX_VALUE;
-            for (ProcessRecord r : PROCESSES) {
-                if (r.state != STATE_ALLOCATED) {
-                    continue;
-                }
-                if (r.mobified < mod) {
-                    i = r.index;
-                    mod = r.mobified;
-                }
-            }
-            if (i >= 0 && (System.currentTimeMillis() - mod > 10 * 1000)) {
-                ProcessRecord r = PROCESSES[i];
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "alloc plugin process: plugin processes maybe busy, reuse process which allocating and expired: index=" + r.index);
-                    LogDebug.i(PLUGIN_TAG, "force maybe st=" + r.state + " i=" + r.index + " orig.p=" + r.plugin);
-                }
-                //
-                r.setStoped();
-                //
-                r.allocate(plugin);
-                // 确保进程为空
-                int pid = lookupPluginProcess(processes, r.index);
-                if (pid > 0) {
-                    if (LOGR) {
-                        LogRelease.i(PLUGIN_TAG, "ppr k i: " + pid);
-                    }
-                    android.os.Process.killProcess(pid);
-                    waitKilled(pid);
-                }
-                return r.index;
-            }
-        }
-
-        // 没有找到，则找一个最先分配的组件为空的
-        {
-            int i = -1;
-            long mod = Long.MAX_VALUE;
-            for (ProcessRecord r : PROCESSES) {
-                if (r.activities > 0) {
-                    continue;
-                }
-                if (r.services > 0) {
-                    continue;
-                }
-                if (r.binders > 0) {
-                    continue;
-                }
-                if (r.mobified < mod) {
-                    i = r.index;
-                    mod = r.mobified;
-                }
-            }
-            if (i >= 0) {
-                ProcessRecord r = PROCESSES[i];
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "alloc plugin process: plugin processes busy, reuse process which components is empty: index=" + r.index);
-                }
-                if (LOGR) {
-                    LogRelease.e(PLUGIN_TAG, "ppr r & k i: " + r.pid);
-                    LogRelease.i(PLUGIN_TAG, "force empty st=" + r.state + " i=" + r.index + " orig.p=" + r.plugin);
-                }
-                //
-                android.os.Process.killProcess(r.pid);
-                waitKilled(r.pid);
-                //
-                r.setStoped();
-                //
-                r.allocate(plugin);
-                return r.index;
-            }
-        }
-
-        // 还没有找到，则强制终止一个最先分配的
-        {
-            int i = 0;
-            long mod = Long.MAX_VALUE;
-            for (ProcessRecord r : PROCESSES) {
-                if (r.mobified < mod) {
-                    i = r.index;
-                    mod = r.mobified;
-                }
-            }
-            //
-            ProcessRecord r = PROCESSES[i];
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "alloc plugin process: plugin processes busy, reuse process which earliest allocated: index=" + r.index);
-            }
-            if (LOGR) {
-                LogRelease.e(PLUGIN_TAG, "ppr r & k i: " + r.pid);
-                LogRelease.i(PLUGIN_TAG, "force earliest st=" + r.state + " i=" + r.index + " orig.p=" + r.plugin);
-            }
-            //
-            android.os.Process.killProcess(r.pid);
-            waitKilled(r.pid);
-            //
-            r.setStoped();
-            //
-            r.allocate(plugin);
-            return r.index;
-        }
-    }
-
-    private static final String attachProcessLocked(int pid, String process, int index, IBinder binder, IPluginClient client, String def) {
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "attach process: pid=" + pid + " index=" + index + " binder=" + client);
-        }
-
+    private static final String getDefaultPluginName(int pid, int index, IBinder binder, IPluginClient client, String def) {
         if (index == IPluginManager.PROCESS_UI) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "attach process: ui");
-            }
             return Constant.PLUGIN_NAME_UI;
         }
-
         /* 是否是用户自定义进程 */
         if (PluginProcessHost.isCustomPluginProcess(index)) {
             return getProcessStringByIndex(index);
         }
-
-        if (!PluginManager.isPluginProcess(index)) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "attach process: invalid index=" + index);
-            }
-            return null;
+        if (PluginManager.isPluginProcess(index)) {
+            return StubProcessManager.attachStubProcess(pid, index, binder, client, def);
         }
-
-        // 检测状态是否一致
-        ProcessRecord r = PROCESSES[index];
-        if (!TextUtils.isEmpty(def)) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "attach process: allocate now");
-            }
-            r.allocate(def);
-        }
-
-        if (r.state != STATE_ALLOCATED) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "attach process: state not allocated: state=" + r.state);
-            }
-            return null;
-        }
-
-        r.setRunning(pid);
-        r.setClient(binder, client);
-
-        return r.plugin;
+        return null;
     }
 
-    private static final boolean regActivityLocked(int pid, int index, String plugin, String activity, String container) {
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "reg activity: pid=" + pid + " index=" + index + " plugin=" + plugin + " activity=" + activity + " container=" + container);
+
+    /**
+     * 进程结束后执行操作 buyuntao
+     * @param p
+     */
+    private static final void handleBinderDiedLocked(final ProcessClientRecord p) {
+        if (p == null){
+            return;
         }
-
-        if (index < 0 || index >= PROCESSES.length) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "reg activity: invalid index=" + index);
-            }
-            return false;
-        }
-
-        ProcessRecord r = PROCESSES[index];
-        r.activities++;
-        r.mobified = System.currentTimeMillis();
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "activities=" + r.activities + " services=" + r.services + " binders=" + r.binders);
-        }
-
-        cancelPluginProcessLoop();
-
-        return true;
-    }
-
-    private static final boolean unregActivityLocked(int pid, int index, String plugin, String activity, String container) {
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "unreg activity: pid=" + pid + " index=" + index + " plugin=" + plugin + " activity=" + activity + " container=" + container);
-        }
-
-        if (index < 0 || index >= PROCESSES.length) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "unreg activity: invalid index=" + index);
-            }
-            return false;
-        }
-
-        ProcessRecord r = PROCESSES[index];
-        r.activities--;
-        r.mobified = System.currentTimeMillis();
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "activities=" + r.activities + " services=" + r.services + " binders=" + r.binders);
-        }
-
-        schedulePluginProcessLoop(CHECK_STAGE2_DELAY);
-
-        return true;
-    }
-
-    private static final boolean regServiceLocked(int pid, int index, String plugin, String service) {
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "reg service: pid=" + pid + " index=" + index + " plugin=" + plugin + " service=" + service);
-        }
-
-        if (index < 0 || index >= PROCESSES.length) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "reg service: invalid index=" + index);
-            }
-            return false;
-        }
-
-        ProcessRecord r = PROCESSES[index];
-        r.services++;
-        r.mobified = System.currentTimeMillis();
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "activities=" + r.activities + " services=" + r.services + " binders=" + r.binders);
-        }
-
-        cancelPluginProcessLoop();
-
-        return true;
-    }
-
-    private static final boolean unregServiceLocked(int pid, int index, String plugin, String service) {
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "unreg service: pid=" + pid + " index=" + index + " plugin=" + plugin + " service=" + service);
-        }
-
-        if (index < 0 || index >= PROCESSES.length) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "unreg service: invalid index=" + index);
-            }
-            return false;
-        }
-
-        ProcessRecord r = PROCESSES[index];
-        r.services--;
-        r.mobified = System.currentTimeMillis();
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "activities=" + r.activities + " services=" + r.services + " binders=" + r.binders);
-        }
-
-        schedulePluginProcessLoop(CHECK_STAGE2_DELAY);
-
-        return true;
-    }
-
-    private static final boolean regBinderLocked(int pid, IBinder binder) {
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "reg binder: pid=" + pid + " binder=" + binder);
-        }
-
-//        // TODO 优化
-//        for (ProcessClientRecord r : ALL.values()) {
-////            if (r.xx == xx) {
-////                break;
-////            }
-//        }
-
-        // TODO 优化
-        for (ProcessRecord r : PROCESSES) {
-            if (r.pid == pid) {
-                r.binders++;
-                r.mobified = System.currentTimeMillis();
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "activities=" + r.activities + " services=" + r.services + " binders=" + r.binders);
+        writeProcessClientLock(new Action<Void>() {
+            @Override
+            public Void call() {
+                ProcessClientRecord r = ALL.get(p.name);
+                if (r == p){ //防止进程重启误判
+                    ALL.remove(r.name);
                 }
-                break;
+                return null;
             }
-        }
+        });
 
-        cancelPluginProcessLoop();
-
-        return true;
-    }
-
-    private static final boolean unregBinderLocked(int pid, IBinder binder) {
-        if (LOG) {
-            LogDebug.d(PLUGIN_TAG, "unreg binder: pid=" + pid + " binder=" + binder);
-        }
-
-//        // TODO 优化
-//        for (ProcessClientRecord r : ALL.values()) {
-////            if (r.xx == xx) {
-////                break;
-////            }
-//        }
-
-        // TODO 优化
-        for (ProcessRecord r : PROCESSES) {
-            if (r.pid == pid) {
-                r.binders--;
-                r.mobified = System.currentTimeMillis();
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "activities=" + r.activities + " services=" + r.services + " binders=" + r.binders);
-                }
-                break;
-            }
-        }
-
-        schedulePluginProcessLoop(CHECK_STAGE2_DELAY);
-
-        return true;
-    }
-
-    private static final int sumBindersLocked(int index) {
-        for (ProcessRecord r : PROCESSES) {
-            if (r.index == index) {
-                return r.binders;
-            }
-        }
-        return -1;
-    }
-
-    private static final void doPluginProcessLoop() {
-        if (Constant.SIMPLE_QUIT_CONTROLLER) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "do plugin process quit check");
-            }
-            synchronized (PROCESSES) {
-                for (ProcessRecord r : PROCESSES) {
-                    if (r.state != STATE_RUNNING) {
-                        continue;
-                    }
-                    if (r.activities > 0) {
-                        continue;
-                    }
-                    if (r.services > 0) {
-                        continue;
-                    }
-                    if (r.binders > 0) {
-                        continue;
-                    }
-                    if (LOGR) {
-                        // terminate empty process
-                        LogRelease.i(PLUGIN_TAG, "t e p " + r.pid);
-                    }
-                    //
-                    android.os.Process.killProcess(r.pid);
-                    waitKilled(r.pid);
-                    r.setStoped();
-                    //
-                    schedulePluginProcessLoop(CHECK_STAGE3_DELAY);
-                    return;
-                }
-            }
-        }
-    }
-
-    private static final void updateListLocked(List<RunningAppProcessInfo> processes) {
-        /* TODO 待完善
-        // 标记所有
-        for (ProcessRecord r : PROCESSES) {
-            if (r.state == STATE_RUNNING) {
-                r.setMarked();
-            }
-        }
-        for (ProcessPluginInfo r : USED_PLUGINS.values()) {
-            if (r.state == STATE_RUNNING) {
-                r.setMarked();
-            }
-        }
-
-        // 遍历设置状态
-        for (RunningAppProcessInfo info : processes) {
-            if (info.uid != PluginManager.sUid) {
-                continue;
-            }
-            //
-            ProcessPluginInfo pi = USED_PLUGINS.get(info.processName);
-            if (pi != null && pi.pid == info.pid) {
-                pi.setRunning();
-            }
-            //
-            int index = PluginManager.evalPluginProcess(info.processName);
-            if (!PluginManager.isPluginProcess(index)) {
-                continue;
-            }
-            //
-            ProcessRecord r = PROCESSES[index];
-            // 状态分析
-            if (r.state == STATE_ALLOCATED) {
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "update plugin process list: plugin process started, index=" + index);
-                }
-                r.setRunning(info.pid);
-            } else if (r.state == STATE_MARKED) {
-                if (info.pid == r.pid) {
-                    if (LOG) {
-                        LogDebug.d(PLUGIN_TAG, "update plugin process list: plugin process running index=" + index);
-                    }
-                    r.setRunning(info.pid);
-                }
-            } else {
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "update plugin process list: plugin process unknown: state=" + r.state + " index=" + index);
-                }
-            }
-        }
-
-        // 标记所有
-        for (ProcessRecord r : PROCESSES) {
-            if (r.state == STATE_MARKED) {
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "update plugin process list: plugin process died, index=" + r.index);
-                }
-                r.setStoped();
-            }
-        }
-        for (ProcessPluginInfo r : USED_PLUGINS.values()) {
-            if (r.state == STATE_MARKED) {
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "update plugin process list: used plugin process died, processName=" + r.processName);
-                }
-                r.setStoped();
-            }
-        } */
-    }
-
-    private static final void waitKilled(int pid) {
-        for (int i = 0; i < 10; i++) {
-            try {
-                Thread.sleep(100, 0);
-            } catch (Throwable e) {
-                //
-            }
-            //
-            List<RunningAppProcessInfo> processes = AMSUtils.getRunningAppProcessesNoThrows(RePluginInternal.getAppContext());
-            if (processes == null || processes.isEmpty()) {
-                continue;
-            }
-            boolean found = false;
-            for (RunningAppProcessInfo info : processes) {
-                if (info.pid == pid) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                return;
-            }
-        }
-    }
-
-    private static final int lookupPluginProcess(List<RunningAppProcessInfo> processes, int index) {
-        for (RunningAppProcessInfo pi : processes) {
-            if (pi.uid != PluginManager.sUid) {
-                continue;
-            }
-            int i = PluginManager.evalPluginProcess(pi.processName);
-            if (i == index) {
-                return pi.pid;
-            }
-        }
-        return -1;
-    }
-
-    private static final void handleBinderDiedLocked(ProcessClientRecord p, PluginManagerServer pms) {
-        // TODO 优化
-        for (ProcessClientRecord r : ALL.values()) {
-            if (r == p) {
-                ALL.remove(r.name);
-                break;
-            }
-        }
-
-        // TODO 优化
-        for (ProcessRecord r : PROCESSES) {
-            if (r.binder == p.binder) {
-                r.setStoped();
-                break;
-            }
-        }
+        StubProcessManager.setProcessStop(p.binder);
 
         // 通知 PluginManagerServer 客户端进程链接已断开
-        pms.onClientProcessKilled(p.name);
+        p.pluginManager.onClientProcessKilled(p.name);
+    }
+
+    ///
+
+    private static <T> T writeProcessClientLock(@NonNull final Action<T> action) {
+        final long start = System.currentTimeMillis();
+//        final String stack = OptUtil.stack2Str(Thread.currentThread().getStackTrace()[3]);
+        try {
+            PROCESS_CLIENT_LOCK.writeLock().lock();
+            if (LogDebug.LOG) {
+                Log.d(TAG, String.format("%s(%sms@%s) WRITING", Thread.currentThread().getStackTrace()[3], System.currentTimeMillis() - start, Thread.currentThread()));
+            }
+            return action.call();
+        } finally {
+            PROCESS_CLIENT_LOCK.writeLock().unlock();
+            if (LogDebug.LOG) {
+                Log.d(TAG, String.format("%s(%sms@%s) WRITING DONE", Thread.currentThread().getStackTrace()[3], System.currentTimeMillis() - start, Thread.currentThread()));
+            }
+        }
+    }
+
+    private static <T> T readProcessClientLock(@NonNull final Action<T> action) {
+        final long start = System.currentTimeMillis();
+//        final String stack = OptUtil.stack2Str(Thread.currentThread().getStackTrace()[3]);
+        try {
+            PROCESS_CLIENT_LOCK.readLock().lock();
+            if (LogDebug.LOG) {
+                Log.d(TAG, String.format("%s(%sms@%s) READING", Thread.currentThread().getStackTrace()[3], System.currentTimeMillis() - start, Thread.currentThread()));
+            }
+            return action.call();
+        } finally {
+            PROCESS_CLIENT_LOCK.readLock().unlock();
+            if (LogDebug.LOG) {
+                Log.d(TAG, String.format("%s(%sms@%s) READING DONE", Thread.currentThread().getStackTrace()[3], System.currentTimeMillis() - start, Thread.currentThread()));
+            }
+        }
+    }
+
+    private interface Action<T> {
+        T call();
     }
 }

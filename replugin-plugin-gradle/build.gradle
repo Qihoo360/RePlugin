@@ -112,4 +112,5 @@ publishing {
     }
 }
 
-apply from: 'bintray.gradle'
+project.ext.RP_ARTIFACT_ID = 'replugin-plugin-gradle'
+apply from: '../rp-publish.gradle'

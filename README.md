@@ -5,9 +5,10 @@
 </p>
 
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
-[![Release Version](https://img.shields.io/badge/release-2.2.4-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
+[![Release Version](https://img.shields.io/badge/release-2.3.1-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
 
-
+## 活动通知
+移动技术最新活动通知：9月1号360移动技术开放日 http://t.cn/RDiNru9
 
 ## RePlugin —— A flexible, stable, easy-to-use Android Plug-in Framework
 
@@ -54,6 +55,9 @@ At present, almost **all Apps with hundreds of millions users from 360, and many
 
 ## Our Vision
 Make RePlugin be used in all kinds of ordinary Apps; and provide stable, flexible, liberal plug-ins which adopt for both large and small projects.
+
+## Latest features
+Solved the Android P (Android 9.0) related adaptation issues, fully support the official version of Android P (Android 9.0).
 
 ## RePlugin Architecture
 

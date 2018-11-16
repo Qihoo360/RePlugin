@@ -6,7 +6,7 @@
 
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
 
-[![Release Version](https://img.shields.io/badge/release-2.2.4-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
+[![Release Version](https://img.shields.io/badge/release-2.3.1-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
 
 
 
@@ -56,6 +56,10 @@ RePlugin是一套完整的、稳定的、适合全面使用的，占坑类插件
 ## 愿景
 
 让插件化能**飞入寻常应用家**，做到稳定、灵活、自由，大小项目兼用。
+
+## 最新特性
+
+解决了Android P（Android 9.0）相关适配问题，全面支持Android P（Android 9.0）正式版。
 
 ## RePlugin 架构图
 
