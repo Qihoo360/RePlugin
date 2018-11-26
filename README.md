@@ -8,7 +8,9 @@
 [![Release Version](https://img.shields.io/badge/release-2.3.1-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
 
 ## 活动通知
-移动技术最新活动通知：9月1号360移动技术开放日 http://t.cn/RDiNru9
+移动技术最新活动通知：
+2018年12月16日，360正式开源重量级移动性能监控产品ArgusAPM，同时将会有360、美团技术大牛为大家分享Android、iOS性能监控实践。
+欢迎报名参加，戳戳戳!!!-->https://mp.weixin.qq.com/s/-7DCnXI_EBMBwYG_PUuUDg
 
 ## RePlugin —— A flexible, stable, easy-to-use Android Plug-in Framework
 
