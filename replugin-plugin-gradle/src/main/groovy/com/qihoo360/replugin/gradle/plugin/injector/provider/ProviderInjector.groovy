@@ -36,12 +36,13 @@ public class ProviderInjector extends BaseInjector {
                                            'bulkInsert',
                                            'delete',
                                            'update',
-                                           'openInputStream',
-                                           'openOutputStream',
-                                           'openFileDescriptor',
-                                           'registerContentObserver',
-                                           'acquireContentProviderClient',
-                                           'notifyChange',
+            /// 以下方法 replugin 暂未支持，导致字节码修改失败。
+//                                           'openInputStream',
+//                                           'openOutputStream',
+//                                           'openFileDescriptor',
+//                                           'registerContentObserver',
+//                                           'acquireContentProviderClient',
+//                                           'notifyChange',
     ]
 
     // 表达式编辑器
@@ -86,11 +87,8 @@ public class ProviderInjector extends BaseInjector {
                     }
 
                     editor.filePath = filePath
-                    ctCls.getDeclaredMethods().each {
-                        it.instrument(editor)
-                    }
 
-                    ctCls.getMethods().each {
+                    (ctCls.getDeclaredMethods() + ctCls.getMethods()).each {
                         it.instrument(editor)
                     }
 
