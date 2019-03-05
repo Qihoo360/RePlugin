@@ -22,8 +22,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 28
 
     defaultConfig {
         versionName "1.1"
@@ -66,10 +65,10 @@ repluginPluginConfig {
 }
 
 dependencies {
-    compile "com.qihoo360.replugin:replugin-plugin-lib:${RP_VERSION}"
-    provided files('libs/fragment.jar')//这个jar就是从Support-fragment中提取出来的并非特制包目的是为了骗过编译期
-    provided files('libs/common-utils-lib-1.0.0.jar')//这个jar就是从Host的utils中编译生成的，其目的是为了骗过编译期
-    compile(name: 'plugin-library', ext: 'aar')//sample:compile aar
+    implementation "com.qihoo360.replugin:replugin-plugin-lib:${RP_VERSION}"
+    compileOnly files('libs/fragment.jar')//这个jar就是从Support-fragment中提取出来的并非特制包目的是为了骗过编译期
+    compileOnly files('libs/common-utils-lib-1.0.0.jar')//这个jar就是从Host的utils中编译生成的，其目的是为了骗过编译期
+    implementation(name: 'plugin-library', ext: 'aar')//sample:compile aar
 
 }
 

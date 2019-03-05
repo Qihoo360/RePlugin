@@ -18,17 +18,23 @@ buildscript {
     repositories {
         mavenLocal()
         jcenter()
+		maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.3.1'
         classpath "com.qihoo360.replugin:replugin-host-gradle:${RP_VERSION}"
     }
+
+    System.out.println("RP_VERSION=${RP_VERSION}")
 }
 
 allprojects {
     repositories {
         mavenLocal()
         jcenter()
+		maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        google()
     }
 }
 

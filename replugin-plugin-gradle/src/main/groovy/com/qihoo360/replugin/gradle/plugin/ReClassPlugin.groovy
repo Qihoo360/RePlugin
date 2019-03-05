@@ -22,6 +22,7 @@ import com.android.build.gradle.AppPlugin
 import com.qihoo360.replugin.gradle.plugin.debugger.PluginDebugger
 import com.qihoo360.replugin.gradle.plugin.inner.CommonData
 import com.qihoo360.replugin.gradle.plugin.inner.ReClassTransform
+import com.qihoo360.replugin.gradle.plugin.util.GradleCompat
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -55,7 +56,7 @@ public class ReClassPlugin implements Plugin<Project> {
                 def variantData = variant.variantData
                 def scope = variantData.scope
 
-                def assembleTask = variant.getAssemble()
+                def assembleTask = GradleCompat.getAssemble(variant)
 
                 def installPluginTaskName = scope.getTaskName(AppConstant.TASK_INSTALL_PLUGIN, "")
                 def installPluginTask = project.task(installPluginTaskName)
