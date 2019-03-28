@@ -32,15 +32,18 @@ public class ProviderExprEditor extends ExprEditor {
 
     @Override
     void edit(MethodCall m) throws CannotCompileException {
-        String clsName = m.getClassName()
-        String methodName = m.getMethodName()
-
-        if (clsName.equalsIgnoreCase('android.content.ContentResolver')) {
-            if (!(methodName in ProviderInjector.includeMethodCall)) {
-                // println "跳过$methodName"
-                return
-            }
+        final String clsName = m.getClassName()
+        final String methodName = m.getMethodName()
+        if (!clsName.equalsIgnoreCase('android.content.ContentResolver')) {
+            return
+        }
+        if (!(methodName in ProviderInjector.includeMethodCall)) { // println "跳过$methodName"
+            return
+        }
+        try {
             replaceStatement(m, methodName, m.lineNumber)
+        } catch (Exception e) { //确保不影响其他 MethodCall
+            println "    [Warning] --> ProviderExprEditor : ${e.toString()}"
         }
     }
 

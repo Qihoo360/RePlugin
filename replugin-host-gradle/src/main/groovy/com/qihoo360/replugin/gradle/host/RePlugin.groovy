@@ -72,8 +72,7 @@ public class Replugin implements Plugin<Project> {
                 generateHostConfigTask.group = AppConstant.TASKS_GROUP
 
                 //depends on build config task
-                String generateBuildConfigTaskName = variant.getVariantData().getScope().getGenerateBuildConfigTask().name
-                def generateBuildConfigTask = project.tasks.getByName(generateBuildConfigTaskName)
+                def generateBuildConfigTask = variant.getGenerateBuildConfig()
                 if (generateBuildConfigTask) {
                     generateHostConfigTask.dependsOn generateBuildConfigTask
                     generateBuildConfigTask.finalizedBy generateHostConfigTask
@@ -89,8 +88,7 @@ public class Replugin implements Plugin<Project> {
                 generateBuiltinJsonTask.group = AppConstant.TASKS_GROUP
 
                 //depends on mergeAssets Task
-                String mergeAssetsTaskName = variant.getVariantData().getScope().getMergeAssetsTask().name
-                def mergeAssetsTask = project.tasks.getByName(mergeAssetsTaskName)
+                def mergeAssetsTask = variant.getMergeAssets()
                 if (mergeAssetsTask) {
                     generateBuiltinJsonTask.dependsOn mergeAssetsTask
                     mergeAssetsTask.finalizedBy generateBuiltinJsonTask
@@ -151,10 +149,8 @@ public class Replugin implements Plugin<Project> {
         }
         showPluginsTask.group = AppConstant.TASKS_GROUP
 
-        //get mergeAssetsTask name
-        String mergeAssetsTaskName = variant.getVariantData().getScope().getMergeAssetsTask().name
-        //get real gradle task
-        def mergeAssetsTask = project.tasks.getByName(mergeAssetsTaskName)
+        //get mergeAssetsTask name, get real gradle task
+        def mergeAssetsTask = variant.getMergeAssets()
 
         //depend on mergeAssetsTask so that assets have been merged
         if (mergeAssetsTask) {

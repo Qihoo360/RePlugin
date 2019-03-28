@@ -183,12 +183,12 @@ if ( pbBintayKey == null ){
 /////// publish to LOCAL
 
 // apply plugin: 'maven'
-
-// uploadArchives {
-//     repositories.mavenDeployer {
-//         repository(url: "file://${System.getenv('HOME')}/.m2")
-//         pom.groupId = group
-//         pom.version = version
-//         pom.artifactId = pbArtifactId
-//     }
-// }
+//final def theGroup = group // group will be reset to 'upload'
+//uploadArchives {
+//    repositories.mavenDeployer {
+//        repository(url: "file://${System.getenv('HOME')}/.m2/repository")
+//        pom.groupId = theGroup
+//        pom.version = version
+//        pom.artifactId = pbArtifactId
+//    }
+//}

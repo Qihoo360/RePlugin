@@ -265,8 +265,5 @@ public class LogDebug {
      */
     public static final String MISC_TAG = "ws002";
 
-    /**
-     * createClassLoader TAG
-     */
     public static final String LOADER_TAG = "createClassLoader";
 }

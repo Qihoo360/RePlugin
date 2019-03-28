@@ -35,22 +35,19 @@ import com.qihoo360.loader2.V5FileInfo;
 import com.qihoo360.loader2.VMRuntimeCompat;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginInternal;
-import com.qihoo360.replugin.helper.JSONHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.utils.FileUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,9 +105,23 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @deprecated 只用于旧的P-n插件，可能会废弃
      */
     public static final int FRAMEWORK_VERSION_UNKNOWN = 0;
+    public static final String PI_PKGNAME = "pkgname"; // √
+    public static final String PI_ALI = "ali"; // √
+    public static final String PI_LOW = "low"; // √
+    public static final String PI_HIGH = "high"; // √
+    public static final String PI_VER = "ver"; // √
+    public static final String PI_PATH = "path";
+    public static final String PI_TYPE = "type";
+    public static final String PI_NAME = "name"; // √
+    public static final String PI_UPINFO = "upinfo";
+    public static final String PI_DELINFO = "delinfo";
+    public static final String PI_COVERINFO = "coverinfo";
+    public static final String PI_COVER = "cover";
+    public static final String PI_VERV = "verv";
+    public static final String PI_USED = "used";
+    public static final String PI_FRM_VER = "frm_ver";
 
-    private transient JSONObject mJson;
-    private String mJsonText;
+    private transient final Map<String, Object> mJson = new ConcurrentHashMap(1 << 4);
 
     // 若插件需要更新，则会有此值
     private PluginInfo mPendingUpdate;
@@ -132,11 +143,10 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     }
 
     private PluginInfo(String name, int low, int high, int ver) {
-        mJson = new JSONObject();
-        JSONHelper.putNoThrows(mJson, "name", name);
-        JSONHelper.putNoThrows(mJson, "low", low);
-        JSONHelper.putNoThrows(mJson, "high", high);
-        JSONHelper.putNoThrows(mJson, "ver", ver);
+        put(PI_NAME, name);
+        put(PI_LOW, low);
+        put(PI_HIGH, high);
+        put(PI_VER, ver);
     }
 
     private PluginInfo(String pkgName, String alias, int low, int high, int version, String path, int type) {
@@ -148,12 +158,11 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
             high = Constant.ADAPTER_COMPATIBLE_VERSION;
         }
 
-        mJson = new JSONObject();
-        JSONHelper.putNoThrows(mJson, "pkgname", pkgName);
-        JSONHelper.putNoThrows(mJson, "ali", alias);
-        JSONHelper.putNoThrows(mJson, "name", makeName(pkgName, alias));
-        JSONHelper.putNoThrows(mJson, "low", low);
-        JSONHelper.putNoThrows(mJson, "high", high);
+        put(PI_PKGNAME, pkgName);
+        put(PI_ALI, alias);
+        put(PI_NAME, makeName(pkgName, alias));
+        put(PI_LOW, low);
+        put(PI_HIGH, high);
 
         setVersion(version);
         setPath(path);
@@ -161,28 +170,31 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     }
 
     private void initPluginInfo(JSONObject jo) {
-        mJson = jo;
-
+        final Iterator<String> keys = jo.keys();
+        while (keys.hasNext()) {
+            final String k = keys.next();
+            put(k, jo.opt(k));
+        }
         // 缓存“待更新”的插件信息
-        JSONObject ujo = jo.optJSONObject("upinfo");
+        final JSONObject ujo = jo.optJSONObject(PI_UPINFO);
         if (ujo != null) {
-            mPendingUpdate = new PluginInfo(ujo);
+            setPendingUpdate(new PluginInfo(ujo));
         }
 
         // 缓存“待卸载”的插件信息
-        JSONObject djo = jo.optJSONObject("delinfo");
+        final JSONObject djo = jo.optJSONObject(PI_DELINFO);
         if (djo != null) {
-            mPendingDelete = new PluginInfo(djo);
+            setPendingDelete(new PluginInfo(djo));
         }
 
         // 缓存"待覆盖安装"的插件信息
-        JSONObject cjo = jo.optJSONObject("coverinfo");
+        final JSONObject cjo = jo.optJSONObject(PI_COVERINFO);
         if (cjo != null) {
-            mPendingCover = new PluginInfo(cjo);
+            setPendingCover(new PluginInfo(cjo));
         }
 
         // 缓存"待覆盖安装"的插件覆盖字段
-        mIsPendingCover = jo.optBoolean("cover");
+        setIsPendingCover(jo.optBoolean(PI_COVER));
     }
 
     // 通过别名和包名来最终确认插件名
@@ -259,7 +271,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
         }
 
         // 三个字段是必备的，其余均可
-        if (jo.has("pkgname") && jo.has("type") && jo.has("ver")) {
+        if (jo.has(PI_PKGNAME) && jo.has(PI_TYPE) && jo.has(PI_VER)) {
             return new PluginInfo(jo);
         } else {
             return null;
@@ -271,35 +283,35 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * （注意：旧插件"p-n"的"别名"就是插件名）
      */
     public String getName() {
-        return mJson.optString("name");
+        return get(PI_NAME, "");
     }
 
     /**
      * 获取插件包名
      */
     public String getPackageName() {
-        return mJson.optString("pkgname");
+        return get(PI_PKGNAME, "");
     }
 
     /**
      * 获取插件别名
      */
     public String getAlias() {
-        return mJson.optString("ali");
+        return get(PI_ALI, "");
     }
 
     /**
      * 获取插件的版本
      */
     public int getVersion() {
-        return mJson.optInt("ver");
+        return get(PI_VER, 0);
     }
 
     /**
      * 获取最新的插件，目前所在的位置
      */
     public String getPath() {
-        return mJson.optString("path");
+        return get(PI_PATH, "");
     }
 
     /**
@@ -307,7 +319,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * 注意：若为“纯APK”方案所用，则修改后需调用PluginInfoList.save来保存，否则会无效
      */
     public void setPath(String path) {
-        JSONHelper.putNoThrows(mJson, "path", path);
+        put(PI_PATH, path);
     }
 
     /**
@@ -325,7 +337,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
             return getParentInfo().isUsed();
         } else {
             // 若是纯APK，且不是PendingUpdate，则直接从Json中获取
-            return mJson.optBoolean("used");
+            return get(PI_USED, false);
         }
     }
 
@@ -336,14 +348,14 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @param used 插件是否被使用过
      */
     public void setIsUsed(boolean used) {
-        JSONHelper.putNoThrows(mJson, "used", used);
+        put(PI_USED, used);
     }
 
     /**
      * 获取Long型的，可用来对比的版本号
      */
     public long getVersionValue() {
-        return mJson.optLong("verv");
+        return get(PI_VERV, 0L);
     }
 
     /**
@@ -511,7 +523,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * 获取插件当前所处的类型。详细见TYPE_XXX常量
      */
     public int getType() {
-        return mJson.optInt("type");
+        return get(PI_TYPE, 0);
     }
 
     /**
@@ -519,7 +531,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * 注意：若为“纯APK”方案所用，则修改后需调用PluginInfoList.save来保存，否则会无效
      */
     public void setType(int type) {
-        JSONHelper.putNoThrows(mJson, "type", type);
+        put(PI_TYPE, type);
     }
 
     /**
@@ -549,9 +561,9 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     public void setPendingUpdate(PluginInfo info) {
         mPendingUpdate = info;
         if (info != null) {
-            JSONHelper.putNoThrows(mJson, "upinfo", info.getJSON());
+            put(PI_UPINFO, info.getJSON());
         } else {
-            mJson.remove("upinfo");
+            mJson.remove(PI_UPINFO);
         }
     }
 
@@ -582,9 +594,9 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     public void setPendingDelete(PluginInfo info) {
         mPendingDelete = info;
         if (info != null) {
-            JSONHelper.putNoThrows(mJson, "delinfo", info.getJSON());
+            put(PI_DELINFO, info.getJSON());
         } else {
-            mJson.remove("delinfo");
+            mJson.remove(PI_DELINFO);
         }
     }
 
@@ -615,9 +627,9 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     public void setPendingCover(PluginInfo info) {
         mPendingCover = info;
         if (info != null) {
-            JSONHelper.putNoThrows(mJson, "coverinfo", info.getJSON());
+            put(PI_COVERINFO, info.getJSON());
         } else {
-            mJson.remove("coverinfo");
+            mJson.remove(PI_COVERINFO);
         }
     }
 
@@ -637,10 +649,10 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      */
     public void setIsPendingCover(boolean coverInfo) {
         mIsPendingCover = coverInfo;
-        if (mIsPendingCover) {
-            JSONHelper.putNoThrows(mJson, "cover", mIsPendingCover);
+        if (coverInfo) {
+            put(PI_COVER, true);
         } else {
-            mJson.remove("cover");
+            mJson.remove(PI_COVER);
         }
     }
 
@@ -648,7 +660,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * 获取最小支持宿主API的版本
      */
     public int getLowInterfaceApi() {
-        return mJson.optInt("low", Constant.ADAPTER_COMPATIBLE_VERSION);
+        return get(PI_LOW, Constant.ADAPTER_COMPATIBLE_VERSION);
     }
 
     /**
@@ -657,7 +669,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @deprecated 可能会废弃
      */
     public int getHighInterfaceApi() {
-        return mJson.optInt("high", Constant.ADAPTER_COMPATIBLE_VERSION);
+        return get(PI_HIGH, Constant.ADAPTER_COMPATIBLE_VERSION);
     }
 
     /**
@@ -667,7 +679,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     public int getFrameworkVersion() {
         // 仅p-n插件在用
         // 之所以默认为FRAMEWORK_VERSION_UNKNOWN，是因为在这里还只是读取p-n文件头，框架版本需要在loadDex阶段获得
-        return mJson.optInt("frm_ver", FRAMEWORK_VERSION_UNKNOWN);
+        return get(PI_FRM_VER, FRAMEWORK_VERSION_UNKNOWN);
     }
 
     /**
@@ -677,7 +689,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @param version 框架版本号
      */
     public void setFrameworkVersion(int version) {
-        JSONHelper.putNoThrows(mJson, "frm_ver", version);
+        put(PI_FRM_VER, version);
     }
 
     /**
@@ -700,7 +712,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
 
     // @hide
     public JSONObject getJSON() {
-        return mJson;
+        return new JSONObject(mJson);
     }
 
     /**
@@ -756,30 +768,30 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     }
 
     static PluginInfo createByJO(JSONObject jo) {
+        if (jo == null || jo.length() == 0) return null;
         PluginInfo pi = new PluginInfo(jo);
         // 必须有包名或别名
         if (TextUtils.isEmpty(pi.getName())) {
             return null;
         }
-
         return pi;
     }
 
     private void setPackageName(String pkgName) {
         if (!TextUtils.equals(pkgName, getPackageName())) {
-            JSONHelper.putNoThrows(mJson, "pkgname", pkgName);
+            put(PI_PKGNAME, pkgName);
         }
     }
 
     private void setAlias(String alias) {
         if (!TextUtils.equals(alias, getAlias())) {
-            JSONHelper.putNoThrows(mJson, "ali", alias);
+            put(PI_ALI, alias);
         }
     }
 
     private void setVersion(int version) {
-        JSONHelper.putNoThrows(mJson, "ver", version);
-        JSONHelper.putNoThrows(mJson, "verv", buildCompareValue());
+        put(PI_VER, version);
+        put(PI_VERV, buildCompareValue());
     }
 
     // -------------------------
@@ -816,50 +828,13 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
 
     @Override
     public Object clone() {
-        PluginInfo pluginInfo = null;
-
-        // 通过 transient 和 Serializable 配合实现深拷贝
-        this.mJsonText = this.mJson != null ? this.mJson.toString() : null;
-
-        // Object -> Stream -> clone Object
         try {
-            ByteArrayOutputStream byteArrOut = new ByteArrayOutputStream();
-            ObjectOutputStream objOut = new ObjectOutputStream(byteArrOut);
-
-            objOut.writeObject(this);
-
-            ByteArrayInputStream byteArrIn = new ByteArrayInputStream(byteArrOut.toByteArray());
-            ObjectInputStream objIn = new ObjectInputStream(byteArrIn);
-
-            pluginInfo = (PluginInfo) objIn.readObject();
-
-            if (pluginInfo != null && !TextUtils.isEmpty(this.mJsonText)) {
-                pluginInfo.mJson = new JSONObject(this.mJsonText);
-
-                JSONObject ujo = pluginInfo.mJson.optJSONObject("upinfo");
-                if (ujo != null) {
-                    pluginInfo.mPendingUpdate = new PluginInfo(ujo);
-                }
-
-                JSONObject djo = pluginInfo.mJson.optJSONObject("delinfo");
-                if (djo != null) {
-                    pluginInfo.mPendingDelete = new PluginInfo(djo);
-                }
-
-                JSONObject cjo = pluginInfo.mJson.optJSONObject("coverinfo");
-                if (cjo != null) {
-                    pluginInfo.mPendingCover = new PluginInfo(cjo);
-                }
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            final String jsonText = getJSON().toString();
+            return new PluginInfo(new JSONObject(jsonText));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        return pluginInfo;
+        return null;
     }
 
     @Override
@@ -869,20 +844,16 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mJson.toString());
+        dest.writeString(getJSON().toString());
     }
 
     @Override
     public String toString() {
-        synchronized (this) {
-            StringBuilder b = new StringBuilder();
-
-            b.append("PInfo { ");
-            toContentString(b);
-            b.append(" }");
-
-            return b.toString();
-        }
+        final StringBuilder b = new StringBuilder();
+        b.append("PInfo { ");
+        toContentString(b);
+        b.append(" }");
+        return b.toString();
     }
 
     private void toContentString(StringBuilder b) {
@@ -972,7 +943,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     // -------------------------
 
     public static final String QUERY_COLUMNS[] = {
-            "name", "low", "high", "ver", "type", "v5type", "path", "v5index", "v5offset", "v5length", "v5md5"
+            PI_NAME, PI_LOW, PI_HIGH, PI_VER, PI_TYPE, "v5type", PI_PATH, "v5index", "v5offset", "v5length", "v5md5"
     };
 
     private static final Pattern REGEX;
@@ -1033,17 +1004,17 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
 
     public static final PluginInfo buildFromBuiltInJson(JSONObject jo) {
         String pkgName = jo.optString("pkg");
-        String name = jo.optString("name");
-        String assetName = jo.optString("path");
+        String name = jo.optString(PI_NAME);
+        String assetName = jo.optString(PI_PATH);
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pkgName) || TextUtils.isEmpty(assetName)) {
             if (LogDebug.LOG) {
                 LogDebug.d(TAG, "buildFromBuiltInJson: Invalid json. j=" + jo);
             }
             return null;
         }
-        int low = jo.optInt("low", Constant.ADAPTER_COMPATIBLE_VERSION);    // Low应指向最低兼容版本
-        int high = jo.optInt("high", Constant.ADAPTER_COMPATIBLE_VERSION);  // High同上
-        int ver = jo.optInt("ver");
+        int low = jo.optInt(PI_LOW, Constant.ADAPTER_COMPATIBLE_VERSION);    // Low应指向最低兼容版本
+        int high = jo.optInt(PI_HIGH, Constant.ADAPTER_COMPATIBLE_VERSION);  // High同上
+        int ver = jo.optInt(PI_VER);
         PluginInfo info = new PluginInfo(pkgName, name, low, high, ver, assetName, TYPE_BUILTIN);
 
         // 从 json 中读取 frameVersion（可选）
@@ -1083,11 +1054,11 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     private PluginInfo(String name, int low, int high, int ver, int type, int v5Type, String path, int v5index, int v5offset, int v5length, String v5md5) {
         this(name, name, low, high, ver, path, type);
 
-        JSONHelper.putNoThrows(mJson, "v5type", v5Type);
-        JSONHelper.putNoThrows(mJson, "v5index", v5index);
-        JSONHelper.putNoThrows(mJson, "v5offset", v5offset);
-        JSONHelper.putNoThrows(mJson, "v5length", v5length);
-        JSONHelper.putNoThrows(mJson, "v5md5", v5md5);
+        put("v5type", v5Type);
+        put("v5index", v5index);
+        put("v5offset", v5offset);
+        put("v5length", v5length);
+        put("v5md5", v5md5);
     }
 
     private String formatName() {
@@ -1101,13 +1072,13 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
     }
 
     public final void to(Intent intent) {
-        intent.putExtra("name", getName());
-        intent.putExtra("low", getLowInterfaceApi());
-        intent.putExtra("high", getHighInterfaceApi());
-        intent.putExtra("ver", getVersion());
-        intent.putExtra("type", getType());
+        intent.putExtra(PI_NAME, getName());
+        intent.putExtra(PI_LOW, getLowInterfaceApi());
+        intent.putExtra(PI_HIGH, getHighInterfaceApi());
+        intent.putExtra(PI_VER, getVersion());
+        intent.putExtra(PI_TYPE, getType());
         intent.putExtra("v5type", getV5Type());
-        intent.putExtra("path", getPath());
+        intent.putExtra(PI_PATH, getPath());
         intent.putExtra("v5index", getV5Index());
         intent.putExtra("v5offset", getV5Offset());
         intent.putExtra("v5length", getV5Length());
@@ -1190,7 +1161,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @deprecated 只用于旧的P-n插件，可能会废弃
      */
     public int getV5Type() {
-        return mJson.optInt("v5type", V5FileInfo.NONE_PLUGIN);
+        return get("v5type", V5FileInfo.NONE_PLUGIN);
     }
 
     /**
@@ -1199,7 +1170,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @deprecated 只用于旧的P-n插件，可能会废弃
      */
     public int getV5Index() {
-        return mJson.optInt("v5index", -1);
+        return get("v5index", -1);
     }
 
     /**
@@ -1208,7 +1179,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @deprecated 只用于旧的P-n插件，可能会废弃
      */
     public int getV5Offset() {
-        return mJson.optInt("v5offset", -1);
+        return get("v5offset", -1);
     }
 
     /**
@@ -1217,7 +1188,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @deprecated 只用于旧的P-n插件，可能会废弃
      */
     public int getV5Length() {
-        return mJson.optInt("v5length", -1);
+        return get("v5length", -1);
     }
 
     /**
@@ -1226,7 +1197,19 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @deprecated 只用于旧的P-n插件，可能会废弃
      */
     public String getV5MD5() {
-        return mJson.optString("v5md5");
+        return get("v5md5", "");
+    }
+
+    ////
+
+    private <T> T get(String name, @NonNull T def) {
+        final Object obj = mJson.get(name);
+        return (def.getClass().isInstance(obj)) ? (T) obj : def;
+    }
+
+    public <T> void put(String key, T value) {
+        if (key == null || value == null) return;
+        mJson.put(key, value); //value & key must not null
     }
 
 }

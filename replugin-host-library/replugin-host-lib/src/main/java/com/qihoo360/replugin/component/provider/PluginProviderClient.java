@@ -77,7 +77,7 @@ public class PluginProviderClient {
      * 调用插件里的Provider
      * @see android.content.ContentResolver#query(Uri, String[], String, String[], String, CancellationSignal)
      */
-    @TargetApi(16)
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static Cursor query(Context c, Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder, CancellationSignal cancellationSignal) {
         Uri turi = toCalledUri(c, uri);
         return c.getContentResolver().query(turi, projection, selection, selectionArgs, sortOrder, cancellationSignal);

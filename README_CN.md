@@ -6,9 +6,19 @@
 
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/Qihoo360/RePlugin/blob/master/LICENSE)
 
-[![Release Version](https://img.shields.io/badge/release-2.3.1-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
+[![Release Version](https://img.shields.io/badge/release-2.3.2-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
+
+## 通知
+
+**360开源又一力作——[ArgusAPM移动性能监控平台](https://github.com/Qihoo360/ArgusAPM)**
+
+[ArgusAPM](https://github.com/Qihoo360/ArgusAPM)是360手机卫士客户端团队继RePlugin之后开源的又一个重量级开源项目。ArgusAPM是360移动端产品使用的可视化性能监控平台，为移动端APP提供性能监控与管理，可以迅速发现和定位各类APP性能和使用问题，帮助APP不断的提升用户体验。
 
 
+**360移动技术最新活动通知：**
+
+2018年12月16日，360移动性能开放日邀您参加，届时将会有360、美团技术大牛为大家分享Android、iOS性能监控实践。
+欢迎报名参加，戳戳戳!!!-->https://mp.weixin.qq.com/s/-7DCnXI_EBMBwYG_PUuUDg
 
 ## RePlugin —— 历经三年多考验，数亿设备使用的，稳定占坑类插件化方案
 

@@ -35,11 +35,8 @@ public class PluginBuiltinJsonCreator implements IFileCreator {
     def PluginBuiltinJsonCreator(def project, def variant, def cfg) {
         this.config = cfg
         this.variant = variant
-        //make sure processResources Task execute after mergeAssets Task
-        String mergeAssetsTaskName = variant.getVariantData().getScope().getMergeAssetsTask().name
-        //get real gradle task
-        def mergeAssetsTask = project.tasks.getByName(mergeAssetsTaskName)
-        fileDir = mergeAssetsTask.outputDir
+        //make sure processResources Task execute after mergeAssets Task, get real gradle task
+        fileDir = variant.getMergeAssets()?.outputDir
         fileName = config.builtInJsonFileName
     }
 
@@ -56,7 +53,7 @@ public class PluginBuiltinJsonCreator implements IFileCreator {
     @Override
     String getFileContent() {
         //查找插件文件并抽取信息,如果没有就直接返回null
-        File pluginDirFile = new File(fileDir.getAbsolutePath() + File.separator + config.pluginDir)
+        File pluginDirFile = new File(fileDir?.getAbsolutePath() + File.separator + config.pluginDir)
         if (!pluginDirFile.exists()) {
             println "${AppConstant.TAG} The ${pluginDirFile.absolutePath} does not exist "
             println "${AppConstant.TAG} pluginsInfo=null"
