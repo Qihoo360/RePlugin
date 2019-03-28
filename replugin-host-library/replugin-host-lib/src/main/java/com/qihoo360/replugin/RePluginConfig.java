@@ -208,7 +208,7 @@ public final class RePluginConfig {
      * 获取宿主的 BuildID
      *
      * @return 宿主的BuildID
-     * @since 2.2.2
+     * @since 2.0.0
      */
     public String getHostBuildID() {
         return hostBuildID;
@@ -220,7 +220,7 @@ public final class RePluginConfig {
      *
      * @param buildID 宿主的BuildID
      * @return RePluginConfig自己。这样可以连环调用set方法
-     * @since 2.2.2
+     * @since 2.0.0
      */
     public RePluginConfig setHostBuild(String buildID) {
         if (!checkAllowModify()) {
@@ -233,7 +233,7 @@ public final class RePluginConfig {
     /**
      * 获取宿主的 VersionName
      *
-     * @since 2.2.2
+     * @since 2.0.0
      */
     public String getHostVersionName() {
         return hostVersionName;
@@ -244,7 +244,7 @@ public final class RePluginConfig {
      *
      * @param versionName 宿主的VersionName
      * @return RePluginConfig自己。这样可以连环调用set方法
-     * @since 2.2.2
+     * @since 2.0.0
      */
     public RePluginConfig setHostVersionName(String versionName) {
         if (!checkAllowModify()) {
@@ -258,7 +258,6 @@ public final class RePluginConfig {
      * 获取宿主的VersionBuild号
      *
      * @return
-     * @since 2.2.2
      */
     public String getHostVersionBuild() {
         return RePlugin.getConfig().getHostVersionName() + "." + RePlugin.getConfig().getHostBuildID();
