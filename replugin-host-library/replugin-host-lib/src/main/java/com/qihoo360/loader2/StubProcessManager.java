@@ -17,7 +17,6 @@ import java.util.List;
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
-
 /**
  * @author RePlugin Team
  * dec: 坑位进程管理 buyuntao
