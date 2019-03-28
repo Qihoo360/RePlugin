@@ -14,7 +14,7 @@ __gradle_exec(){ if [[ -x gradlew ]];then ./gradlew ${@}; else gradle ${@}; fi; 
 __rp_deploy_project(){
 	[[ ! -d ${1} ]] && echo ">>> INVALID ${1}!!! <<<" && return
 	# execute deploying
-	echo ">>> ${1} <<<" && __gradle_exec -p ${1} clean bintrayUpload
+	echo ">>> ${1} <<<" && cd ${1} && __gradle_exec -p ${1} clean bintrayUpload
 	# revert changed files
 	git checkout ${1}
 }
