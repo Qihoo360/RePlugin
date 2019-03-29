@@ -18,6 +18,7 @@
 package com.qihoo360.replugin.gradle.plugin.injector.localbroadcast
 
 import com.qihoo360.replugin.gradle.plugin.injector.BaseInjector
+import com.qihoo360.replugin.gradle.plugin.inner.InjectHistory
 import com.qihoo360.replugin.gradle.plugin.inner.Util
 import javassist.ClassPool
 
@@ -61,6 +62,9 @@ public class LocalBroadcastInjector extends BaseInjector {
                 String filePath = file.toString()
                 editor.filePath = filePath
 
+                if (InjectHistory.contains(project, filePath)) {
+                    return super.visitFile(file, attrs)
+                }
                 def stream, ctCls
                 try {
                     // 不处理 LocalBroadcastManager.class

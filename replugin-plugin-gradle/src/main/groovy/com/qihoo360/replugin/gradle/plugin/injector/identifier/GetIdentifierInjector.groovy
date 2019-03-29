@@ -18,6 +18,7 @@
 package com.qihoo360.replugin.gradle.plugin.injector.identifier
 
 import com.qihoo360.replugin.gradle.plugin.injector.BaseInjector
+import com.qihoo360.replugin.gradle.plugin.inner.InjectHistory
 import com.qihoo360.replugin.gradle.plugin.inner.Util
 import javassist.ClassPool
 
@@ -48,6 +49,9 @@ public class GetIdentifierInjector extends BaseInjector {
 
                 //todo only .class
                 String filePath = file.toString()
+                if (InjectHistory.contains(project, filePath)) {
+                    return super.visitFile(file, attrs)
+                }
 
                 editor.filePath = filePath
 

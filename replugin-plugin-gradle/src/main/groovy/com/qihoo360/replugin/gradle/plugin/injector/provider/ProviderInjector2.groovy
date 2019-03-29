@@ -17,6 +17,7 @@
 
 package com.qihoo360.replugin.gradle.plugin.injector.provider
 
+import com.qihoo360.replugin.gradle.plugin.inner.InjectHistory
 import com.qihoo360.replugin.gradle.plugin.inner.Util
 import com.qihoo360.replugin.gradle.plugin.injector.BaseInjector
 import javassist.ClassPool
@@ -58,6 +59,9 @@ public class ProviderInjector2 extends BaseInjector {
             FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
                 String filePath = file.toString()
+                if (InjectHistory.contains(project, filePath)) {
+                    return super.visitFile(file, attrs)
+                }
                 def stream, ctCls
 
                 try {
