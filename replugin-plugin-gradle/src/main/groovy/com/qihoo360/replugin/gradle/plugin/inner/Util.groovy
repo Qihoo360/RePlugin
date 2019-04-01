@@ -22,17 +22,21 @@ import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInput
 import com.android.build.gradle.internal.scope.GlobalScope
 import com.android.sdklib.IAndroidTarget
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.stream.JsonReader
+import com.qihoo360.replugin.gradle.plugin.AppConstant
+import com.qihoo360.replugin.gradle.plugin.manifest.ManifestAPI
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
-import com.google.common.base.Charsets
-import com.google.common.hash.Hashing
 import org.gradle.api.Project
 
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipFile
 
-import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES;
-
+import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES
 /**
  * @author RePlugin Team
  */
@@ -40,14 +44,16 @@ public class Util {
 
     /** 生成 ClassPool 使用的 ClassPath 集合，同时将要处理的 jar 写入 includeJars */
     def
-    static getClassPaths(Project project, GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
+    static getClassPaths(Project project, String buildType, GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
         def classpathList = []
+
+        includeJars.clear()
 
         // android.jar
         classpathList.add(getAndroidJarPath(globalScope))
 
         // 原始项目中引用的 classpathList
-        getProjectClassPath(project, inputs, includeJars, map).each {
+        getProjectClassPath(project, buildType, inputs, includeJars, map).each {
             classpathList.add(it)
         }
 
@@ -57,15 +63,20 @@ public class Util {
     }
 
     /** 获取原始项目中的 ClassPath */
-    def private static getProjectClassPath(Project project,
+    def private static getProjectClassPath(Project project, String buildType,
                                            Collection<TransformInput> inputs,
                                            Set<String> includeJars, Map<String, String> map) {
         def classPath = []
         def visitor = new ClassFileVisitor()
-        def projectDir = project.getRootDir().absolutePath
 
         println ">>> Unzip Jar ..."
+        def infoMap = readJarInjectorHistory(project, buildType)
+        final def injectDir = project.getBuildDir().path +
+                File.separator + FD_INTERMEDIATES + File.separator + "replugin-jar"+ File.separator + buildType;
 
+        def activityMd5 = genActivityMd5(project, buildType);
+
+        boolean needSave = false
         inputs.each { TransformInput input ->
 
             input.directoryInputs.each { DirectoryInput dirInput ->
@@ -77,44 +88,136 @@ public class Util {
             }
 
             input.jarInputs.each { JarInput jarInput ->
-                File jar = jarInput.file
+                def jar = jarInput.file
                 def jarPath = jar.absolutePath
 
-                if (!jarPath.contains(projectDir)) {
+                def md5 = md5File(jar);
+                def reJar = new File(injectDir + File.separator + md5 + ".jar");
+                def reJarPath = reJar.getAbsolutePath()
+                boolean needInject = checkNeedInjector(infoMap, jar, reJar, activityMd5, md5);
 
-                    String jarZipDir = project.getBuildDir().path +
-                            File.separator + FD_INTERMEDIATES + File.separator + "exploded-aar" +
-                            File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class";
-                    if (unzip(jarPath, jarZipDir)) {
-                        def jarZip = jarZipDir + ".jar"
-                        includeJars << jarPath
-                        classPath << jarZipDir
-                        visitor.setBaseDir(jarZipDir)
-                        Files.walkFileTree(Paths.get(jarZipDir), visitor)
-                        map.put(jarPath, jarZip)
-                    }
-
-                } else {
-
-                    includeJars << jarPath
-                    map.put(jarPath, jarPath)
-
+                //ReClassTransform.copyJar需要用到
+                map.put(jarPath, reJarPath)
+                if (needInject) {
                     /* 将 jar 包解压，并将解压后的目录加入 classpath */
                     // println ">>> 解压Jar${jarPath}"
-                    String jarZipDir = jar.getParent() + File.separatorChar + jar.getName().replace('.jar', '')
+                    def jarZipDir = reJar.getParent() + File.separatorChar + reJar.getName().replace('.jar', '')
                     if (unzip(jarPath, jarZipDir)) {
+
+                        includeJars << jarPath
                         classPath << jarZipDir
+                        //保存修改的插件版本号
+                        needSave = true
+                        infoMap.put(jarPath, new JarPatchInfo(jar, activityMd5))
 
                         visitor.setBaseDir(jarZipDir)
                         Files.walkFileTree(Paths.get(jarZipDir), visitor)
                     }
-
-                    // 删除 jar
-                    FileUtils.forceDelete(jar)
+                    if (reJar.exists()) {
+                        FileUtils.forceDelete(reJar)
+                    }
                 }
             }
         }
+        if (needSave) {
+            saveJarInjectorHistory(project, buildType, infoMap)
+        }
         return classPath
+    }
+
+    /**
+     * activities的md5
+     */
+    def static genActivityMd5(Project project, String buildType){
+        def activityList = new ArrayList<>();
+        new ManifestAPI().getActivities(project, buildType).each {
+            // 处理没有被忽略的 Activity
+            if (!(it in CommonData.ignoredActivities)) {
+                //
+                activityList.add(it)
+            }
+        }
+        Collections.sort(activityList, new Comparator<String>(){
+            @Override
+            int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        return DigestUtils.md5Hex(activityList.toString());
+    }
+
+    /**
+     * 计算jar的md5
+     */
+    def static md5File(File jar) {
+        def fileInputStream = new FileInputStream(jar);
+        def md5 = DigestUtils.md5Hex(fileInputStream);
+        fileInputStream.close()
+        return md5
+    }
+
+
+    def static checkNeedInjector( Map<String, JarPatchInfo> infoMap, File jar,File reJar,String activityMd5,String md5){
+        boolean needInject = true
+
+        if (reJar.exists()) {
+            def info = infoMap.get(jar.getAbsolutePath());
+            if (info != null) {
+                if (activityMd5.equals(info.manifestActivitiesMd5)
+                        && AppConstant.VER.equals(info.pluginVersion)
+                        && md5.equals(info.jarMd5)) {
+                    needInject = false
+                }
+            }
+        }
+
+        return needInject;
+    }
+
+    /**
+     * 读取修改jar的记录
+     */
+    def static readJarInjectorHistory(Project project, String buildType) {
+        final String dir = FD_INTERMEDIATES + File.separator + "replugin-jar"+ File.separator + buildType;
+        File file = new File(project.getBuildDir(), dir + File.separator + "version.json");
+        if (!file.exists()) {
+            return new HashMap<String, JarPatchInfo>();
+        }
+        Gson gson = new GsonBuilder()
+                .create();
+        FileReader fileReader = new FileReader(file)
+        JsonReader jsonReader = new JsonReader(fileReader);
+        Map<String, JarPatchInfo> injectorMap = gson.fromJson(jsonReader, new TypeToken<Map<String, JarPatchInfo>>() {
+        }.getType());
+        jsonReader.close()
+        if (injectorMap == null) {
+            injectorMap = new HashMap<String, JarPatchInfo>();
+        }
+        return injectorMap;
+    }
+
+    /**
+     * 保存修改jar的记录
+     */
+    def static saveJarInjectorHistory(Project project,String buildType, Map<String, JarPatchInfo> injectorMap) {
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
+        final String dir = FD_INTERMEDIATES + File.separator + "replugin-jar"+ File.separator + buildType;
+        File file = new File(project.getBuildDir(), dir + File.separator + "version.json");
+        if (file.exists()) {
+            file.delete()
+        } else {
+            File p = file.getParentFile();
+            if (!p.exists()) {
+                p.mkdirs()
+            }
+        }
+        file.createNewFile()
+        FileWriter fileWriter = new FileWriter(file);
+        String json = gson.toJson(injectorMap);
+        fileWriter.write(json)
+        fileWriter.close()
     }
 
     /**

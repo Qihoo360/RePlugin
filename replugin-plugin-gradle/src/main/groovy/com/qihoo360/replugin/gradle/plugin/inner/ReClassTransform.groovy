@@ -83,6 +83,7 @@ public class ReClassTransform extends Transform {
         // Compatible with path separators for window and Linux, and fit split param based on 'Pattern.quote'
         def variantDir = rootLocation.absolutePath.split(getName() + Pattern.quote(File.separator))[1]
         println ">>> variantDir: ${variantDir}"
+        String buildType = variantDir;
 
         CommonData.appModule = config.appModule
         CommonData.ignoredActivities = config.ignoredActivities
@@ -91,7 +92,7 @@ public class ReClassTransform extends Transform {
         if (injectors.isEmpty()) {
             copyResult(inputs, outputProvider) // 跳过 reclass
         } else {
-            doTransform(inputs, outputProvider, config, injectors) // 执行 reclass
+            doTransform(inputs, buildType, outputProvider, config, injectors) // 执行 reclass
         }
     }
 
@@ -116,12 +117,13 @@ public class ReClassTransform extends Transform {
      * 执行 Transform
      */
     def doTransform(Collection<TransformInput> inputs,
+                    buildType,
                     TransformOutputProvider outputProvider,
                     Object config,
                     def injectors) {
 
         /* 初始化 ClassPool */
-        Object pool = initClassPool(inputs)
+        Object pool = initClassPool(inputs, buildType)
 
         /* 进行注入操作 */
         Util.newSection()
@@ -175,13 +177,18 @@ public class ReClassTransform extends Transform {
         includeJars.each {
             File jar = new File(it)
             String JarAfterzip = map.get(jar.getParent() + File.separatorChar + jar.getName())
-            String dirAfterUnzip = JarAfterzip.replace('.jar', '')
-            // println ">>> 压缩目录 $dirAfterUnzip"
-            
-            Util.zipDir(dirAfterUnzip, JarAfterzip)
+            if(JarAfterzip != null){
+                String dirAfterUnzip = JarAfterzip.replace('.jar', '')
+                File dirAfterUnzipFile = new File(dirAfterUnzip);
+                if(dirAfterUnzipFile.exists()){
+                    // println ">>> 压缩目录 $dirAfterUnzip"
 
-            // println ">>> 删除目录 $dirAfterUnzip"
-            FileUtils.deleteDirectory(new File(dirAfterUnzip))
+                    Util.zipDir(dirAfterUnzip, JarAfterzip)
+
+                    // println ">>> 删除目录 $dirAfterUnzip"
+                    FileUtils.deleteDirectory(dirAfterUnzipFile)
+                }
+            }
         }
     }
 
@@ -207,11 +214,11 @@ public class ReClassTransform extends Transform {
     /**
      * 初始化 ClassPool
      */
-    def initClassPool(Collection<TransformInput> inputs) {
+    def initClassPool(Collection<TransformInput> inputs, String buildType) {
         Util.newSection()
         def pool = new ClassPool(true)
         // 添加编译时需要引用的到类到 ClassPool, 同时记录要修改的 jar 到 includeJars
-        Util.getClassPaths(project, globalScope, inputs, includeJars, map).each {
+        Util.getClassPaths(project, buildType, globalScope, inputs, includeJars, map).each {
             println "    $it"
             pool.insertClassPath(it)
         }
