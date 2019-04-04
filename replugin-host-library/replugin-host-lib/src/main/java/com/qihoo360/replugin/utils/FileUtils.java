@@ -736,4 +736,23 @@ public class FileUtils {
 
         return (filePosition < extensionPosition ? filePath.substring(filePosition + 1, extensionPosition) : filePath.substring(filePosition + 1));
     }
+
+    /**
+     * 根据输入的文件路径，得到扩展名
+     *
+     * @param filePath
+     * @return
+     */
+    public static String getFileExt(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return filePath;
+        }
+
+        int extPosi = filePath.lastIndexOf(".");
+        int filePosi = filePath.lastIndexOf(File.separator);
+        if (extPosi == -1) {
+            return "";
+        }
+        return (filePosi >= extPosi) ? "" : filePath.substring(extPosi + 1);
+    }
 }

@@ -19,6 +19,7 @@ package com.qihoo360.replugin.loader.p;
 import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -196,6 +197,34 @@ public class PluginProviderClient {
         return -1;
     }
 
+    /**
+     * 调用插件里的Provider
+     *
+     * @see android.content.ContentResolver#getType(Uri)
+     */
+    public static String getType(Context c, Uri uri) {
+        if (c == null) {
+            return null;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            return c.getContentResolver().getType(uri);
+        }
+
+        try {
+            Object obj = ProxyRePluginProviderClientVar.getType.call(null, c, uri);
+            if (obj != null) {
+                return (String) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
     public static class ProxyRePluginProviderClientVar {
 
         private static MethodInvoker query;
@@ -210,6 +239,30 @@ public class PluginProviderClient {
 
         private static MethodInvoker update;
 
+        private static MethodInvoker getType;
+
+        private static MethodInvoker openInputStream;
+
+        private static MethodInvoker openOutputStream;
+
+        private static MethodInvoker openOutputStream2;
+
+        private static MethodInvoker openFileDescriptor;
+
+        private static MethodInvoker openFileDescriptor2;
+
+        private static MethodInvoker registerContentObserver;
+
+        private static MethodInvoker acquireContentProviderClient;
+
+        private static MethodInvoker notifyChange;
+
+        private static MethodInvoker notifyChange2;
+
+        private static MethodInvoker toCalledUri;
+
+        private static MethodInvoker toCalledUri2;
+
         public static void initLocked(final ClassLoader classLoader) {
             //
             String rePluginProviderClient = "com.qihoo360.loader2.mgr.PluginProviderClient";
@@ -223,6 +276,21 @@ public class PluginProviderClient {
             bulkInsert = new MethodInvoker(classLoader, rePluginProviderClient, "bulkInsert", new Class<?>[]{Context.class, Uri.class, ContentValues[].class});
             delete = new MethodInvoker(classLoader, rePluginProviderClient, "delete", new Class<?>[]{Context.class, Uri.class, String.class, String[].class});
             update = new MethodInvoker(classLoader, rePluginProviderClient, "update", new Class<?>[]{Context.class, Uri.class, ContentValues.class, String.class, String[].class});
+            // new supported
+            getType = new MethodInvoker(classLoader, rePluginProviderClient, "getType", new Class<?>[]{Context.class, Uri.class});
+            openInputStream = new MethodInvoker(classLoader, rePluginProviderClient, "openInputStream", new Class<?>[]{Context.class, Uri.class});
+            openOutputStream = new MethodInvoker(classLoader, rePluginProviderClient, "openOutputStream", new Class<?>[]{Context.class, Uri.class});
+            openOutputStream2 = new MethodInvoker(classLoader, rePluginProviderClient, "openOutputStream", new Class<?>[]{Context.class, Uri.class, String.class});
+            openFileDescriptor = new MethodInvoker(classLoader, rePluginProviderClient, "openFileDescriptor", new Class<?>[]{Context.class, Uri.class, String.class});
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                openFileDescriptor2 = new MethodInvoker(classLoader, rePluginProviderClient, "openFileDescriptor", new Class<?>[]{Context.class, Uri.class, String.class, CancellationSignal.class});
+            }
+            registerContentObserver = new MethodInvoker(classLoader, rePluginProviderClient, "registerContentObserver", new Class<?>[]{Context.class, Uri.class, Boolean.class, ContentObserver.class});
+            acquireContentProviderClient = new MethodInvoker(classLoader, rePluginProviderClient, "acquireContentProviderClient", new Class<?>[]{Context.class, String.class});
+            notifyChange = new MethodInvoker(classLoader, rePluginProviderClient, "notifyChange", new Class<?>[]{Context.class, Uri.class, ContentObserver.class});
+            notifyChange2 = new MethodInvoker(classLoader, rePluginProviderClient, "notifyChange", new Class<?>[]{Context.class, Uri.class, ContentObserver.class, Boolean.class});
+            toCalledUri = new MethodInvoker(classLoader, rePluginProviderClient, "toCalledUri", new Class<?>[]{Context.class, Uri.class});
+            toCalledUri2 = new MethodInvoker(classLoader, rePluginProviderClient, "toCalledUri", new Class<?>[]{Context.class, String.class, Uri.class, Integer.class});
         }
     }
 }
