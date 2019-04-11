@@ -16,6 +16,7 @@
 
 package com.qihoo360.replugin.gradle.host
 
+import com.android.build.OutputFile
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.qihoo360.replugin.gradle.host.creator.FileCreators
@@ -109,6 +110,14 @@ public class Replugin implements Plugin<Project> {
                                     //3.0.0之前，直接使用
                                     manifestFile = file
                                 }
+
+                                if (!manifestFile.exists()) {
+                                    def abi = output.filters.find { it.filterType == OutputFile.ABI }?.identifier
+                                    if (abi != null) {
+                                        manifestFile = new File(file, "${abi}/AndroidManifest.xml")
+                                    }
+                                }
+
                                 //检测文件是否存在
                                 if (manifestFile != null && manifestFile.exists()) {
                                     println "${AppConstant.TAG} handle manifest: ${manifestFile}"
