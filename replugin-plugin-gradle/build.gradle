@@ -22,12 +22,16 @@ apply plugin: 'maven-publish'
 //apply from: 'config.gradle'
 
 repositories {
+    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    google()
     jcenter()
     mavenCentral()
 }
 
 buildscript {
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        google()
         jcenter()
         mavenCentral()
     }
@@ -49,7 +53,7 @@ version = "${verLine.split("\"")[1]}" // 版本
 java.lang.System.err.println "version=${version}"
 
 dependencies {
-    compile 'com.android.tools.build:gradle:2.1.3'
+    compile 'com.android.tools.build:gradle:3.3.1'
     compile 'org.json:json:20160212'
     compile 'org.codehaus.groovy:groovy:2.4.7'
     compile 'com.squareup:javapoet:1.5.1'

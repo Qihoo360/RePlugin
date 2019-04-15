@@ -17,20 +17,25 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 28
+	
     defaultConfig {
         applicationId "com.qihoo360.replugin.sample.host"
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    lintOptions {
+        warning 'ExpiredTargetSdkVersion'
+        abortOnError false
     }
 }
 
@@ -43,7 +48,7 @@ repluginHostConfig {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile "com.qihoo360.replugin:replugin-host-lib:${RP_VERSION}"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:28.+'
+    implementation "com.qihoo360.replugin:replugin-host-lib:${RP_VERSION}"
 }

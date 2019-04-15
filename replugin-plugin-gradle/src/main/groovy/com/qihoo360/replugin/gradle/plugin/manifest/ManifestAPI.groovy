@@ -17,6 +17,7 @@
 
 package com.qihoo360.replugin.gradle.plugin.manifest
 
+import com.qihoo360.replugin.gradle.plugin.util.GradleCompat
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
@@ -57,16 +58,9 @@ public class ManifestAPI {
         if (processManifestTask) {
             File result = null
             //正常的manifest
-            File manifestOutputFile = null
+            File manifestOutputFile = GradleCompat.getManifestOutputFile(processManifestTask)
             //instant run的manifest
-            File instantRunManifestOutputFile = null
-            try {
-                manifestOutputFile = processManifestTask.getManifestOutputFile()
-                instantRunManifestOutputFile = processManifestTask.getInstantRunManifestOutputFile()
-            } catch (Exception e) {
-                manifestOutputFile = new File(processManifestTask.getManifestOutputDirectory(), "AndroidManifest.xml")
-                instantRunManifestOutputFile = new File(processManifestTask.getInstantRunManifestOutputDirectory(), "AndroidManifest.xml")
-            }
+            File instantRunManifestOutputFile = GradleCompat.getInstantRunManifestOutputFile(processManifestTask)
 
             if (manifestOutputFile == null && instantRunManifestOutputFile == null) {
                 throw new GradleException("can't get manifest file")

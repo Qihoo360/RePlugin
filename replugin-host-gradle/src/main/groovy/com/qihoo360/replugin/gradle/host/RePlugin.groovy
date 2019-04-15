@@ -22,6 +22,7 @@ import com.qihoo360.replugin.gradle.host.creator.FileCreators
 import com.qihoo360.replugin.gradle.host.creator.IFileCreator
 import com.qihoo360.replugin.gradle.host.creator.impl.json.PluginBuiltinJsonCreator
 import com.qihoo360.replugin.gradle.host.handlemanifest.ComponentsGenerator
+import com.qihoo360.replugin.gradle.host.util.GradleCompat
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
@@ -72,7 +73,7 @@ public class Replugin implements Plugin<Project> {
                 generateHostConfigTask.group = AppConstant.TASKS_GROUP
 
                 //depends on build config task
-                def generateBuildConfigTask = variant.getGenerateBuildConfig()
+                def generateBuildConfigTask = GradleCompat.getGenerateBuildConfig(variant)
                 if (generateBuildConfigTask) {
                     generateHostConfigTask.dependsOn generateBuildConfigTask
                     generateBuildConfigTask.finalizedBy generateHostConfigTask
@@ -88,15 +89,15 @@ public class Replugin implements Plugin<Project> {
                 generateBuiltinJsonTask.group = AppConstant.TASKS_GROUP
 
                 //depends on mergeAssets Task
-                def mergeAssetsTask = variant.getMergeAssets()
+                def mergeAssetsTask = GradleCompat.getMergeAssets(variant)
                 if (mergeAssetsTask) {
                     generateBuiltinJsonTask.dependsOn mergeAssetsTask
                     mergeAssetsTask.finalizedBy generateBuiltinJsonTask
                 }
 
                 variant.outputs.each { output ->
-                    output.processManifest.doLast {
-                        output.processManifest.outputs.files.each { File file ->
+                    GradleCompat.getProcessManifest(output)?.doLast {
+                        GradleCompat.getProcessManifest(output).outputs.files.each { File file ->
                             def manifestFile = null;
                             //在gradle plugin 3.0.0之前，file是文件，且文件名为AndroidManifest.xml
                             //在gradle plugin 3.0.0之后，file是目录，且不包含AndroidManifest.xml，需要自己拼接
@@ -150,7 +151,7 @@ public class Replugin implements Plugin<Project> {
         showPluginsTask.group = AppConstant.TASKS_GROUP
 
         //get mergeAssetsTask name, get real gradle task
-        def mergeAssetsTask = variant.getMergeAssets()
+        def mergeAssetsTask = GradleCompat.getMergeAssets(variant)
 
         //depend on mergeAssetsTask so that assets have been merged
         if (mergeAssetsTask) {
