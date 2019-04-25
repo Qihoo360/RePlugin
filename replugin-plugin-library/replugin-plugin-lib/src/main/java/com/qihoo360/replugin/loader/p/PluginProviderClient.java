@@ -225,6 +225,44 @@ public class PluginProviderClient {
         return null;
     }
 
+    /**
+     * 调用插件里的Provider
+     *
+     * @see android.content.ContentResolver#notifyChange(Uri, ContentObserver)
+     */
+    public static void notifyChange(Context c, Uri uri, ContentObserver observer) {
+        if (c == null) {
+            return;
+        }
+
+        try {
+            ProxyRePluginProviderClientVar.notifyChange.call(null, c, uri, observer);
+        } catch (Exception e) {
+            if (DEBUG) {
+                LogUtils.logError(TAG, "", e);
+            }
+        }
+    }
+
+    /**
+     * 调用插件里的Provider
+     *
+     * @see android.content.ContentResolver#registerContentObserver(Uri, boolean, ContentObserver)
+     */
+    public static void registerContentObserver(Context c, Uri uri, boolean notifyForDescendants, ContentObserver observer) {
+        if (c == null) {
+            return;
+        }
+
+        try {
+            ProxyRePluginProviderClientVar.registerContentObserver.call(null, c, uri, notifyForDescendants, observer);
+        } catch (Exception e) {
+            if (DEBUG) {
+                LogUtils.logError(TAG, "", e);
+            }
+        }
+    }
+
     public static class ProxyRePluginProviderClientVar {
 
         private static MethodInvoker query;
@@ -285,12 +323,12 @@ public class PluginProviderClient {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 openFileDescriptor2 = new MethodInvoker(classLoader, rePluginProviderClient, "openFileDescriptor", new Class<?>[]{Context.class, Uri.class, String.class, CancellationSignal.class});
             }
-            registerContentObserver = new MethodInvoker(classLoader, rePluginProviderClient, "registerContentObserver", new Class<?>[]{Context.class, Uri.class, Boolean.class, ContentObserver.class});
+            registerContentObserver = new MethodInvoker(classLoader, rePluginProviderClient, "registerContentObserver", new Class<?>[]{Context.class, Uri.class, boolean.class, ContentObserver.class});
             acquireContentProviderClient = new MethodInvoker(classLoader, rePluginProviderClient, "acquireContentProviderClient", new Class<?>[]{Context.class, String.class});
             notifyChange = new MethodInvoker(classLoader, rePluginProviderClient, "notifyChange", new Class<?>[]{Context.class, Uri.class, ContentObserver.class});
-            notifyChange2 = new MethodInvoker(classLoader, rePluginProviderClient, "notifyChange", new Class<?>[]{Context.class, Uri.class, ContentObserver.class, Boolean.class});
+            notifyChange2 = new MethodInvoker(classLoader, rePluginProviderClient, "notifyChange", new Class<?>[]{Context.class, Uri.class, ContentObserver.class, boolean.class});
             toCalledUri = new MethodInvoker(classLoader, rePluginProviderClient, "toCalledUri", new Class<?>[]{Context.class, Uri.class});
-            toCalledUri2 = new MethodInvoker(classLoader, rePluginProviderClient, "toCalledUri", new Class<?>[]{Context.class, String.class, Uri.class, Integer.class});
+            toCalledUri2 = new MethodInvoker(classLoader, rePluginProviderClient, "toCalledUri", new Class<?>[]{Context.class, String.class, Uri.class, int.class});
         }
     }
 }
