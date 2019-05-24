@@ -37,13 +37,13 @@ public class ProviderInjector extends BaseInjector {
                                            'delete',
                                            'update',
             /// 以下方法 replugin plugin lib 暂未支持，导致字节码修改失败。
-//                                           'openInputStream',
-//                                           'openOutputStream',
-//                                           'openFileDescriptor',
-//                                           'registerContentObserver',
-//                                           'acquireContentProviderClient',
-//                                           'notifyChange',
-//                                           'toCalledUri',
+                                           'openInputStream',
+                                           'openOutputStream',
+                                           'openFileDescriptor',
+                                           'registerContentObserver',
+                                           'acquireContentProviderClient',
+                                           'notifyChange',
+                                           'toCalledUri',
     ]
 
     // 表达式编辑器
