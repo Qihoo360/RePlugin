@@ -35,8 +35,11 @@ public class PluginBuiltinJsonCreator implements IFileCreator {
     def PluginBuiltinJsonCreator(def project, def variant, def cfg) {
         this.config = cfg
         this.variant = variant
-        //make sure processResources Task execute after mergeAssets Task, get real gradle task
-        fileDir = variant.getMergeAssets()?.outputDir
+        // make sure processResources Task execute after mergeAssets Task, get real gradle task
+        // 在 com.android.tools.build:gradle:3.3.2 及之前 outputDir 为 File 类型。
+        // 但从 com.android.tools.build:gradle:3.4.1 开始 Google 将此类型改为 `Provider<Directory>`。
+        final def out = variant.getMergeAssets()?.outputDir
+        fileDir = File.class.isInstance(out) ? out : out?.get()?.getAsFile()
         fileName = config.builtInJsonFileName
     }
 
