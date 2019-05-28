@@ -18,6 +18,7 @@ package com.qihoo360.replugin.gradle.host
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
+import com.qihoo360.replugin.gradle.compat.VariantCompat
 import com.qihoo360.replugin.gradle.host.creator.FileCreators
 import com.qihoo360.replugin.gradle.host.creator.IFileCreator
 import com.qihoo360.replugin.gradle.host.creator.impl.json.PluginBuiltinJsonCreator
@@ -56,7 +57,8 @@ public class Replugin implements Plugin<Project> {
                     checkUserConfig(config)
                 }
 
-                def appID = variant.generateBuildConfig.appPackageName
+                def generateBuildConfigTask = VariantCompat.getGenerateBuildConfigTask(variant)
+                def appID = generateBuildConfigTask.appPackageName
                 def newManifest = ComponentsGenerator.generateComponent(appID, config)
                 println "${TAG} countTask=${config.countTask}"
 
@@ -73,7 +75,6 @@ public class Replugin implements Plugin<Project> {
                 generateHostConfigTask.group = AppConstant.TASKS_GROUP
 
                 //depends on build config task
-                def generateBuildConfigTask = variant.getGenerateBuildConfig()
                 if (generateBuildConfigTask) {
                     generateHostConfigTask.dependsOn generateBuildConfigTask
                     generateBuildConfigTask.finalizedBy generateHostConfigTask
@@ -89,16 +90,16 @@ public class Replugin implements Plugin<Project> {
                 generateBuiltinJsonTask.group = AppConstant.TASKS_GROUP
 
                 //depends on mergeAssets Task
-                def mergeAssetsTask = variant.getMergeAssets()
+                def mergeAssetsTask = VariantCompat.getMergeAssetsTask(variant)
                 if (mergeAssetsTask) {
                     generateBuiltinJsonTask.dependsOn mergeAssetsTask
                     mergeAssetsTask.finalizedBy generateBuiltinJsonTask
                 }
 
                 variant.outputs.each { output ->
-                    output.processManifest.doLast {
-                        println "${AppConstant.TAG} processManifest: ${output.processManifest.outputs.files}"
-                        output.processManifest.outputs.files.each { File file ->
+                    VariantCompat.getProcessManifestTask(output).doLast {
+                        println "${AppConstant.TAG} processManifest: ${it.outputs.files}"
+                        it.outputs.files.each { File file ->
                             updateManifest(file, newManifest)
                         }
                     }
@@ -113,11 +114,11 @@ public class Replugin implements Plugin<Project> {
      * 
      * 在gradle plugin 3.0.0之前，file是文件，且文件名为AndroidManifest.xml
      * 在gradle plugin 3.0.0之后，file是目录，(特别是3.3.2)在这里改成递归的方式替换内部所有的 manifest 文件
-     * 
-     * @param  file        manifest文件
-     * @param  newManifest 需要添加的 manifest 信息
+     *
+     * @param file manifest文件
+     * @param newManifest 需要添加的 manifest 信息
      */
-    def updateManifest(def file, def newManifest){
+    def updateManifest(def file, def newManifest) {
         // 除了目录和AndroidManifest.xml之外，还可能会包含manifest-merger-debug-report.txt等不相干的文件，过滤它
         if (file == null || !file.exists() || newManifest == null) return
         if (file.isDirectory()) {
@@ -125,7 +126,7 @@ public class Replugin implements Plugin<Project> {
             file.listFiles().each {
                 updateManifest(it, newManifest)
             }
-        } else if(file.name.equalsIgnoreCase("AndroidManifest.xml")){
+        } else if (file.name.equalsIgnoreCase("AndroidManifest.xml")) {
             appendManifest(file, newManifest)
         }
     }
@@ -164,7 +165,7 @@ public class Replugin implements Plugin<Project> {
         showPluginsTask.group = AppConstant.TASKS_GROUP
 
         //get mergeAssetsTask name, get real gradle task
-        def mergeAssetsTask = variant.getMergeAssets()
+        def mergeAssetsTask = VariantCompat.getMergeAssetsTask(variant)
 
         //depend on mergeAssetsTask so that assets have been merged
         if (mergeAssetsTask) {
