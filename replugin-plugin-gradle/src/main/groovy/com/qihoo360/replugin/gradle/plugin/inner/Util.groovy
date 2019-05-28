@@ -20,11 +20,10 @@ package com.qihoo360.replugin.gradle.plugin.inner
 import com.android.build.api.transform.DirectoryInput
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInput
-import com.android.build.gradle.internal.scope.GlobalScope
-import com.android.sdklib.IAndroidTarget
-import org.apache.commons.io.FileUtils
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
+import com.qihoo360.replugin.gradle.compat.ScopeCompat
+import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 
 import java.nio.file.Files
@@ -40,7 +39,7 @@ public class Util {
 
     /** 生成 ClassPool 使用的 ClassPath 集合，同时将要处理的 jar 写入 includeJars */
     def
-    static getClassPaths(Project project, GlobalScope globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
+    static getClassPaths(Project project, def globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
         def classpathList = []
 
         // android.jar
@@ -120,8 +119,8 @@ public class Util {
     /**
      * 编译环境中 android.jar 的路径
      */
-    def static getAndroidJarPath(GlobalScope globalScope) {
-        return globalScope.getAndroidBuilder().getTarget().getPath(IAndroidTarget.ANDROID_JAR)
+    def static getAndroidJarPath(def globalScope) {
+        return ScopeCompat.getAndroidJar(globalScope)
     }
 
     /**
