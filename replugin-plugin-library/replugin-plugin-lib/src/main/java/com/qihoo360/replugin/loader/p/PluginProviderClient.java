@@ -190,7 +190,7 @@ public class PluginProviderClient {
         }
 
         try {
-            Object obj = ProxyRePluginProviderClientVar.update.call(null, c, uri);
+            Object obj = ProxyRePluginProviderClientVar.update.call(null, c, uri, values, selection, selectionArgs);
             if (obj != null) {
                 return (Integer) obj;
             }
