@@ -18,6 +18,7 @@ package com.qihoo360.replugin.gradle.host
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
+import com.qihoo360.replugin.gradle.compat.VariantCompat
 import com.qihoo360.replugin.gradle.host.creator.FileCreators
 import com.qihoo360.replugin.gradle.host.creator.IFileCreator
 import com.qihoo360.replugin.gradle.host.creator.impl.json.PluginBuiltinJsonCreator
@@ -56,8 +57,10 @@ public class Replugin implements Plugin<Project> {
                     checkUserConfig(config)
                 }
 
-                def appID = variant.generateBuildConfig.appPackageName
+                def generateBuildConfigTask = VariantCompat.getGenerateBuildConfigTask(variant)
+                def appID = generateBuildConfigTask.appPackageName
                 def newManifest = ComponentsGenerator.generateComponent(appID, config)
+                println "${TAG} countTask=${config.countTask}"
 
                 def variantData = variant.variantData
                 def scope = variantData.scope
@@ -72,7 +75,6 @@ public class Replugin implements Plugin<Project> {
                 generateHostConfigTask.group = AppConstant.TASKS_GROUP
 
                 //depends on build config task
-                def generateBuildConfigTask = variant.getGenerateBuildConfig()
                 if (generateBuildConfigTask) {
                     generateHostConfigTask.dependsOn generateBuildConfigTask
                     generateBuildConfigTask.finalizedBy generateHostConfigTask
@@ -88,39 +90,52 @@ public class Replugin implements Plugin<Project> {
                 generateBuiltinJsonTask.group = AppConstant.TASKS_GROUP
 
                 //depends on mergeAssets Task
-                def mergeAssetsTask = variant.getMergeAssets()
+                def mergeAssetsTask = VariantCompat.getMergeAssetsTask(variant)
                 if (mergeAssetsTask) {
                     generateBuiltinJsonTask.dependsOn mergeAssetsTask
                     mergeAssetsTask.finalizedBy generateBuiltinJsonTask
                 }
 
                 variant.outputs.each { output ->
-                    output.processManifest.doLast {
-                        output.processManifest.outputs.files.each { File file ->
-                            def manifestFile = null;
-                            //在gradle plugin 3.0.0之前，file是文件，且文件名为AndroidManifest.xml
-                            //在gradle plugin 3.0.0之后，file是目录，且不包含AndroidManifest.xml，需要自己拼接
-                            //除了目录和AndroidManifest.xml之外，还可能会包含manifest-merger-debug-report.txt等不相干的文件，过滤它
-                            if ((file.name.equalsIgnoreCase("AndroidManifest.xml") && !file.isDirectory()) || file.isDirectory()) {
-                                if (file.isDirectory()) {
-                                    //3.0.0之后，自己拼接AndroidManifest.xml
-                                    manifestFile = new File(file, "AndroidManifest.xml")
-                                } else {
-                                    //3.0.0之前，直接使用
-                                    manifestFile = file
-                                }
-                                //检测文件是否存在
-                                if (manifestFile != null && manifestFile.exists()) {
-                                    println "${AppConstant.TAG} handle manifest: ${manifestFile}"
-                                    def updatedContent = manifestFile.getText("UTF-8").replaceAll("</application>", newManifest + "</application>")
-                                    manifestFile.write(updatedContent, 'UTF-8')
-                                }
-                            }
+                    VariantCompat.getProcessManifestTask(output).doLast {
+                        println "${AppConstant.TAG} processManifest: ${it.outputs.files}"
+                        it.outputs.files.each { File file ->
+                            updateManifest(file, newManifest)
                         }
                     }
                 }
             }
         }
+    }
+
+    /**
+     *
+     * @hyongbai
+     * 
+     * 在gradle plugin 3.0.0之前，file是文件，且文件名为AndroidManifest.xml
+     * 在gradle plugin 3.0.0之后，file是目录，(特别是3.3.2)在这里改成递归的方式替换内部所有的 manifest 文件
+     *
+     * @param file manifest文件
+     * @param newManifest 需要添加的 manifest 信息
+     */
+    def updateManifest(def file, def newManifest) {
+        // 除了目录和AndroidManifest.xml之外，还可能会包含manifest-merger-debug-report.txt等不相干的文件，过滤它
+        if (file == null || !file.exists() || newManifest == null) return
+        if (file.isDirectory()) {
+            println "${AppConstant.TAG} updateManifest: ${file}"
+            file.listFiles().each {
+                updateManifest(it, newManifest)
+            }
+        } else if (file.name.equalsIgnoreCase("AndroidManifest.xml")) {
+            appendManifest(file, newManifest)
+        }
+    }
+
+    def appendManifest(def file, def content) {
+        if (file == null || !file.exists()) return
+        println "${AppConstant.TAG} appendManifest: ${file}"
+        def updatedContent = file.getText("UTF-8").replaceAll("</application>", content + "</application>")
+        file.write(updatedContent, 'UTF-8')
     }
 
     // 添加 【查看所有插件信息】 任务
@@ -150,7 +165,7 @@ public class Replugin implements Plugin<Project> {
         showPluginsTask.group = AppConstant.TASKS_GROUP
 
         //get mergeAssetsTask name, get real gradle task
-        def mergeAssetsTask = variant.getMergeAssets()
+        def mergeAssetsTask = VariantCompat.getMergeAssetsTask(variant)
 
         //depend on mergeAssetsTask so that assets have been merged
         if (mergeAssetsTask) {

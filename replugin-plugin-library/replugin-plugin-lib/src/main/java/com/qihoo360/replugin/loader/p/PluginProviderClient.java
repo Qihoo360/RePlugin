@@ -17,6 +17,7 @@
 package com.qihoo360.replugin.loader.p;
 
 import android.annotation.TargetApi;
+import android.content.ContentProviderClient;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.ContentObserver;
@@ -24,10 +25,15 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.CancellationSignal;
+import android.os.ParcelFileDescriptor;
 
 import com.qihoo360.replugin.MethodInvoker;
 import com.qihoo360.replugin.RePluginFramework;
 import com.qihoo360.replugin.helper.LogDebug;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * 一种能够对【插件】的Provider做增加、删除、改变、查询的接口。
@@ -184,7 +190,7 @@ public class PluginProviderClient {
         }
 
         try {
-            Object obj = ProxyRePluginProviderClientVar.update.call(null, c, uri);
+            Object obj = ProxyRePluginProviderClientVar.update.call(null, c, uri, values, selection, selectionArgs);
             if (obj != null) {
                 return (Integer) obj;
             }
@@ -215,6 +221,285 @@ public class PluginProviderClient {
             Object obj = ProxyRePluginProviderClientVar.getType.call(null, c, uri);
             if (obj != null) {
                 return (String) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    public static InputStream openInputStream(Context c, Uri uri) {
+        if (c == null) {
+            return null;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            try {
+                return c.getContentResolver().openInputStream(uri);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        try {
+            Object obj = ProxyRePluginProviderClientVar.openInputStream.call(null, c, uri);
+            if (obj != null) {
+                return (InputStream) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    public static OutputStream openOutputStream(Context c, Uri uri) {
+        if (c == null) {
+            return null;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            try {
+                return c.getContentResolver().openOutputStream(uri);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        try {
+            Object obj = ProxyRePluginProviderClientVar.openOutputStream.call(null, c, uri);
+            if (obj != null) {
+                return (OutputStream) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    @TargetApi(3)
+    public static OutputStream openOutputStream(Context c, Uri uri, String mode) {
+        if (c == null) {
+            return null;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            try {
+                return c.getContentResolver().openOutputStream(uri, mode);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        try {
+            Object obj = ProxyRePluginProviderClientVar.openOutputStream2.call(null, c, uri, mode);
+            if (obj != null) {
+                return (OutputStream) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+
+    public static ParcelFileDescriptor openFileDescriptor(Context c, Uri uri, String mode) {
+        if (c == null) {
+            return null;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            try {
+                return c.getContentResolver().openFileDescriptor(uri, mode);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        try {
+            Object obj = ProxyRePluginProviderClientVar.openFileDescriptor.call(null, c, uri, mode);
+            if (obj != null) {
+                return (ParcelFileDescriptor) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    @TargetApi(19)
+    public static ParcelFileDescriptor openFileDescriptor(Context c, Uri uri, String mode, CancellationSignal cancellationSignal) {
+        if (c == null) {
+            return null;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            try {
+                return c.getContentResolver().openFileDescriptor(uri, mode, cancellationSignal);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        try {
+            Object obj = ProxyRePluginProviderClientVar.openFileDescriptor2.call(null, c, uri, mode, cancellationSignal);
+            if (obj != null) {
+                return (ParcelFileDescriptor) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    public static void registerContentObserver(Context c, Uri uri, boolean notifyForDescendents, ContentObserver observer) {
+        if (c == null) {
+            return;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            c.getContentResolver().registerContentObserver(uri, notifyForDescendents, observer);
+            return;
+        }
+
+        try {
+            ProxyRePluginProviderClientVar.registerContentObserver.call(null, c, uri, notifyForDescendents, observer);
+            return;
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return;
+    }
+
+
+    /**
+     * TODO 支持{@link android.content.ContentResolver#acquireContentProviderClient(Uri)}
+     *
+     * @param c
+     * @param name
+     * @return
+     */
+    @TargetApi(Build.VERSION_CODES.ECLAIR)
+    public static ContentProviderClient acquireContentProviderClient(Context c, String name) {
+        if (c == null) {
+            return null;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            return c.getContentResolver().acquireContentProviderClient(name);
+        }
+
+        try {
+            Object obj = ProxyRePluginProviderClientVar.acquireContentProviderClient.call(null, c, name);
+            if (obj != null) {
+                return (ContentProviderClient) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public static void notifyChange(Context c, Uri uri, ContentObserver observer) {
+        if (c == null) {
+            return;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            c.getContentResolver().notifyChange(uri, observer);
+            return;
+        }
+
+        try {
+            ProxyRePluginProviderClientVar.notifyChange.call(null, c, uri, observer);
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public static void notifyChange(Context c, Uri uri, ContentObserver observer, boolean b) {
+        if (c == null) {
+            return;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            c.getContentResolver().notifyChange(uri, observer, b);
+            return;
+        }
+
+        try {
+            ProxyRePluginProviderClientVar.notifyChange2.call(null, c, uri, observer, b);
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static Uri toCalledUri(Context c, Uri uri) {
+        if (c == null) {
+            return null;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            return uri;
+        }
+
+        try {
+            Object obj = ProxyRePluginProviderClientVar.toCalledUri.call(null, c, uri);
+            if (obj != null) {
+                return (Uri) obj;
+            }
+        } catch (Exception e) {
+            if (LogDebug.LOG) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    public static Uri toCalledUri(Context c, String plugin, Uri uri, int process) {
+        if (c == null) {
+            return null;
+        }
+
+        if (!RePluginFramework.mHostInitialized) {
+            return uri;
+        }
+
+        try {
+            Object obj = ProxyRePluginProviderClientVar.toCalledUri2.call(null, c, plugin, uri, process);
+            if (obj != null) {
+                return (Uri) obj;
             }
         } catch (Exception e) {
             if (LogDebug.LOG) {

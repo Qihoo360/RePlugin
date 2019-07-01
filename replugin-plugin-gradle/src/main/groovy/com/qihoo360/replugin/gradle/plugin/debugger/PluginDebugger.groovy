@@ -17,6 +17,7 @@
 
 package com.qihoo360.replugin.gradle.plugin.debugger
 
+import com.qihoo360.replugin.gradle.compat.ScopeCompat
 import com.qihoo360.replugin.gradle.plugin.AppConstant
 import com.qihoo360.replugin.gradle.plugin.util.CmdUtil
 import org.gradle.api.Project
@@ -56,7 +57,7 @@ class PluginDebugger {
             apkFile = new File(apkDir, variantConfiguration.getBaseName() + File.separator + apkName)
         }
 
-        adbFile = globalScope.androidBuilder.sdkInfo.adb;
+        adbFile = ScopeCompat.getAdbExecutable(globalScope)
 
     }
 
