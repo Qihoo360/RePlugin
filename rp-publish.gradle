@@ -57,6 +57,8 @@ def pbEmail = getPropertyExt('RP_EMAIL', pbUser)
 
 def pbUserId = getPropertyExt('RP_USER_ID', pbUser)
 
+def pbUserOrg = getPropertyExt('RP_USERORG', '')
+
 def pbBintayKey = getPropertyExt('RP_BINTRAY_KEY', System.getenv('RP_BINTRAY_KEY'))
 
 //
@@ -120,6 +122,29 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
+
+// TODO: mavenLocal & jcenter conflicts
+
+if ( pbBintayKey == null ){
+
+	System.err.println("\n>>>「publish.gradle」bintray access key is EMPTY, UPLOAD LOCAL ONLY!\n")
+
+    ///// publish to LOCAL
+
+    apply plugin: 'maven'
+    final def theGroup = group // group will be reset to 'upload'
+    uploadArchives {
+       repositories.mavenDeployer {
+           repository(url: "file://${System.getenv('HOME')}/.m2/repository")
+           pom.groupId = theGroup
+           pom.version = version
+           pom.artifactId = pbArtifactId
+       }
+    }
+
+    return
+}
+
 /////// publish to BINTRAY
 
 apply plugin: 'com.jfrog.bintray'
@@ -157,38 +182,19 @@ install {
     }
 }
 
-// config bintray
-
-if ( pbBintayKey == null ){
-	System.err.println("bintray access key is EMPTY!!!")
-} else {
-	bintray {
-	    user = pbUser
-	    key = pbBintayKey
-	    configurations = ['archives']
-	    pkg {
-            desc = pbDesc
-	        repo = pbRepo
-	        name = pbArtifactId
-	        vcsUrl = pbGitUrl
-            userOrg = 'qihoo360'
-	        websiteUrl = pbSiteUrl
-	    	issueTrackerUrl = pbIssueUrl
-	        licenses = [pbLicense]
-	        publish = true
-	    }
-	}
+bintray {
+    user = pbUser
+    key = pbBintayKey
+    configurations = ['archives']
+    pkg {
+        desc = pbDesc
+        repo = pbRepo
+        name = pbArtifactId
+        vcsUrl = pbGitUrl
+        userOrg = pbUserOrg
+        websiteUrl = pbSiteUrl
+        issueTrackerUrl = pbIssueUrl
+        licenses = [pbLicense]
+        publish = true
+    }
 }
-
-/////// publish to LOCAL
-
-// apply plugin: 'maven'
-//final def theGroup = group // group will be reset to 'upload'
-//uploadArchives {
-//    repositories.mavenDeployer {
-//        repository(url: "file://${System.getenv('HOME')}/.m2/repository")
-//        pom.groupId = theGroup
-//        pom.version = version
-//        pom.artifactId = pbArtifactId
-//    }
-//}
