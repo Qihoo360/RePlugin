@@ -58,8 +58,10 @@ public class PluginInfoParser extends DefaultHandler {
         String fullName = pluginFile.name
         pluginInfo.path = config.pluginDir + "/" + fullName
 
-        String postfix = config.pluginFilePostfix
-        pluginInfo.name = fullName.substring(0, fullName.length() - postfix.length())
+        if (pluginInfo.name == null || pluginInfo.name.length() == 0) {
+            String postfix = config.pluginFilePostfix
+            pluginInfo.name = fullName.substring(0, fullName.length() - postfix.length())
+        }
     }
 
 
