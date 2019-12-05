@@ -26,9 +26,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import com.qihoo360.loader2.Constant;
 import com.qihoo360.loader2.PluginNativeLibsHelper;
 import com.qihoo360.loader2.V5FileInfo;

@@ -20,9 +20,9 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.RePluginEnv;
 import com.qihoo360.replugin.helper.JSONHelper;

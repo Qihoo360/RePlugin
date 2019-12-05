@@ -46,7 +46,9 @@ public class LoaderActivityInjector extends BaseInjector {
             'android.support.v4.app.FragmentActivity' : 'com.qihoo360.replugin.loader.a.PluginFragmentActivity',
             'android.support.v7.app.AppCompatActivity': 'com.qihoo360.replugin.loader.a.PluginAppCompatActivity',
             'android.preference.PreferenceActivity'   : 'com.qihoo360.replugin.loader.a.PluginPreferenceActivity',
-            'android.app.ExpandableListActivity'      : 'com.qihoo360.replugin.loader.a.PluginExpandableListActivity'
+            'android.app.ExpandableListActivity'      : 'com.qihoo360.replugin.loader.a.PluginExpandableListActivity',
+            'androidx.appcompat.app.AppCompatActivity': 'com.qihoo360.replugin.loader.a.PluginAppCompatActivity',
+            'androidx.fragment.app.FragmentActivity'  : 'com.qihoo360.replugin.loader.a.PluginFragmentActivity'
     ]
 
     @Override
@@ -134,7 +136,7 @@ public class LoaderActivityInjector extends BaseInjector {
                     })
                 }
 
-                ctCls.writeFile(CommonData.getClassPath(ctCls.name))
+                ctCls.writeFile(CommonData.getClassPath(ctCls.name) as String)
                 println "    Replace ${ctCls.name}'s SuperClass ${superCls.name} to ${targetSuperCls.name}"
             }
 

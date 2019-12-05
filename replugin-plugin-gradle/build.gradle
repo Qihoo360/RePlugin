@@ -46,15 +46,15 @@ String verPath = "${project.projectDir}" + classPath + ".groovy"
 String verLine = new File(verPath).filterLine { it =~ /def static final VER =/ }
 version = "${verLine.split("\"")[1]}" // 版本
 //红色醒目打印显示版本号
-java.lang.System.err.println "version=${version}"
+System.err.println "version=${version}"
 
-sourceSets {
-    main {
-        groovy {
-            srcDirs '../replugin-host-gradle/src/main/groovy/com/qihoo360/replugin/gradle/compat'
-        }
-    }
-}
+//sourceSets {
+//    main {
+//        groovy {
+//            srcDirs '../replugin-host-gradle/src/main/groovy/com/qihoo360/replugin/gradle/compat'
+//        }
+//    }
+//}
 
 dependencies {
     compile 'com.android.tools.build:gradle:2.1.3'

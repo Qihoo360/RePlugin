@@ -45,7 +45,7 @@
     public protected *;
 }
 # LocalBroadcastManager，插件会用
--keep public class android.support.v4.content.LocalBroadcastManager {
+-keep public class androidx.localbroadcastmanager.content.LocalBroadcastManager {
     public *;
 }
 

@@ -101,13 +101,21 @@ public class PluginRunningList implements Parcelable, Iterable<String>, Cloneabl
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         PluginRunningList strings = (PluginRunningList) o;
 
-        if (mPid != strings.mPid) return false;
-        if (!mList.equals(strings.mList)) return false;
+        if (mPid != strings.mPid) {
+            return false;
+        }
+        if (!mList.equals(strings.mList)) {
+            return false;
+        }
 
         return mProcessName != null ? mProcessName.equals(strings.mProcessName) : strings.mProcessName == null;
     }

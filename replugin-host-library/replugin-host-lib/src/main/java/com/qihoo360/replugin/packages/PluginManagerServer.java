@@ -21,9 +21,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.RemoteException;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import com.qihoo360.loader2.CertUtils;
 import com.qihoo360.loader2.MP;
 import com.qihoo360.loader2.PluginNativeLibsHelper;

@@ -20,10 +20,10 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.qihoo360.loader2.PMF;
 import com.qihoo360.replugin.base.IPC;
 import com.qihoo360.replugin.helper.LogDebug;

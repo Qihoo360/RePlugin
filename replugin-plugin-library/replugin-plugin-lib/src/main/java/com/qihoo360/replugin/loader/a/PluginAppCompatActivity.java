@@ -20,9 +20,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.helper.LogRelease;
 
