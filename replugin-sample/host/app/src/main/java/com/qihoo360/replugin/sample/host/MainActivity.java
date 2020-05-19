@@ -43,7 +43,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //test
         setContentView(R.layout.activity_main);
         findViewById(R.id.btn_start_demo1).setOnClickListener(new View.OnClickListener() {
             @Override
