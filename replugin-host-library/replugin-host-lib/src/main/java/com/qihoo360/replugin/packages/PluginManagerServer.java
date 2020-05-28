@@ -158,7 +158,7 @@ public class PluginManagerServer {
             if (checkResult < 0) {
                 RePlugin.getConfig().getEventCallbacks().onInstallPluginFailed(path, RePluginEventCallbacks.InstallResult.VERIFY_VER_FAIL);
                 return null;
-            } else if (checkResult == 0){
+            } else if (checkResult == 0) {
                 instPli.setIsPendingCover(true);
             }
         }
@@ -297,7 +297,7 @@ public class PluginManagerServer {
                 if (LogDebug.LOG) {
                     LogDebug.w(TAG, "updateOrLater: Plugin need update high version. clear PendingDelete and PendingCover.");
                 }
-            } else if (instPli.getVersion() == curPli.getVersion()){
+            } else if (instPli.getVersion() == curPli.getVersion()) {
                 // 同版本覆盖
                 curPli.setPendingCover(instPli);
                 curPli.setPendingDelete(null);
@@ -429,23 +429,42 @@ public class PluginManagerServer {
             LogDebug.i(TAG, "move. curPi=" + curPi.getPath() + "; newPi=" + newPi.getPath());
         }
         try {
-            FileUtils.copyFile(newPi.getApkFile(), curPi.getApkFile());
-
-            if (newPi.getDexFile().exists()) {
-                FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
+            try {
+                FileUtils.copyFile(newPi.getApkFile(), curPi.getApkFile());
+            } catch (Exception e) {
+                if (LogRelease.LOGR) {
+                    e.printStackTrace();
+                }
             }
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                FileUtils.copyDir(newPi.getExtraOdexDir(), curPi.getExtraOdexDir());
+            try {
+                if (newPi.getDexFile().exists()) {
+                    FileUtils.copyFile(newPi.getDexFile(), curPi.getDexFile());
+                }
+            } catch (Exception e) {
+                if (LogRelease.LOGR) {
+                    e.printStackTrace();
+                }
             }
 
-            if (newPi.getNativeLibsDir().exists()) {
-                FileUtils.copyDir(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+            try {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    FileUtils.copyDir(newPi.getExtraOdexDir(), curPi.getExtraOdexDir());
+                }
+            } catch (Exception e) {
+                if (LogRelease.LOGR) {
+                    e.printStackTrace();
+                }
             }
 
-        } catch (IOException e) {
-            if (LogRelease.LOGR) {
-                e.printStackTrace();
+            try {
+                if (newPi.getNativeLibsDir().exists()) {
+                    FileUtils.copyDir(newPi.getNativeLibsDir(), curPi.getNativeLibsDir());
+                }
+            } catch (Exception e) {
+                if (LogRelease.LOGR) {
+                    e.printStackTrace();
+                }
             }
         } finally {
             try {
@@ -471,13 +490,9 @@ public class PluginManagerServer {
                 FileUtils.forceDelete(pi.getExtraOdexDir());
             }
             FileUtils.forceDelete(pi.getNativeLibsDir());
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (LogRelease.LOGR) {
                 e.printStackTrace();
-            }
-        } catch (IllegalArgumentException e2) {
-            if (LogRelease.LOGR) {
-                e2.printStackTrace();
             }
         }
     }
@@ -594,7 +609,7 @@ public class PluginManagerServer {
         l.add(pluginName);
 
         if (LogDebug.LOG) {
-            LogDebug.d(TAG, "addToRunningPluginsLocked: Added! pl =" + l +"; map=" + mProcess2PluginsMap);
+            LogDebug.d(TAG, "addToRunningPluginsLocked: Added! pl =" + l + "; map=" + mProcess2PluginsMap);
         }
     }
 
