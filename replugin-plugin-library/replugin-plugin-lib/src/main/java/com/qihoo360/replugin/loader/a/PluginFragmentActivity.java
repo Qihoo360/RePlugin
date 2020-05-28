@@ -18,6 +18,7 @@ package com.qihoo360.replugin.loader.a;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.helper.LogRelease;
+import com.qihoo360.replugin.res.PluginResources;
 
 import java.lang.reflect.Field;
 
@@ -33,9 +35,12 @@ import java.lang.reflect.Field;
  */
 public abstract class PluginFragmentActivity extends FragmentActivity {
 
+    private Resources mPluginResources;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         newBase = RePluginInternal.createActivityContext(this, newBase);
+        mPluginResources = new PluginResources(newBase.getResources());
         super.attachBaseContext(newBase);
     }
 
@@ -43,6 +48,14 @@ public abstract class PluginFragmentActivity extends FragmentActivity {
     public Context getBaseContext() {
 
         return super.getBaseContext();
+    }
+
+    @Override
+    public Resources getResources() {
+        if (mPluginResources != null) {
+            return mPluginResources;
+        }
+        return super.getResources();
     }
 
     @Override
