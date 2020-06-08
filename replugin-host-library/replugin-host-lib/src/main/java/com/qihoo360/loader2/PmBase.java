@@ -360,6 +360,9 @@ class PmBase {
             }
         }
 
+        // 将插件信息存入Map
+        refreshPluginMap(plugins);
+
         // 判断是否有需要更新的插件
         // FIXME 执行此操作前，判断下当前插件的运行进程，具体可以限制仅允许该插件运行在一个进程且为自身进程中
         List<PluginInfo> updatedPlugins = null;
@@ -374,10 +377,9 @@ class PmBase {
             }
         }
 
+        // 将需要更新的插件更新到Map中
         if (updatedPlugins != null) {
             refreshPluginMap(updatedPlugins);
-        } else {
-            refreshPluginMap(plugins);
         }
     }
 

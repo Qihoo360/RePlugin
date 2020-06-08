@@ -1290,7 +1290,7 @@ public class RePlugin {
             startActivity = new MethodInvoker(classLoader, rePlugin, "startActivity", new Class<?>[]{Context.class, Intent.class});
             startActivity2 = new MethodInvoker(classLoader, rePlugin, "startActivity", new Class<?>[]{Context.class, Intent.class, String.class, String.class});
             startActivityForResult = new MethodInvoker(classLoader, rePlugin, "startActivityForResult", new Class<?>[]{Activity.class, Intent.class, int.class});
-            startActivityForResult2 = new MethodInvoker(classLoader, rePlugin, "startActivityForResult", new Class<?>[]{Context.class, Intent.class, int.class, Bundle.class});
+            startActivityForResult2 = new MethodInvoker(classLoader, rePlugin, "startActivityForResult", new Class<?>[]{Activity.class, Intent.class, int.class, Bundle.class});
             createIntent = new MethodInvoker(classLoader, rePlugin, "createIntent", new Class<?>[]{String.class, String.class});
             createComponentName = new MethodInvoker(classLoader, rePlugin, "createComponentName", new Class<?>[]{String.class, String.class});
             isForDev = new MethodInvoker(classLoader, rePlugin, "isForDev", new Class<?>[]{});

@@ -62,7 +62,7 @@ dependencies {
     compile 'org.codehaus.groovy:groovy:2.4.7'
     compile 'com.squareup:javapoet:1.5.1'
     compile 'com.android.tools.build:transform-api:1.5.0'
-    compile 'javassist:javassist:3.12.1.GA'
+    compile 'org.javassist:javassist:3.18.2-GA'
     compile 'commons-io:commons-io:2.5'
 
     compile gradleApi()

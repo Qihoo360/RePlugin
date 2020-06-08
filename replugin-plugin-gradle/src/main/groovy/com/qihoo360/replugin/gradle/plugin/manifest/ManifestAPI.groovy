@@ -64,8 +64,20 @@ public class ManifestAPI {
                 manifestOutputFile = processManifestTask.getManifestOutputFile()
                 instantRunManifestOutputFile = processManifestTask.getInstantRunManifestOutputFile()
             } catch (Exception e) {
-                manifestOutputFile = new File(processManifestTask.getManifestOutputDirectory(), "AndroidManifest.xml")
-                instantRunManifestOutputFile = new File(processManifestTask.getInstantRunManifestOutputDirectory(), "AndroidManifest.xml")
+//                manifestOutputFile = new File(processManifestTask.getManifestOutputDirectory(), "AndroidManifest.xml")
+//                instantRunManifestOutputFile = new File(processManifestTask.getInstantRunManifestOutputDirectory(), "AndroidManifest.xml")
+                def dir = processManifestTask.getManifestOutputDirectory()
+                if (dir instanceof File || dir instanceof String) {
+                    manifestOutputFile = new File(dir, "AndroidManifest.xml")
+                } else {
+                    manifestOutputFile = new File(dir.getAsFile().get(), "AndroidManifest.xml")
+                }
+                dir = processManifestTask.getInstantRunManifestOutputDirectory()
+                if (dir instanceof File || dir instanceof String) {
+                    instantRunManifestOutputFile = new File(dir, "AndroidManifest.xml")
+                } else {
+                    instantRunManifestOutputFile = new File(dir.getAsFile().get(), "AndroidManifest.xml")
+                }
             }
 
             if (manifestOutputFile == null && instantRunManifestOutputFile == null) {

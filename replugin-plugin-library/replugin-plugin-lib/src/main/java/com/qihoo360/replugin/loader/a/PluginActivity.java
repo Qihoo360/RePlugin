@@ -19,10 +19,12 @@ package com.qihoo360.replugin.loader.a;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import com.qihoo360.replugin.RePluginInternal;
 import com.qihoo360.replugin.helper.LogRelease;
+import com.qihoo360.replugin.loader.PluginResource;
 
 /**
  * 插件内的BaseActivity，建议插件内所有的Activity都要继承此类
@@ -32,10 +34,21 @@ import com.qihoo360.replugin.helper.LogRelease;
  */
 public abstract class PluginActivity extends Activity {
 
+    private PluginResource pluginResource;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         newBase = RePluginInternal.createActivityContext(this, newBase);
+        pluginResource = new PluginResource(newBase.getResources());
         super.attachBaseContext(newBase);
+    }
+
+    @Override
+    public Resources getResources() {
+        if (pluginResource != null){
+            return pluginResource;
+        }
+        return super.getResources();
     }
 
     @Override
