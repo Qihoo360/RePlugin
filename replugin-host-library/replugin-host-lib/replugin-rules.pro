@@ -98,7 +98,7 @@
     public *;
 }
 # IPC
--keep public class com.qihoo360.mobilesafe.api.IPC {
+-keep public class com.qihoo360.replugin.base.IPC {
     public *;
 }
 # QihooServiceManager
