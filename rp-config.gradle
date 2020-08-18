@@ -11,5 +11,5 @@ project.ext{
 	RP_LICENSES_NAME = 'Apache-2.0'
 	//
 	RP_GROUP = 'com.qihoo360.replugin'
-	RP_VERSION = '2.3.3'
+	RP_VERSION = '2.3.4'
 }
