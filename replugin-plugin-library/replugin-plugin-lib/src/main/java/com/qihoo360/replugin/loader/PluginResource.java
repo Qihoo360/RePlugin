@@ -24,7 +24,7 @@ public class PluginResource extends Resources {
     public PluginResource(Resources resources) {
         super(resources.getAssets(), resources.getDisplayMetrics(), resources.getConfiguration());
         this.mPluginResource = resources;
-        if (RePlugin.isHostInitialized()){
+        if (RePlugin.isHostInitialized()) {
             mHostResources = RePlugin.getHostContext().getResources();
         }
     }
@@ -164,9 +164,13 @@ public class PluginResource extends Resources {
     public int getDimensionPixelSize(int id) throws NotFoundException {
         try {
             return mPluginResource.getDimensionPixelSize(id);
-        }catch (NotFoundException e){
+        } catch (NotFoundException e) {
             e.printStackTrace();
-            return mHostResources.getDimensionPixelSize(id);
+            try {
+                return mHostResources.getDimensionPixelSize(id);
+            } catch (NotFoundException e1) {
+                return 0;
+            }
         }
     }
 
@@ -406,7 +410,7 @@ public class PluginResource extends Resources {
     public int getIdentifier(String name, String defType, String defPackage) {
         try {
             return mPluginResource.getIdentifier(name, defType, defPackage);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return mHostResources.getIdentifier(name, defType, defPackage);
         }
@@ -416,7 +420,7 @@ public class PluginResource extends Resources {
     public Configuration getConfiguration() {
         try {
             return mPluginResource.getConfiguration();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return mHostResources.getConfiguration();
         }
