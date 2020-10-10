@@ -190,6 +190,12 @@ class Loader {
                 }
                 mPackageInfo.applicationInfo.sourceDir = mPath;
                 mPackageInfo.applicationInfo.publicSourceDir = mPath;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    mPackageInfo.applicationInfo.dataDir = mContext.getDataDir().getAbsolutePath();
+                } else {
+                    String filesDir = mContext.getFilesDir().getAbsolutePath();
+                    mPackageInfo.applicationInfo.dataDir = filesDir.substring(0, filesDir.lastIndexOf('/'));
+                }
 
                 if (TextUtils.isEmpty(mPackageInfo.applicationInfo.processName)) {
                     mPackageInfo.applicationInfo.processName = mPackageInfo.applicationInfo.packageName;
