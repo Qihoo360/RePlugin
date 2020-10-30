@@ -58,7 +58,7 @@ public class Replugin implements Plugin<Project> {
                 }
 
                 def generateBuildConfigTask = VariantCompat.getGenerateBuildConfigTask(variant)
-                def appID = generateBuildConfigTask.appPackageName
+                def appID = getAppIdCompat(variant)
                 def newManifest = ComponentsGenerator.generateComponent(appID, config)
                 println "${TAG} countTask=${config.countTask}"
 
@@ -66,7 +66,7 @@ public class Replugin implements Plugin<Project> {
                 def scope = variantData.scope
 
                 //host generate task
-                def generateHostConfigTaskName = scope.getTaskName(AppConstant.TASK_GENERATE, "HostConfig")
+                def generateHostConfigTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_GENERATE, "HostConfig")
                 def generateHostConfigTask = project.task(generateHostConfigTaskName)
 
                 generateHostConfigTask.doLast {
@@ -81,7 +81,7 @@ public class Replugin implements Plugin<Project> {
                 }
 
                 //json generate task
-                def generateBuiltinJsonTaskName = scope.getTaskName(AppConstant.TASK_GENERATE, "BuiltinJson")
+                def generateBuiltinJsonTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_GENERATE, "BuiltinJson")
                 def generateBuiltinJsonTask = project.task(generateBuiltinJsonTaskName)
 
                 generateBuiltinJsonTask.doLast {
@@ -138,11 +138,42 @@ public class Replugin implements Plugin<Project> {
         file.write(updatedContent, 'UTF-8')
     }
 
+    def getAppIdCompat(def variant) {
+        if (getAndroidGradlePluginVersionCompat() >= '4.1.0') {
+            return variant.variantData.variantDslInfo.applicationId.get()
+        }
+        return variant.generateBuildConfig.appPackageName
+    }
+
+    def getAndroidGradlePluginVersionCompat() {
+        String version = null
+        try {
+            Class versionModel = Class.forName("com.android.builder.model.Version")
+            def versionFiled = versionModel.getDeclaredField("ANDROID_GRADLE_PLUGIN_VERSION")
+            versionFiled.setAccessible(true)
+            version = versionFiled.get(null)
+        } catch (Exception e) {
+        }
+        return version
+    }
+
+    def getTaskNameFromVariantScopeCompat(def variant, String prefix, String suffix) {
+        def taskName = null
+        try {
+            def variantData = variant.variantData
+            def scope = variantData.scope
+            taskName = scope.getTaskName(prefix, suffix)
+        } catch(Exception e) {
+            //For AGP4.1.0
+            def componentProperties = variant.componentProperties
+            taskName = componentProperties.computeTaskName(prefix, suffix)
+        }
+        return taskName
+    }
+
     // 添加 【查看所有插件信息】 任务
     def addShowPluginTask(def variant) {
-        def variantData = variant.variantData
-        def scope = variantData.scope
-        def showPluginsTaskName = scope.getTaskName(AppConstant.TASK_SHOW_PLUGIN, "")
+        def showPluginsTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_SHOW_PLUGIN, "")
         def showPluginsTask = project.task(showPluginsTaskName)
 
         showPluginsTask.doLast {

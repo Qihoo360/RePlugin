@@ -37,16 +37,14 @@ class PluginDebugger {
         this.project = project
         this.config = config
         this.variant = variant
-        def variantData = this.variant.variantData
-        def scope = variantData.scope
-        def globalScope = scope.globalScope
-        def variantConfiguration = variantData.variantConfiguration
-        String archivesBaseName = globalScope.getArchivesBaseName();
+        def globalScope = getGlobalScopeCompat(this.variant)
+        def variantConfiguration = getVariantConfigurationCompat(this.variant)
+        String archivesBaseName = getArchivesBaseNameCompat(globalScope)
         String apkBaseName = archivesBaseName + "-" + variantConfiguration.getBaseName()
 
         File apkDir = new File(globalScope.getBuildDir(), "outputs" + File.separator + "apk")
 
-        String unsigned = (variantConfiguration.getSigningConfig() == null
+        String unsigned = (getSigningConfigCompat(this.variant) == null
                 ? "-unsigned.apk"
                 : ".apk");
         String apkName = apkBaseName + unsigned
@@ -59,6 +57,55 @@ class PluginDebugger {
 
         adbFile = ScopeCompat.getAdbExecutable(globalScope)
 
+    }
+
+    def getArchivesBaseNameCompat(def globalScope) {
+        def archivesBaseName = null
+        try {
+            archivesBaseName = globalScope.getArchivesBaseName()
+        } catch(Exception e) {
+            //AGP4.1.0
+            archivesBaseName = globalScope.getProjectBaseName()
+        }
+        return archivesBaseName
+    }
+
+    def getVariantConfigurationCompat(def variant) {
+        def variantConfiguration = null
+        try {
+            variantConfiguration = variant.variantData.variantConfiguration
+        } catch(Exception e) {
+            //AGP4.1.0
+            variantConfiguration = variant.@componentProperties
+        }
+        return variantConfiguration
+    }
+
+    def getSigningConfigCompat(def variant) {
+        def signingConfig = null
+        def variantData = variant.variantData
+        try {
+            def variantConfiguration = variantData.variantConfiguration
+            signingConfig = variantConfiguration.getSigningConfig()
+        } catch(Exception e) {
+            //AGP4.1.0
+            def variantDslInfo = variantData.variantDslInfo
+            signingConfig = variantDslInfo.signingConfig
+        }
+    }
+
+    def getGlobalScopeCompat(def variant) {
+        def globalScope = null
+        try {
+            def variantData = variant.variantData
+            VariantScope scope = variantData.scope
+            globalScope = scope.globalScope
+        } catch(Exception e) {
+            //AGP4.1.0
+            def componentProperties = variant.componentProperties
+            globalScope = componentProperties.globalScope
+        }
+        return globalScope
     }
 
     /**

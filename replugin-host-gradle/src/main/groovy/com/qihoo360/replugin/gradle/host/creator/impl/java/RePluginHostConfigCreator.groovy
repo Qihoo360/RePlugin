@@ -37,9 +37,20 @@ public class RePluginHostConfigCreator implements IFileCreator {
         this.variant = variant;
         this.config = cfg
         //make it generated in buildConfig output dir so that we don't need to hook anything
-        File buildConfigGeneratedDir = this.variant.getVariantData().getScope().getBuildConfigSourceOutputDir()
+        File buildConfigGeneratedDir = getBuildConfigGeneratedDirCompat(this.variant)
         fileName = HOST_CONFIG_NAME;
         fileDir = new File(buildConfigGeneratedDir, HOST_CONFIG_PATH)
+    }
+
+    def getBuildConfigGeneratedDirCompat(def variant) {
+        File buildConfigGeneratedDir = null
+        try {
+            buildConfigGeneratedDir = variant.getVariantData().getScope().getBuildConfigSourceOutputDir()
+        } catch(Exception e) {
+            //AGP4.1.0
+            buildConfigGeneratedDir = variant.componentProperties.paths.buildConfigSourceOutputDir
+        }
+        return buildConfigGeneratedDir
     }
 
     @Override

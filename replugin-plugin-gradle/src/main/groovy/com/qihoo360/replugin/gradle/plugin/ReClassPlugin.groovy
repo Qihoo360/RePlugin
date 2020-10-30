@@ -53,12 +53,9 @@ public class ReClassPlugin implements Plugin<Project> {
             android.applicationVariants.all { variant ->
                 PluginDebugger pluginDebugger = new PluginDebugger(project, config, variant)
 
-                def variantData = variant.variantData
-                def scope = variantData.scope
-
                 def assembleTask = VariantCompat.getAssembleTask(variant)
 
-                def installPluginTaskName = scope.getTaskName(AppConstant.TASK_INSTALL_PLUGIN, "")
+                def installPluginTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_INSTALL_PLUGIN, "")
                 def installPluginTask = project.task(installPluginTaskName)
 
                 installPluginTask.doLast {
@@ -71,7 +68,7 @@ public class ReClassPlugin implements Plugin<Project> {
                 installPluginTask.group = AppConstant.TASKS_GROUP
 
 
-                def uninstallPluginTaskName = scope.getTaskName(AppConstant.TASK_UNINSTALL_PLUGIN, "")
+                def uninstallPluginTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_UNINSTALL_PLUGIN, "")
                 def uninstallPluginTask = project.task(uninstallPluginTaskName)
 
                 uninstallPluginTask.doLast {
@@ -114,14 +111,14 @@ public class ReClassPlugin implements Plugin<Project> {
                     installPluginTask.dependsOn assembleTask
                 }
 
-                def runPluginTaskName = scope.getTaskName(AppConstant.TASK_RUN_PLUGIN, "")
+                def runPluginTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_RUN_PLUGIN, "")
                 def runPluginTask = project.task(runPluginTaskName)
                 runPluginTask.doLast {
                     pluginDebugger.run()
                 }
                 runPluginTask.group = AppConstant.TASKS_GROUP
 
-                def installAndRunPluginTaskName = scope.getTaskName(AppConstant.TASK_INSTALL_AND_RUN_PLUGIN, "")
+                def installAndRunPluginTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_INSTALL_AND_RUN_PLUGIN, "")
                 def installAndRunPluginTask = project.task(installAndRunPluginTaskName)
                 installAndRunPluginTask.doLast {
                     pluginDebugger.run()
@@ -138,6 +135,20 @@ public class ReClassPlugin implements Plugin<Project> {
             // 将 transform 注册到 android
             android.registerTransform(transform)
         }
+    }
+
+    def getTaskNameFromVariantScopeCompat(def variant, String prefix, String suffix) {
+        def taskName = null
+        try {
+            def variantData = variant.variantData
+            def scope = variantData.scope
+            taskName = scope.getTaskName(prefix, suffix)
+        } catch(Exception e) {
+            //AGP4.1.0
+            def componentProperties = variant.componentProperties
+            taskName = componentProperties.computeTaskName(prefix, suffix)
+        }
+        return taskName
     }
 }
 
