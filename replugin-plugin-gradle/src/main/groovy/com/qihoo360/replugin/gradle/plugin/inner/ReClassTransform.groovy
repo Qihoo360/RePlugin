@@ -44,11 +44,18 @@ public class ReClassTransform extends Transform {
 
     public ReClassTransform(Project p) {
         this.project = p
-        def appPlugin = project.plugins.getPlugin(AppPlugin)
-        // taskManager 在 2.1.3 中为 protected 访问类型的，在之后的版本为 private 访问类型的，
-        // 使用反射访问
-        def taskManager = BasePlugin.metaClass.getProperty(appPlugin, "taskManager")
-        this.globalScope = taskManager.globalScope;
+        try {
+            def appPlugin = project.plugins.getPlugin(AppPlugin)
+            // taskManager 在 2.1.3 中为 protected 访问类型的，在之后的版本为 private 访问类型的，
+            // 使用反射访问
+            def taskManager = BasePlugin.metaClass.getProperty(appPlugin, "taskManager")
+            this.globalScope = taskManager.globalScope;
+        } catch(Exception e) {
+            //AGP1.4.0
+            def androidExtension = project.extensions.getByName("android")
+            this.globalScope = androidExtension.globalScope
+        }
+
     }
 
     @Override
