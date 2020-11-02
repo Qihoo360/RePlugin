@@ -19,7 +19,7 @@ package com.qihoo360.replugin.gradle.plugin.manifest
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-
+import com.qihoo360.replugin.gradle.plugin.util.CompatUtil
 import java.util.regex.Pattern
 
 /**
@@ -66,13 +66,14 @@ public class ManifestAPI {
             } catch (Exception e) {
 //                manifestOutputFile = new File(processManifestTask.getManifestOutputDirectory(), "AndroidManifest.xml")
 //                instantRunManifestOutputFile = new File(processManifestTask.getInstantRunManifestOutputDirectory(), "AndroidManifest.xml")
-                def dir = processManifestTask.getManifestOutputDirectory()
+                def dir = CompatUtil.isGeAGP410() ? processManifestTask.multiApkManifestOutputDirectory : processManifestTask.getManifestOutputDirectory()
                 if (dir instanceof File || dir instanceof String) {
                     manifestOutputFile = new File(dir, "AndroidManifest.xml")
                 } else {
                     manifestOutputFile = new File(dir.getAsFile().get(), "AndroidManifest.xml")
                 }
-                dir = processManifestTask.getInstantRunManifestOutputDirectory()
+                //AGP 4.1.0 NO InstantRun feature
+                dir = CompatUtil.isGeAGP410() ? processManifestTask.multiApkManifestOutputDirectory : processManifestTask.getInstantRunManifestOutputDirectory()
                 if (dir instanceof File || dir instanceof String) {
                     instantRunManifestOutputFile = new File(dir, "AndroidManifest.xml")
                 } else {
