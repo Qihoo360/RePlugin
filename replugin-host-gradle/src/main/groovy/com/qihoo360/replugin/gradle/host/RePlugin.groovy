@@ -18,6 +18,7 @@ package com.qihoo360.replugin.gradle.host
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
+import com.qihoo360.replugin.gradle.compat.CompatUtil
 import com.qihoo360.replugin.gradle.compat.VariantCompat
 import com.qihoo360.replugin.gradle.host.creator.FileCreators
 import com.qihoo360.replugin.gradle.host.creator.IFileCreator
@@ -94,6 +95,12 @@ public class Replugin implements Plugin<Project> {
                 if (mergeAssetsTask) {
                     generateBuiltinJsonTask.dependsOn mergeAssetsTask
                     mergeAssetsTask.finalizedBy generateBuiltinJsonTask
+
+                    if (CompatUtil.isGeAGP410()) {
+                        def compressAssetsName = getTaskNameFromVariantScopeCompat(variant, "compress", "Assets")
+                        def compressAssetsTask = project.tasks.getByName(compressAssetsName)
+                        compressAssetsTask.mustRunAfter(generateBuiltinJsonTask)
+                    }
                 }
 
                 variant.outputs.each { output ->
@@ -139,22 +146,10 @@ public class Replugin implements Plugin<Project> {
     }
 
     def getAppIdCompat(def variant) {
-        if (getAndroidGradlePluginVersionCompat() >= '4.1.0') {
+        if (CompatUtil.isGeAGP410()) {
             return variant.variantData.variantDslInfo.applicationId.get()
         }
         return variant.generateBuildConfig.appPackageName
-    }
-
-    def getAndroidGradlePluginVersionCompat() {
-        String version = null
-        try {
-            Class versionModel = Class.forName("com.android.builder.model.Version")
-            def versionFiled = versionModel.getDeclaredField("ANDROID_GRADLE_PLUGIN_VERSION")
-            versionFiled.setAccessible(true)
-            version = versionFiled.get(null)
-        } catch (Exception e) {
-        }
-        return version
     }
 
     def getTaskNameFromVariantScopeCompat(def variant, String prefix, String suffix) {
