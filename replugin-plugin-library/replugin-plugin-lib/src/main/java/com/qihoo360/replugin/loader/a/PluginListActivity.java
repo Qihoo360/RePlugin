@@ -36,7 +36,7 @@ public abstract class PluginListActivity extends ListActivity {
     @Override
     protected void attachBaseContext(Context newBase) {
         newBase = RePluginInternal.createActivityContext(this, newBase);
-        pluginResource = new PluginResource(newBase.getResources());
+        pluginResource = new PluginResource(newBase);
         super.attachBaseContext(newBase);
     }
 

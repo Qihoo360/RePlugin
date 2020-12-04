@@ -36,7 +36,7 @@ public abstract class PluginActivityGroup extends ActivityGroup {
     @Override
     protected void attachBaseContext(Context newBase) {
         newBase = RePluginInternal.createActivityContext(this, newBase);
-        pluginResource = new PluginResource(newBase.getResources());
+        pluginResource = new PluginResource(newBase);
         super.attachBaseContext(newBase);
     }
 

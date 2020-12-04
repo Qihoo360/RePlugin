@@ -1,6 +1,7 @@
 package com.qihoo360.replugin.loader;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -20,14 +21,19 @@ import java.io.InputStream;
 
 public class PluginResource extends Resources {
 
+    private Context mContext;
     private Resources mPluginResource;
     private Resources mHostResources;
 
-    public PluginResource(Resources resources) {
-        super(resources.getAssets(), resources.getDisplayMetrics(), resources.getConfiguration());
-        this.mPluginResource = resources;
+    public PluginResource(Context context) {
+        super(context.getResources().getAssets(), context.getResources().getDisplayMetrics(),
+                context.getResources().getConfiguration());
+        this.mContext = context;
+        this.mPluginResource = context.getResources();
         if (RePlugin.isHostInitialized()) {
             mHostResources = RePlugin.getHostContext().getResources();
+        } else {
+            mHostResources = context.getResources();
         }
     }
 
@@ -411,17 +417,26 @@ public class PluginResource extends Resources {
     @Override
     public int getIdentifier(String name, String defType, String defPackage) {
         try {
-            //当defPackage不是插件包名，也不是宿主包名时，比如android，vivo等，
-            // 此时需要用宿主的resources进行加载
-            //plugin gradle会替换getIdentifier的defPackage，所以此处用反射方式进行处理
-            if (!TextUtils.equals(RePlugin.getPluginContext().getPackageName(), defPackage)
-                    && !TextUtils.equals(RePlugin.getHostContext().getPackageName(), defPackage)) {
-                return Integer.parseInt(String.valueOf(ReflectUtils.invokeMethod(mHostResources.getClass().getClassLoader(),
-                        "android.content.res.Resources", "getIdentifier", mHostResources,
-                        new Class[]{String.class, String.class, String.class},
-                        name, defType, defPackage)));
+            if (RePlugin.isHostInitialized()) {
+                //当defPackage不是插件包名，也不是宿主包名时，比如android，vivo等，
+                // 此时需要用宿主的resources进行加载
+                //plugin gradle会替换getIdentifier的defPackage，所以此处用反射方式进行处理
+                if (!TextUtils.equals(RePlugin.getPluginContext().getPackageName(), defPackage)
+                        && !TextUtils.equals(RePlugin.getHostContext().getPackageName(), defPackage)) {
+                    return Integer.parseInt(String.valueOf(ReflectUtils.invokeMethod(mHostResources.getClass().getClassLoader(),
+                            "android.content.res.Resources", "getIdentifier", mHostResources,
+                            new Class[]{String.class, String.class, String.class},
+                            name, defType, defPackage)));
+                }
+            } else {
+                if (!TextUtils.equals(mContext.getPackageName(), defPackage)) {
+                    return Integer.parseInt(String.valueOf(ReflectUtils.invokeMethod(mHostResources.getClass().getClassLoader(),
+                            "android.content.res.Resources", "getIdentifier", mHostResources,
+                            new Class[]{String.class, String.class, String.class},
+                            name, defType, defPackage)));
+                }
             }
-            return mHostResources.getIdentifier(name, defType, defPackage);
+            return mPluginResource.getIdentifier(name, defType, defPackage);
         } catch (Exception e) {
             e.printStackTrace();
         }
