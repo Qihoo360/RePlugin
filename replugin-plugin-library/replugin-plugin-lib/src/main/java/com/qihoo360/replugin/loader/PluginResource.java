@@ -10,9 +10,11 @@ import android.content.res.XmlResourceParser;
 import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.TypedValue;
 
 import com.qihoo360.replugin.RePlugin;
+import com.qihoo360.replugin.utils.ReflectUtils;
 
 import java.io.InputStream;
 
@@ -409,11 +411,21 @@ public class PluginResource extends Resources {
     @Override
     public int getIdentifier(String name, String defType, String defPackage) {
         try {
-            return mPluginResource.getIdentifier(name, defType, defPackage);
+            //当defPackage不是插件包名，也不是宿主包名时，比如android，vivo等，
+            // 此时需要用宿主的resources进行加载
+            //plugin gradle会替换getIdentifier的defPackage，所以此处用反射方式进行处理
+            if (!TextUtils.equals(RePlugin.getPluginContext().getPackageName(), defPackage)
+                    && !TextUtils.equals(RePlugin.getHostContext().getPackageName(), defPackage)) {
+                return Integer.parseInt(String.valueOf(ReflectUtils.invokeMethod(mHostResources.getClass().getClassLoader(),
+                        "android.content.res.Resources", "getIdentifier", mHostResources,
+                        new Class[]{String.class, String.class, String.class},
+                        name, defType, defPackage)));
+            }
+            return mHostResources.getIdentifier(name, defType, defPackage);
         } catch (Exception e) {
             e.printStackTrace();
-            return mHostResources.getIdentifier(name, defType, defPackage);
         }
+        return 0;
     }
 
     @Override
