@@ -8,12 +8,16 @@
 
 [![Release Version](https://img.shields.io/badge/release-2.3.3-brightgreen.svg)](https://github.com/Qihoo360/RePlugin/releases)
 
-## 通知
-
+## ！！！重要通知！！！
 
 由于jcenter停服原因，RePlugin将迁移到http://maven.geelib.360.cn/nexus上
-如果需要继续接入RePlugin，需要在项目的build.gradle内增加以下引用
+
+如果需要继续接入RePlugin，需要在项目的build.gradle内增加新的仓库地址
+
 maven {url "http://maven.geelib.360.cn/nexus/service/rest/repository/browse/replugin/"}
+
+
+## 通知
 
 
 **360开源又一力作——[ArgusAPM移动性能监控平台](https://github.com/Qihoo360/ArgusAPM)**
