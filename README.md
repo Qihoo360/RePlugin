@@ -10,6 +10,12 @@
 
 ## 通知
 
+
+由于jcenter停服原因，RePlugin将迁移到http://maven.geelib.360.cn/nexus上
+如果需要继续接入RePlugin，需要在项目的build.gradle内增加以下引用
+maven {url "http://maven.geelib.360.cn/nexus/service/rest/repository/browse/replugin/"}
+
+
 **360开源又一力作——[ArgusAPM移动性能监控平台](https://github.com/Qihoo360/ArgusAPM)**
 
 [ArgusAPM](https://github.com/Qihoo360/ArgusAPM)是360手机卫士客户端团队继RePlugin之后开源的又一个重量级开源项目。ArgusAPM是360移动端产品使用的可视化性能监控平台，为移动端APP提供性能监控与管理，可以迅速发现和定位各类APP性能和使用问题，帮助APP不断的提升用户体验。
