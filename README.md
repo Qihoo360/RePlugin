@@ -12,7 +12,7 @@
 
 由于jcenter停服原因，RePlugin将迁移到http://maven.geelib.360.cn/nexus上
 
-如果需要继续接入RePlugin，需要在项目的build.gradle内增加新的仓库地址
+如果需要继续接入RePlugin，需要在项目的build.gradle内增加新的仓库地址:
 
 maven {url "http://maven.geelib.360.cn/nexus/service/rest/repository/browse/replugin/"}
 
