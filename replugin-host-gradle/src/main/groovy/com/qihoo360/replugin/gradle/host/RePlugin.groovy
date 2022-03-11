@@ -18,6 +18,7 @@ package com.qihoo360.replugin.gradle.host
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
+import com.qihoo360.replugin.gradle.compat.CompatUtil
 import com.qihoo360.replugin.gradle.compat.VariantCompat
 import com.qihoo360.replugin.gradle.host.creator.FileCreators
 import com.qihoo360.replugin.gradle.host.creator.IFileCreator
@@ -58,7 +59,7 @@ public class Replugin implements Plugin<Project> {
                 }
 
                 def generateBuildConfigTask = VariantCompat.getGenerateBuildConfigTask(variant)
-                def appID = generateBuildConfigTask.appPackageName
+                def appID = getAppIdCompat(variant)
                 def newManifest = ComponentsGenerator.generateComponent(appID, config)
                 println "${TAG} countTask=${config.countTask}"
 
@@ -66,7 +67,7 @@ public class Replugin implements Plugin<Project> {
                 def scope = variantData.scope
 
                 //host generate task
-                def generateHostConfigTaskName = scope.getTaskName(AppConstant.TASK_GENERATE, "HostConfig")
+                def generateHostConfigTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_GENERATE, "HostConfig")
                 def generateHostConfigTask = project.task(generateHostConfigTaskName)
 
                 generateHostConfigTask.doLast {
@@ -81,7 +82,7 @@ public class Replugin implements Plugin<Project> {
                 }
 
                 //json generate task
-                def generateBuiltinJsonTaskName = scope.getTaskName(AppConstant.TASK_GENERATE, "BuiltinJson")
+                def generateBuiltinJsonTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_GENERATE, "BuiltinJson")
                 def generateBuiltinJsonTask = project.task(generateBuiltinJsonTaskName)
 
                 generateBuiltinJsonTask.doLast {
@@ -94,6 +95,12 @@ public class Replugin implements Plugin<Project> {
                 if (mergeAssetsTask) {
                     generateBuiltinJsonTask.dependsOn mergeAssetsTask
                     mergeAssetsTask.finalizedBy generateBuiltinJsonTask
+
+                    if (CompatUtil.isGeAGP410()) {
+                        def compressAssetsName = getTaskNameFromVariantScopeCompat(variant, "compress", "Assets")
+                        def compressAssetsTask = project.tasks.getByName(compressAssetsName)
+                        compressAssetsTask.mustRunAfter(generateBuiltinJsonTask)
+                    }
                 }
 
                 variant.outputs.each { output ->
@@ -138,11 +145,30 @@ public class Replugin implements Plugin<Project> {
         file.write(updatedContent, 'UTF-8')
     }
 
+    def getAppIdCompat(def variant) {
+        if (CompatUtil.isGeAGP410()) {
+            return variant.variantData.variantDslInfo.applicationId.get()
+        }
+        return variant.generateBuildConfig.appPackageName
+    }
+
+    def getTaskNameFromVariantScopeCompat(def variant, String prefix, String suffix) {
+        def taskName = null
+        try {
+            def variantData = variant.variantData
+            def scope = variantData.scope
+            taskName = scope.getTaskName(prefix, suffix)
+        } catch(Exception e) {
+            //For AGP4.1.0
+            def componentProperties = variant.componentProperties
+            taskName = componentProperties.computeTaskName(prefix, suffix)
+        }
+        return taskName
+    }
+
     // 添加 【查看所有插件信息】 任务
     def addShowPluginTask(def variant) {
-        def variantData = variant.variantData
-        def scope = variantData.scope
-        def showPluginsTaskName = scope.getTaskName(AppConstant.TASK_SHOW_PLUGIN, "")
+        def showPluginsTaskName = getTaskNameFromVariantScopeCompat(variant, AppConstant.TASK_SHOW_PLUGIN, "")
         def showPluginsTask = project.task(showPluginsTaskName)
 
         showPluginsTask.doLast {
