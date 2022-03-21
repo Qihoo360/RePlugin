@@ -1,0 +1,8 @@
+ext{
+    userOrg = 'lennon-xia' // 用户名
+    repoName = "lennon" // 仓库名
+    groupId = 'com.lennon.utill' // groupId
+    desc = 'useful tool for android' // 描述
+    website = 'https://github.com/lennon19940306/RePlugin' // 地址 ， 填写真实可访问地址
+    licences = ['Apache-2.0']// 描述 ， 填写licences
+}

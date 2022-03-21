@@ -20,12 +20,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 25
+        minSdkVersion 15
+        targetSdkVersion 29
 
         versionCode 2
         versionName version
@@ -42,12 +42,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    api fileTree(include: ['*.jar'], dir: 'libs')
 
     // 以“占位符”（Provided）的方式来引用support-v4，不会编入AAR
     // 但宿主需要支持Support-v4（至少应支持LocalBroadcastManager）
-    provided 'com.android.support:support-v4:25.2.0'
+    api 'androidx.legacy:legacy-support-v4:1.0.0'
 }
 
-project.ext.RP_ARTIFACT_ID = 'replugin-host-lib'
-apply from: '../../rp-publish.gradle'
+//project.ext.RP_ARTIFACT_ID = 'replugin-host-lib'
+//apply from: '../../rp-publish.gradle'

@@ -21,8 +21,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 
+import androidx.annotation.Nullable;
 import com.qihoo360.i.IPluginManager;
 
 import java.lang.ref.WeakReference;

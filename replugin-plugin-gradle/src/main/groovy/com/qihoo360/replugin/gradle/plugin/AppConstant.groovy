@@ -22,48 +22,48 @@ package com.qihoo360.replugin.gradle.plugin
  */
 class AppConstant {
 
-    /** ç‰ˆæœ¬å· */
-    def static final VER = "${RP_VERSION}"
+    /** °æ±¾ºÅ */
+    def static final VER = "2.3.3"
 
-    /** æ‰“å°ä¿¡æ¯æ—¶å€™çš„å‰ç¼€ */
+    /** ´òÓ¡ĞÅÏ¢Ê±ºòµÄÇ°×º */
     def static final TAG = "< replugin-plugin-v${VER} >"
 
-    /** å¤–éƒ¨ç”¨æˆ·é…ç½®ä¿¡æ¯ */
+    /** Íâ²¿ÓÃ»§ÅäÖÃĞÅÏ¢ */
     def static final USER_CONFIG = "repluginPluginConfig"
 
-    /** ç”¨æˆ·Taskç»„ */
+    /** ÓÃ»§Task×é */
     def static final TASKS_GROUP = "replugin-plugin"
 
-    /** Taskå‰ç¼€ */
+    /** TaskÇ°×º */
     def static final TASKS_PREFIX = "rp"
 
 
-    /** ç”¨æˆ·Task:å¼ºåˆ¶åœæ­¢å®¿ä¸»app */
+    /** ÓÃ»§Task:Ç¿ÖÆÍ£Ö¹ËŞÖ÷app */
     def static final TASK_FORCE_STOP_HOST_APP = TASKS_PREFIX + "ForceStopHostApp"
 
-    /** ç”¨æˆ·Task:å¯åŠ¨å®¿ä¸»app */
+    /** ÓÃ»§Task:Æô¶¯ËŞÖ÷app */
     def static final TASK_START_HOST_APP = TASKS_PREFIX + "StartHostApp"
 
-    /** ç”¨æˆ·Task:é‡å¯å®¿ä¸»app */
+    /** ÓÃ»§Task:ÖØÆôËŞÖ÷app */
     def static final TASK_RESTART_HOST_APP = TASKS_PREFIX + "RestartHostApp"
 
 
-    /** ç”¨æˆ·Task:å®‰è£…æ’ä»¶ */
+    /** ÓÃ»§Task:°²×°²å¼ş */
     def static final TASK_INSTALL_PLUGIN = TASKS_PREFIX + "InstallPlugin"
 
-    /** ç”¨æˆ·Task:å®‰è£…æ’ä»¶ */
+    /** ÓÃ»§Task:°²×°²å¼ş */
     def static final TASK_UNINSTALL_PLUGIN = TASKS_PREFIX + "UninstallPlugin"
 
-    /** ç”¨æˆ·Task:è¿è¡Œæ’ä»¶ */
+    /** ÓÃ»§Task:ÔËĞĞ²å¼ş */
     def static final TASK_RUN_PLUGIN = TASKS_PREFIX + "RunPlugin"
 
-    /** ç”¨æˆ·Task:å®‰è£…å¹¶è¿è¡Œæ’ä»¶ */
+    /** ÓÃ»§Task:°²×°²¢ÔËĞĞ²å¼ş */
     def static final TASK_INSTALL_AND_RUN_PLUGIN = TASKS_PREFIX + "InstallAndRunPlugin"
 
 
-    /** é…ç½®ä¾‹å­ */
+    /** ÅäÖÃÀı×Ó */
     static final String CONFIG_EXAMPLE = '''
-// è¿™ä¸ªpluginéœ€è¦æ”¾åœ¨androidé…ç½®ä¹‹åï¼Œå› ä¸ºéœ€è¦è¯»å–androidä¸­çš„é…ç½®é¡¹
+// Õâ¸öpluginĞèÒª·ÅÔÚandroidÅäÖÃÖ®ºó£¬ÒòÎªĞèÒª¶ÁÈ¡androidÖĞµÄÅäÖÃÏî
 apply plugin: 'replugin-plugin-gradle\'
 repluginPluginConfig {
     pluginName = "demo3"

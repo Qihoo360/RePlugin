@@ -40,20 +40,10 @@ interface IPluginHost {
 
     void unregPluginBinder(in PluginBinderInfo info, IBinder binder);
 
-    /**
-    * 注册某插件下所有静态声明的的 receiver 到常驻进程
-    */
     void regReceiver(String plugin, in Map receiverFilterMap);
 
     void unregReceiver();
 
-    /**
-     * 插件收到广播
-     *
-     * @param plugin 插件名称
-     * @param receiver Receiver 名称
-     * @param Intent 广播的 Intent 数据
-     */
     void onReceive(String plugin, String receiver, in Intent intent);
 
     int sumBinders(int index);
@@ -78,42 +68,17 @@ interface IPluginHost {
 
     IBinder queryPluginBinder(String plugin, String binder);
 
-    /**
-     * 根据 Inent 查询所有插件中的与之匹配的 Receivers
-     */
     List queryPluginsReceiverList(in Intent intent);
 
-    /**
-     * 获取“全新Service管理方案”在Server端的服务
-     * Added by Jiongxuan Zhang
-     */
     IPluginServiceServer fetchServiceServer();
 
-    /**
-     * 获取 IPluginManagerServer（纯APK方案使用）的插件服务
-     * Added by Jiongxuan Zhang
-     */
     IPluginManagerServer fetchManagerServer();
 
-    /**
-     * 根据 taskAffinity，判断应该取第几组 TaskAffinity
-     * 由于 taskAffinity 是跨进程的属性，所以这里要将 taskAffinityGroup 的数据保存在常驻进程中
-     * Added by hujunjie
-     */
     int getTaskAffinityGroupIndex(String taskAffinity);
 
-    /**
-     * 通过进程名来获取PID
-     */
     int getPidByProcessName(String processName);
 
-    /**
-     * 通过PID来获取进程名
-     */
     String getProcessNameByPid(int pid);
 
-    /**
-     * dump详细的运行时信息
-     */
     String dump();
 }

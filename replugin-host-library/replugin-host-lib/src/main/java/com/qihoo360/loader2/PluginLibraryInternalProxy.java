@@ -780,7 +780,7 @@ public class PluginLibraryInternalProxy {
     private static int getDefaultThemeId() {
         if (HostConfigHelper.ACTIVITY_PIT_USE_APPCOMPAT) {
             try {
-                Class clazz = ReflectUtils.getClass("android.support.v7.appcompat.R$style");
+                Class clazz = ReflectUtils.getClass("androidx.appcompat.R$style");
                 return (int) ReflectUtils.readStaticField(clazz, "Theme_AppCompat");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
