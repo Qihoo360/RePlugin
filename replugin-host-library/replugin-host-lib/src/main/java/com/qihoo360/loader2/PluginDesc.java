@@ -20,10 +20,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.qihoo360.loader.utils.LocalBroadcastManager;
+import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.utils.Charsets;
 import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.mobilesafe.core.BuildConfig;
@@ -196,8 +197,7 @@ public class PluginDesc {
                 }
             };
             IntentFilter filter = new IntentFilter(ACTION_UPDATE);
-            LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(PMF.getApplicationContext());
-            lbm.registerReceiver(sUpdateReceiver, filter);
+            LocalBroadcastManager.getInstance(PMF.getApplicationContext()).registerReceiver(sUpdateReceiver,filter);
         }
     }
 }

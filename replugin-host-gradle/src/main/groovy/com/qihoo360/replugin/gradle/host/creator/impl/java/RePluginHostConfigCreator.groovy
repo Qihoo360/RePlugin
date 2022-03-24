@@ -90,6 +90,9 @@ public class RePluginHostConfig {
     // 是否使用 AppCompat 库
     public static boolean ACTIVITY_PIT_USE_APPCOMPAT = ${config.useAppCompat};
 
+   // HOST 是否使用 androidx 库
+    public static boolean HOST_USE_ANDROIDX = ${config.useAndroidX};
+
     //------------------------------------------------------------
     // 主程序支持的插件版本范围
     //------------------------------------------------------------

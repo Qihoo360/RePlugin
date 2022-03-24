@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -227,9 +226,23 @@ public class PluginProcessMain {
     }
 
     /**
+     * 连接常驻进程后的Action
+     */
+    public interface DiedAction {
+        void onDied();
+    }
+
+    /**
      * 非常驻进程调用，获取常驻进程的 IPluginHost
      */
     static final void connectToHostSvc() {
+        connectToHostSvc(null);
+    }
+
+    /**
+     * 非常驻进程调用，获取常驻进程的 IPluginHost
+     */
+    static final void connectToHostSvc(final DiedAction diedAction) {
         Context context = PMF.getApplicationContext();
         IBinder binder = PluginProviderStub.proxyFetchHostBinder(context);
         if (LOG) {
@@ -261,6 +274,11 @@ public class PluginProcessMain {
 
                     // 断开和插件化管理器服务端的连接，因为已经失效
                     PluginManagerProxy.disconnect();
+
+                    //断开连接后，需要尝试重新连接
+                    if (diedAction != null) {
+                        diedAction.onDied();
+                    }
                 }
             }, 0);
         } catch (RemoteException e) {
@@ -756,7 +774,7 @@ public class PluginProcessMain {
 
     ///
 
-    private static <T> T writeProcessClientLock(@NonNull final Action<T> action) {
+    private static <T> T writeProcessClientLock( final Action<T> action) {
         final long start = System.currentTimeMillis();
 //        final String stack = OptUtil.stack2Str(Thread.currentThread().getStackTrace()[3]);
         try {
@@ -773,7 +791,7 @@ public class PluginProcessMain {
         }
     }
 
-    private static <T> T readProcessClientLock(@NonNull final Action<T> action) {
+    private static <T> T readProcessClientLock( final Action<T> action) {
         final long start = System.currentTimeMillis();
 //        final String stack = OptUtil.stack2Str(Thread.currentThread().getStackTrace()[3]);
         try {

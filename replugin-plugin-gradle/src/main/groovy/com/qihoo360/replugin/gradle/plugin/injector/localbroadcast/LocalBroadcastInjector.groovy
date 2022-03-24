@@ -64,7 +64,8 @@ public class LocalBroadcastInjector extends BaseInjector {
                 def stream, ctCls
                 try {
                     // 不处理 LocalBroadcastManager.class
-                    if (filePath.contains('android/support/v4/content/LocalBroadcastManager')) {
+                    if (filePath.contains('android/support/v4/content/LocalBroadcastManager') ||
+                            filePath.contains('androidx/localbroadcastmanager/content/LocalBroadcastManager')) {
                         println "Ignore ${filePath}"
                         return super.visitFile(file, attrs)
                     }

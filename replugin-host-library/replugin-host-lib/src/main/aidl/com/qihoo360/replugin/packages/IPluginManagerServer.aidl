@@ -93,4 +93,26 @@ interface IPluginManagerServer {
      * @return 正在运行此插件的进程名列表。一定不会为Null
      */
     String[] getRunningProcessesByPlugin(String pluginName);
+
+    /**
+     * 预安装内置插件到app_p_a目录，只做p.l文件的写入，真正的安装执行，在做插件Load的时候执行
+     *
+     * @param 待安装的插件列表
+     * @return 安装后的所有插件列表
+     */
+    List<PluginInfo> preInstallBuiltins(in List<PluginInfo> pluginInfos);
+
+    void updateTP(String plugin,int type,String path);
+
+     /**
+      * 设置isUsed状态，并通知所有进程更新
+      *
+      * @param pluginName 插件名
+      * @param path 是否已经使用
+      * @param type 是否已经使用
+      * @param used 是否已经使用
+      */
+    void updateUsedNew(String pluginName, String path, int type, boolean used);
+
+
 }

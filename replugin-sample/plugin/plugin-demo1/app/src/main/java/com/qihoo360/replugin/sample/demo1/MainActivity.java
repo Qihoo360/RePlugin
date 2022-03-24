@@ -39,7 +39,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.qihoo360.replugin.RePlugin;
-import com.qihoo360.replugin.common.utils.TimeUtils;
 import com.qihoo360.replugin.sample.demo1.activity.file_provider.FileProviderActivity;
 import com.qihoo360.replugin.sample.demo1.activity.notify_test.NotifyActivity;
 import com.qihoo360.replugin.sample.demo1.activity.preference.PrefActivity2;
@@ -54,7 +53,6 @@ import com.qihoo360.replugin.sample.demo1.activity.webview.WebViewActivity;
 import com.qihoo360.replugin.sample.demo1.service.PluginDemoService1;
 import com.qihoo360.replugin.sample.demo1.support.NotifyUtils;
 import com.qihoo360.replugin.sample.demo2.IDemo2;
-import com.qihoo360.replugin.sample.library.LibMainActivity;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

@@ -20,9 +20,8 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
 
 import com.qihoo360.loader2.PMF;
 import com.qihoo360.replugin.base.IPC;
@@ -64,7 +63,7 @@ public class PluginFastInstallProvider extends ContentProvider {
     }
 
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         if (LogDebug.LOG) {
             LogDebug.d(TAG, "update: cv=" + values);
         }
@@ -100,29 +99,27 @@ public class PluginFastInstallProvider extends ContentProvider {
         }
     }
 
-    @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        // Nothing
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public String getType(@NonNull Uri uri) {
-        // Nothing
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+    public Cursor query( Uri uri,  String[] projection,  String selection,  String[] selectionArgs,  String sortOrder) {
         // Nothing
         return null;
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+    public String getType( Uri uri) {
+        // Nothing
+        return null;
+    }
+
+
+    @Override
+    public Uri insert( Uri uri,  ContentValues values) {
+        // Nothing
+        return null;
+    }
+
+    @Override
+    public int delete( Uri uri,  String selection,  String[] selectionArgs) {
         // Nothing
         return 0;
     }

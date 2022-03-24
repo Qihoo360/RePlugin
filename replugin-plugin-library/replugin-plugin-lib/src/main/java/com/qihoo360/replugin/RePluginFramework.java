@@ -47,7 +47,7 @@ public class RePluginFramework {
      * @param cl
      * @return 返回true表示运行在HOST中，返回false表示运行的是独立APK
      */
-    static boolean init(ClassLoader cl) {
+    public static boolean init(ClassLoader cl) {
         synchronized (LOCK) {
             return initLocked(cl);
         }

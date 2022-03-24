@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.qihoo360.replugin.common.utils;
+package com.qihoo360.replugin.sample.demo1;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -174,5 +174,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/fileprovider_path" />
         </provider>
+
+        <activity
+            android:name=".LibMainActivity"
+            android:label="@string/app_name">
+        </activity>
     </application>
 </manifest>

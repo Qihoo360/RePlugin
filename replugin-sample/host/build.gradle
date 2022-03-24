@@ -18,9 +18,11 @@ buildscript {
     repositories {
         mavenLocal()
         jcenter()
+        mavenCentral()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.5.4'
         classpath "com.qihoo360.replugin:replugin-host-gradle:${RP_VERSION}"
     }
 }
@@ -29,6 +31,8 @@ allprojects {
     repositories {
         mavenLocal()
         jcenter()
+        mavenCentral()
+        google()
     }
 }
 

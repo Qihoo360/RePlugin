@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.qihoo360.i.Factory2;
@@ -37,7 +36,7 @@ import com.qihoo360.replugin.helper.LogDebug;
 public class DynamicClassProxyActivity extends Activity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         ComponentName cn = getIntent().getComponent();

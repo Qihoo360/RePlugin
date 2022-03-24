@@ -18,6 +18,7 @@ package com.qihoo360.loader2;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.qihoo360.replugin.utils.Charsets;
 import com.qihoo360.replugin.utils.CloseableUtils;
@@ -37,6 +38,7 @@ import java.io.InputStream;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
+import static com.qihoo360.replugin.helper.LogDebug.TAG_NO_PN;
 
 /**
  * @author RePlugin Team
@@ -88,6 +90,9 @@ public class FinderBuiltin {
             }
             if (LOG) {
                 LogDebug.d(PLUGIN_TAG, "built-in plugins config: item: " + info);
+            }
+            if (LOG) {
+                Log.d(TAG_NO_PN, "add builtin plugin=" + info);
             }
             all.addBuiltin(info);
         }

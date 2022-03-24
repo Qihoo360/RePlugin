@@ -21,8 +21,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.RemoteException;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.qihoo360.loader2.CertUtils;
 import com.qihoo360.loader2.MP;
@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
+import static com.qihoo360.replugin.helper.LogDebug.TAG_NO_PN;
 
 /**
  * 插件管理器。用来控制插件的安装、卸载、获取等。运行在常驻进程中 <p>
@@ -103,6 +104,19 @@ public class PluginManagerServer {
 
         // 执行“更新或删除Pending”插件，并返回结果
         return updateAllLocked();
+    }
+
+    private List<PluginInfo> installBuiltins(List<PluginInfo> builtins) {
+        if (builtins != null) {
+            for (PluginInfo builtin : builtins) {
+                if (LogDebug.LOG) {
+                    Log.d(LogDebug.TAG_NO_PN, "installBuiltins, plugin=" + builtin + ",address=" + System.identityHashCode(builtin));
+                }
+                mList.add(builtin);
+            }
+        }
+        mList.save(mContext);
+        return mList.cloneList();
     }
 
     private List<PluginInfo> updateAllLocked() {
@@ -175,8 +189,15 @@ public class PluginManagerServer {
 
         // 6. 若已经安装旧版本插件，则尝试更新插件信息，否则直接加入到列表中
         if (curPli != null) {
+            if (LogDebug.LOG) {
+                Log.d(TAG_NO_PN, "cur exist pinfo,curinfo=" + curPli + ",address=" + System.identityHashCode(curPli));
+            }
             updateOrLater(curPli, instPli);
+            Log.d(TAG_NO_PN, "updateOrLater,mList.get=" + mList.get(curPli.getName()) + ",address=" + System.identityHashCode(mList.get(curPli.getName())));
         } else {
+            if (LogDebug.LOG) {
+                Log.d(TAG_NO_PN, "new install,pinfo=" + instPli + ",address=" + System.identityHashCode(instPli));
+            }
             mList.add(instPli);
         }
 
@@ -268,11 +289,6 @@ public class PluginManagerServer {
             LogDebug.d(TAG, "updateOrLater: Need update. pn=" + curPli.getName() +
                     "; cur_ver=" + curPli.getVersion() + "; update_ver=" + instPli.getVersion());
         }
-        // 既然要更新到新的"纯APK"方案，自然需要把旧p-n的信息迁移到新列表中
-        // FIXME 看看有没有别的兼容问题，尤其是和两个List表之间的
-        if (curPli.isPnPlugin()) {
-            mList.add(curPli);
-        }
 
         // 已有“待更新版本”？
         PluginInfo curUpdatePli = curPli.getPendingUpdate();
@@ -314,6 +330,7 @@ public class PluginManagerServer {
                 LogDebug.i(TAG, "updateOrLater: Not running. Update now! pn=" + curPli.getName());
             }
             updateNow(curPli, instPli);
+            mList.addForce(instPli);
         }
     }
 
@@ -424,7 +441,7 @@ public class PluginManagerServer {
         }
     }
 
-    private void move(@NonNull PluginInfo curPi, @NonNull PluginInfo newPi) {
+    private void move(PluginInfo curPi, PluginInfo newPi) {
         if (LogDebug.LOG) {
             LogDebug.i(TAG, "move. curPi=" + curPi.getPath() + "; newPi=" + newPi.getPath());
         }
@@ -463,7 +480,7 @@ public class PluginManagerServer {
         }
     }
 
-    private void delete(@NonNull PluginInfo pi) {
+    private void delete(PluginInfo pi) {
         try {
             FileUtils.forceDelete(new File(pi.getPath()));
             FileUtils.forceDelete(pi.getDexFile());
@@ -482,18 +499,52 @@ public class PluginManagerServer {
         }
     }
 
-    private void updateUsedLocked(String pluginName, boolean used) {
-        PluginInfo pi = MP.getPlugin(pluginName, false);
+    /**
+     * 去掉pn之后，此方法不再使用，应该及时更新p.l中的Path和type
+     * @deprecated
+     *
+     * @param name
+     * @param used
+     */
+    private void updateUsedLocked(String name, boolean used) {
+        final PluginInfo pi = MP.getPlugin(name, false);
+        if (LogDebug.LOG) {
+            Log.d(LogDebug.TAG_NO_PN, "prepare to update used  for :" + name + ",pi=" + pi);
+        }
         if (pi == null) {
             return;
         }
 
         // 1. 设置状态并保存
         pi.setIsUsed(used);
+
         mList.save(mContext);
 
         // 2. 给各进程发送广播，要求更新Used状态（同步）
-        PluginInfoUpdater.updateIsUsed(RePluginInternal.getAppContext(), pluginName, used);
+        PluginInfoUpdater.updateIsUsed(RePluginInternal.getAppContext(), name, used);
+    }
+
+    private void updateUsedLocked(String name, String path, int type, boolean used) {
+        final PluginInfo pi = MP.getPlugin(name, false);
+        if (LogDebug.LOG) {
+            Log.d(LogDebug.TAG_NO_PN, "prepare to update used  for :" + name + ",pi=" + pi  + ",address=" + System.identityHashCode(pi));
+        }
+        if (pi == null) {
+            return;
+        }
+
+        // 1. 设置状态并保存
+        pi.setIsUsed(used);
+        pi.setPath(path);
+        pi.setType(type);
+
+        if (LogDebug.LOG) {
+            Log.d(LogDebug.TAG_NO_PN, "plugin in list ,pi=" + mList.get(name) + ",address=" + System.identityHashCode(mList.get(name)));
+        }
+        mList.save(mContext);
+
+        // 2. 给各进程发送广播，要求更新Used状态（同步）
+        PluginInfoUpdater.updateIsUsed(RePluginInternal.getAppContext(), name, used);
     }
 
     private boolean uninstallLocked(PluginInfo pi) {
@@ -608,6 +659,17 @@ public class PluginManagerServer {
         return l.toArray(new String[0]);
     }
 
+    private void updateTP(String name, int type, String path) {
+        PluginInfo pi = MP.getPlugin(name, false);
+        if (pi == null) {
+            return;
+        }
+        pi.setType(type);
+        pi.setPath(path);
+        mList.add(pi);
+        mList.save(mContext);
+    }
+
     private class Stub extends IPluginManagerServer.Stub {
 
         @Override
@@ -625,6 +687,13 @@ public class PluginManagerServer {
         }
 
         @Override
+        public List<PluginInfo> preInstallBuiltins(List<PluginInfo> builtins) throws RemoteException {
+            synchronized (LOCKER) {
+                return PluginManagerServer.this.installBuiltins(builtins);
+            }
+        }
+
+        @Override
         public List<PluginInfo> updateAll() throws RemoteException {
             synchronized (LOCKER) {
                 return PluginManagerServer.this.updateAllLocked();
@@ -632,9 +701,16 @@ public class PluginManagerServer {
         }
 
         @Override
-        public void updateUsed(String pluginName, boolean used) throws RemoteException {
+        public void updateUsed(String name, boolean used) throws RemoteException {
             synchronized (LOCKER) {
-                PluginManagerServer.this.updateUsedLocked(pluginName, used);
+                PluginManagerServer.this.updateUsedLocked(name, used);
+            }
+        }
+
+        @Override
+        public void updateUsedNew(String name, String path, int type, boolean used) throws RemoteException {
+            synchronized (LOCKER) {
+                PluginManagerServer.this.updateUsedLocked(name, path, type, used);
             }
         }
 
@@ -679,5 +755,13 @@ public class PluginManagerServer {
                 return PluginManagerServer.this.getRunningProcessesByPluginLocked(pluginName);
             }
         }
+
+        @Override
+        public void updateTP(String plugin, int type, String path) throws RemoteException {
+            synchronized (LOCKER) {
+                PluginManagerServer.this.updateTP(plugin, type, path);
+            }
+        }
+
     }
 }

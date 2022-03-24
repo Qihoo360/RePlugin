@@ -21,7 +21,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 
 import com.qihoo360.i.IPluginManager;
 
@@ -44,7 +43,6 @@ public class PluginPitService extends Service {
         sService = new WeakReference<>(this);
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;

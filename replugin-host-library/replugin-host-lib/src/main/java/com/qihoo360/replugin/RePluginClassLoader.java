@@ -79,6 +79,10 @@ public class RePluginClassLoader extends PathClassLoader {
         initMethods(orig);
     }
 
+    public ClassLoader getOrig(){
+        return mOrig;
+    }
+
     private void initMethods(ClassLoader cl) {
         Class<?> c = cl.getClass();
         findResourceMethod = ReflectUtils.getMethod(c, "findResource", String.class);

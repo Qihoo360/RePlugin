@@ -1,4 +1,4 @@
-package com.qihoo360.replugin.sample.library;
+package com.qihoo360.replugin.sample.demo1;
 
 import android.app.Activity;
 import android.os.Bundle;

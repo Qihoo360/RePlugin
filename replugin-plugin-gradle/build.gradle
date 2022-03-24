@@ -19,17 +19,18 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
-//apply from: 'config.gradle'
 
 repositories {
     jcenter()
     mavenCentral()
+    google()
 }
 
 buildscript {
     repositories {
         jcenter()
         mavenCentral()
+        google()
     }
     dependencies {
 //        classpath 'com.android.tools.build:gradle:2.1.0'
@@ -57,7 +58,7 @@ sourceSets {
 }
 
 dependencies {
-    compile 'com.android.tools.build:gradle:2.1.3'
+    compile 'com.android.tools.build:gradle:3.5.4'
     compile 'org.json:json:20160212'
     compile 'org.codehaus.groovy:groovy:2.4.7'
     compile 'com.squareup:javapoet:1.5.1'

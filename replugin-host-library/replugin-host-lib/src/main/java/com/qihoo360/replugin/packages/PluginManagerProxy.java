@@ -92,6 +92,18 @@ public class PluginManagerProxy {
     }
 
     /**
+     * 预安装内置插件到app_p_a目录。因为考虑到内置插件的特殊性和缓存中针对内置插件需要做一些处理，最开始我们需要认为内置插件就已经属于安装了，读取列表应该能读取到才行。
+     * 所以需要把插件信息写入到p.l中，以便于后续的加载和更新都可以读到。
+     * 注意：只会在首次启动应用的时候做这个事
+     * @param builtins 内置插件列表
+     * @return 安装完后的插件列表，理论上就是内置插件
+     * @throws RemoteException
+     */
+    public static List<PluginInfo> preInstallBuiltins(List<PluginInfo> builtins) throws RemoteException {
+        return sRemote.preInstallBuiltins(builtins);
+    }
+
+    /**
      * 调用常驻进程的Server端去更新插件列表
      *
      * @return PluginInfo的列表
@@ -105,11 +117,13 @@ public class PluginManagerProxy {
     /**
      * 去常驻进程更新isUsed状态，并发送到所有进程中更新
      *
-     * @param pluginName
+     * @param name 插件名字
+     * @param path 插件释放的路径
+     * @param type 插件状态类型
      * @param used 插件是否已被使用
      */
-    public static void updateUsedIfNeeded(String pluginName, boolean used) throws RemoteException {
-        PluginInfo pi = MP.getPlugin(pluginName, false);
+    public static void updateUsedIfNeeded(String name, String path, int type, boolean used) throws RemoteException {
+        PluginInfo pi = MP.getPlugin(name, false);
         if (pi == null) {
             // 不太可能到这里
             return;
@@ -117,14 +131,11 @@ public class PluginManagerProxy {
         if (pi.isUsed() == used) {
             // 已经改变了？那就不做处理
             if (LOG) {
-                LogDebug.i(TAG, "updateUsedIfNeeded: pi.isUsed == used, ignore. used=" + used + "; pn=" + pluginName);
+                LogDebug.i(TAG, "updateUsedIfNeeded: pi.isUsed == used, ignore. used=" + used + "; pn=" + name);
             }
             return;
         }
-        if (pi.isPnPlugin()) {
-            // 是常驻进程？老逻辑直接走dex文件存在判断，也无需做处理
-            return;
-        }
+
         if (sRemote == null) {
             // 常驻已挂掉，可以认为无需处理
             if (LogRelease.LOGR) {
@@ -134,7 +145,20 @@ public class PluginManagerProxy {
         }
 
         // 去常驻进程更新状态
-        sRemote.updateUsed(pi.getName(), used);
+        sRemote.updateUsedNew(name, path, type, used);
+    }
+
+
+    /**
+     * 更新插件信息到常驻进程和p.l文件，一般是首次内置插件加载完毕后，需要调用
+     *
+     * @param plugin 插件名字
+     * @param type   插件的类型
+     * @param path   插件的路径
+     * @throws RemoteException
+     */
+    public static void updateTP(String plugin, int type, String path) throws RemoteException {
+        sRemote.updateTP(plugin, type, path);
     }
 
     /**

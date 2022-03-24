@@ -26,7 +26,10 @@ import javassist.expr.MethodCall
  */
 public class LocalBroadcastExprEditor extends ExprEditor {
 
-    static def TARGET_CLASS = 'android.support.v4.content.LocalBroadcastManager'
+    static def TARGET_CLASS = ""
+    static def includeClass = ['android.support.v4.content.LocalBroadcastManager',
+                               'androidx.localbroadcastmanager.content.LocalBroadcastManager']
+
     static def PROXY_CLASS = 'com.qihoo360.replugin.loader.b.PluginLocalBroadcastManager'
 
     /** 处理以下方法 */
@@ -41,7 +44,8 @@ public class LocalBroadcastExprEditor extends ExprEditor {
 
     @Override
     void edit(MethodCall call) throws CannotCompileException {
-        if (call.getClassName().equalsIgnoreCase(TARGET_CLASS)) {
+        if (call.getClassName() in includeClass ) {
+            TARGET_CLASS = call.getClassName()
             if (!(call.getMethodName() in includeMethodCall)) {
                 // println "Skip $methodName"
                 return

@@ -37,35 +37,8 @@ public class Finder {
      * 扫描插件
      */
     static final void search(Context context, PxAll all) {
-        // 扫描内置插件
+        // 扫描内置插件-builtin
         FinderBuiltin.loadPlugins(context, all);
-
-        // 扫描V5插件
-        File pluginDir = context.getDir(Constant.LOCAL_PLUGIN_SUB_DIR, 0);
-        V5Finder.search(context, pluginDir, all);
-
-        // 扫描现有插件，包括刚才从V5插件文件更新过来的文件
-        HashSet<File> deleted = new HashSet<File>();
-        {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "search plugins: dir=" + pluginDir.getAbsolutePath());
-            }
-            searchLocalPlugins(pluginDir, all, deleted);
-        }
-
-        // 删除非插件文件和坏的文件
-        for (File f : deleted) {
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "search: delete plugin dir invalid file=" + f.getAbsolutePath());
-            }
-            boolean rc = f.delete();
-            if (!rc) {
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "search: can't delete plugin dir invalid file=" + f.getAbsolutePath());
-                }
-            }
-        }
-        deleted.clear();
     }
 
     private static final void searchLocalPlugins(File dir, PxAll all, HashSet<File> others) {

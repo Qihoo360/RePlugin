@@ -20,11 +20,13 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.ConditionVariable;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.qihoo360.i.IModule;
 import com.qihoo360.i.IPlugin;
@@ -51,6 +53,7 @@ import java.util.HashMap;
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.MAIN_TAG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
+import static com.qihoo360.replugin.helper.LogDebug.TAG_NO_PN;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
 
 /**
@@ -116,6 +119,12 @@ class Plugin {
      *
      */
     PluginInfo mInfo;
+    /**
+     * sync
+     */
+    private final Object LOCK = new Object();
+
+    private final ConditionVariable APPLICATION_LOCK = new ConditionVariable();
 
     /**
      * 没有IPlugin对象
@@ -140,7 +149,8 @@ class Plugin {
     /**
      *
      */
-    boolean mInitialized;
+   volatile boolean mInitialized;
+
 
     /**
      *
@@ -155,7 +165,7 @@ class Plugin {
     /**
      * 用来控制插件里的Application对象
      */
-    PluginApplicationClient mApplicationClient;
+    volatile PluginApplicationClient mApplicationClient;
 
     private static class UpdateInfoTask implements Runnable {
 
@@ -531,41 +541,43 @@ class Plugin {
             }
             return false;
         }
-        if (mInitialized) {
-            if (mLoader == null) {
-                if (LOG) {
-                    LogDebug.i(MAIN_TAG, "loadLocked(): Initialized but mLoader is Null");
+        synchronized (LOCK) {
+            if (mInitialized) {
+                if (mLoader == null) {
+                    if (LOG) {
+                        LogDebug.i(MAIN_TAG, "loadLocked(): Initialized but mLoader is Null");
+                    }
+                    return false;
                 }
-                return false;
-            }
-            if (load == LOAD_INFO) {
-                boolean rl = mLoader.isPackageInfoLoaded();
-                if (LOG) {
-                    LogDebug.i(MAIN_TAG, "loadLocked(): Initialized, pkginfo loaded = " + rl);
+                if (load == LOAD_INFO) {
+                    boolean rl = mLoader.isPackageInfoLoaded();
+                    if (LOG) {
+                        LogDebug.i(MAIN_TAG, "loadLocked(): Initialized, pkginfo loaded = " + rl);
+                    }
+                    return rl;
                 }
-                return rl;
-            }
-            if (load == LOAD_RESOURCES) {
-                boolean rl = mLoader.isResourcesLoaded();
-                if (LOG) {
-                    LogDebug.i(MAIN_TAG, "loadLocked(): Initialized, resource loaded = " + rl);
+                if (load == LOAD_RESOURCES) {
+                    boolean rl = mLoader.isResourcesLoaded();
+                    if (LOG) {
+                        LogDebug.i(MAIN_TAG, "loadLocked(): Initialized, resource loaded = " + rl);
+                    }
+                    return rl;
                 }
-                return rl;
-            }
-            if (load == LOAD_DEX) {
-                boolean rl = mLoader.isDexLoaded();
-                if (LOG) {
-                    LogDebug.i(MAIN_TAG, "loadLocked(): Initialized, dex loaded = " + rl);
+                if (load == LOAD_DEX) {
+                    boolean rl = mLoader.isDexLoaded();
+                    if (LOG) {
+                        LogDebug.i(MAIN_TAG, "loadLocked(): Initialized, dex loaded = " + rl);
+                    }
+                    return rl;
                 }
-                return rl;
+                boolean il = mLoader.isAppLoaded();
+                if (LOG) {
+                    LogDebug.i(MAIN_TAG, "loadLocked(): Initialized, is loaded = " + il);
+                }
+                return il;
             }
-            boolean il = mLoader.isAppLoaded();
-            if (LOG) {
-                LogDebug.i(MAIN_TAG, "loadLocked(): Initialized, is loaded = " + il);
-            }
-            return il;
+            mInitialized = true;
         }
-        mInitialized = true;
 
         // 若开启了“打印详情”则打印调用栈，便于观察
         if (RePlugin.getConfig().isPrintDetailLog()) {
@@ -738,9 +750,9 @@ class Plugin {
     }
 
     /**
-     * 抽出方法，将mLoader设置为null与doload中mLoader的使用添加同步锁，解决在多线程下导致mLoader为空指针的问题。
+     * 抽出方法
      */
-    private synchronized boolean tryLoadAgain(String tag, Context context, ClassLoader parent, PluginCommImpl manager, int load) {
+    private boolean tryLoadAgain(String tag, Context context, ClassLoader parent, PluginCommImpl manager, int load) {
         mLoader = null;
         return doLoad(tag, context, parent, manager, load);
     }
@@ -750,8 +762,8 @@ class Plugin {
             // 试图释放文件
             PluginInfo info = null;
             if (mInfo.getType() == PluginInfo.TYPE_BUILTIN) {
-                //
-                File dir = context.getDir(Constant.LOCAL_PLUGIN_SUB_DIR, 0);
+                //内置插件，首次加载的时候，把数据写到p.l中，然后把文件拷贝到对应目录
+                File dir = new File(mInfo.getApkDir());
                 File dexdir = mInfo.getDexParentDir();
                 String dstName = mInfo.getApkFile().getName();
                 boolean rc = AssetsUtils.quickExtractTo(context, mInfo, dir.getAbsolutePath(), dstName, dexdir.getAbsolutePath());
@@ -765,57 +777,21 @@ class Plugin {
                 File file = new File(dir, dstName);
                 info = (PluginInfo) mInfo.clone();
                 info.setPath(file.getPath());
+                info.setType(PluginInfo.TYPE_EXTRACTED);
 
-                // FIXME 不应该是P-N，即便目录相同，未来会优化这里
-                info.setType(PluginInfo.TYPE_PN_INSTALLED);
-
-            } else if (mInfo.getType() == PluginInfo.TYPE_PN_JAR) {
-                //
-                V5FileInfo v5i = V5FileInfo.build(new File(mInfo.getPath()), mInfo.getV5Type());
-                if (v5i == null) {
-                    // build v5 plugin info failed: plugin=
-                    if (LOGR) {
-                        LogRelease.e(PLUGIN_TAG, "p e b v i f " + mInfo);
+            } else if(mInfo.getType() == PluginInfo.TYPE_PN_INSTALLED || mInfo.getType() == PluginInfo.TYPE_EXTRACTED){
+                try {
+                    //针对升级上来的用户，重新释放已安装插件的so，更换路径
+                    File oldSoLibDir = mInfo.getOldNativeLibsDir();
+                    File soLibDir = mInfo.getNativeLibsDir();
+                    if (oldSoLibDir.exists() && oldSoLibDir.listFiles() != null && oldSoLibDir.listFiles().length > 0
+                            && (!soLibDir.exists() || soLibDir.listFiles() == null || soLibDir.listFiles().length == 0)){
+                        PluginNativeLibsHelper.install(mInfo.getPath(), soLibDir);
                     }
+                }catch (Exception e){
                     return false;
                 }
-                File dir = context.getDir(Constant.LOCAL_PLUGIN_SUB_DIR, 0);
-                info = v5i.updateV5FileTo(context, dir, true, true);
-                if (info == null) {
-                    // update v5 file to failed: plugin=
-                    if (LOGR) {
-                        LogRelease.e(PLUGIN_TAG, "p u v f t f " + mInfo);
-                    }
-                    return false;
-                }
-                // 检查是否改变了？
-                if (info.getLowInterfaceApi() != mInfo.getLowInterfaceApi() || info.getHighInterfaceApi() != mInfo.getHighInterfaceApi()) {
-                    if (LOG) {
-                        LogDebug.d(PLUGIN_TAG, "v5 plugin has changed: plugin=" + info + ", original=" + mInfo);
-                    }
-                    // 看看目标文件是否存在
-                    String dstName = mInfo.getApkFile().getName();
-                    File file = new File(dir, dstName);
-                    if (!file.exists()) {
-                        if (LOGR) {
-                            LogRelease.e(PLUGIN_TAG, "can't load: v5 plugin has changed to "
-                                    + info.getLowInterfaceApi() + "-" + info.getHighInterfaceApi()
-                                    + ", orig " + mInfo.getLowInterfaceApi() + "-" + mInfo.getHighInterfaceApi()
-                                    + " bare not exist");
-                        }
-                        return false;
-                    }
-                    // 重新构造
-                    info = PluginInfo.build(file);
-                    if (info == null) {
-                        return false;
-                    }
-                }
-
-            } else {
-                //
             }
-
             //
             if (info != null) {
                 // 替换
@@ -825,13 +801,23 @@ class Plugin {
             //
             mLoader = new Loader(context, mInfo.getName(), mInfo.getPath(), this);
             if (!mLoader.loadDex(parent, load)) {
+                //内置插件加载失败后，需要把释放的文件路径和类型写入到p.l中去。
+                try {
+                    PluginManagerProxy.updateTP(mInfo.getName(), mInfo.getType(), mInfo.getPath());
+                } catch (RemoteException e) {
+                }
                 return false;
             }
 
             // 设置插件为“使用过的”
             // 注意，需要重新获取当前的PluginInfo对象，而非使用“可能是新插件”的mInfo
             try {
-                PluginManagerProxy.updateUsedIfNeeded(mInfo.getName(), true);
+                long start = System.currentTimeMillis();
+                PluginManagerProxy.updateUsedIfNeeded(mInfo.getName(), mInfo.getPath(), mInfo.getType(), true);
+                mInfo.setIsUsed(true);
+                if (LOG) {
+                    Log.d(TAG_NO_PN, "update " + mInfo.getName() + " time=" + (System.currentTimeMillis() - start));
+                }
             } catch (RemoteException e) {
                 // 同步出现问题，但仍继续进行
                 if (LOGR) {
@@ -839,6 +825,7 @@ class Plugin {
                 }
             }
 
+            long startApp = System.currentTimeMillis();
             // 若需要加载Dex，则还同时需要初始化插件里的Entry对象
             if (load == LOAD_APP) {
                 // NOTE Entry对象是可以在任何线程中被调用到
@@ -848,6 +835,9 @@ class Plugin {
                 // NOTE 在此处调用则必须Post到UI，但此时有可能Activity已被加载
                 //      会出现Activity.onCreate比Application更早的情况，故应放在load外面立即调用
                 // callApp();
+            }
+            if (LOG) {
+                Log.d(TAG_NO_PN, "load entry for  " + mInfo.getName() + " time=" + (System.currentTimeMillis() - startApp));
             }
         }
 
@@ -914,16 +904,22 @@ class Plugin {
                     callAppLocked();
                 }
             });
+            if(!APPLICATION_LOCK.block(3 * 1000)){
+                if (LOGR) {
+                    LogRelease.e(PLUGIN_TAG, "p.cal timeout " + mInfo.getName());
+                }
+            }
         }
     }
 
-    private void callAppLocked() {
+    private synchronized void callAppLocked() {
         // 获取并调用Application的几个核心方法
         if (!mDummyPlugin) {
             // NOTE 不排除A的Application中调到了B，B又调回到A，或在同一插件内的onCreate开启Service/Activity，而内部逻辑又调用fetchContext并再次走到这里
             // NOTE 因此需要对mApplicationClient做判断，确保永远只执行一次，无论是否成功
             if (mApplicationClient != null) {
                 // 已经初始化过，无需再次处理
+                APPLICATION_LOCK.open();
                 return;
             }
 
@@ -939,5 +935,6 @@ class Plugin {
                 LogRelease.e(PLUGIN_TAG, "p.cal dm " + mInfo.getName());
             }
         }
+        APPLICATION_LOCK.open();
     }
 }

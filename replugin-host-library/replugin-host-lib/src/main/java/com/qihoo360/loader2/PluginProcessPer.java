@@ -22,8 +22,9 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+
+import com.qihoo360.loader.utils.LocalBroadcastManager;
 
 import com.qihoo360.i.IPluginManager;
 import com.qihoo360.loader2.alc.ActivityController;

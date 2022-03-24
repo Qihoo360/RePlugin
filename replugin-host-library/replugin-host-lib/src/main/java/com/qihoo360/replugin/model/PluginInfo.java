@@ -26,7 +26,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.qihoo360.loader2.Constant;
@@ -329,10 +328,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      */
     public boolean isUsed() {
         // 注意：该方法不单纯获取JSON中的值，而是根据插件类型（p-n、纯APK）、所处环境（新插件、当前插件）而定
-        if (isPnPlugin()) {
-            // 为兼容以前逻辑，p-n仍是判断dex是否存在
-            return isDexExtracted();
-        } else if (getParentInfo() != null) {
+       if (getParentInfo() != null) {
             // 若PluginInfo是其它PluginInfo中的PendingUpdate，则返回那个PluginInfo的Used即可
             return getParentInfo().isUsed();
         } else {
@@ -389,9 +385,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
         // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
         Context context = RePluginInternal.getAppContext();
         File dir;
-        if (isPnPlugin()) {
-            dir = context.getDir(Constant.LOCAL_PLUGIN_SUB_DIR, 0);
-        } else if (getIsPendingCover()) {
+        if (getIsPendingCover()) {
             dir = context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
         } else {
             dir = context.getDir(Constant.LOCAL_PLUGIN_APK_SUB_DIR, 0);
@@ -407,7 +401,6 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @param dirSuffix 目录后缀
      * @return 插件的Dex所在目录的File对象
      */
-    @NonNull
     private File getDexDir(File dexDir, String dirSuffix) {
 
         File dir = new File(dexDir, makeInstalledFileName() + dirSuffix);
@@ -463,9 +456,7 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
             return new File(getApkDir() + File.separator + "oat" + File.separator + VMRuntimeCompat.getArtOatCpuType());
         } else {
-            if (isPnPlugin()) {
-                return context.getDir(Constant.LOCAL_PLUGIN_ODEX_SUB_DIR, 0);
-            } else if (getIsPendingCover()) {
+            if (getIsPendingCover()) {
                 return context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
             } else {
                 return context.getDir(Constant.LOCAL_PLUGIN_APK_ODEX_SUB_DIR, 0);
@@ -506,12 +497,16 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @return SO释放路径所在的File对象
      */
     public File getNativeLibsDir() {
+        File oldDir = getOldNativeLibsDir();
+        return new File(oldDir.getAbsolutePath(), VMRuntimeCompat.getArtOatCpuType());
+    }
+
+    @Deprecated
+    public File getOldNativeLibsDir(){
         // 必须使用宿主的Context对象，防止出现“目录定位到插件内”的问题
         Context context = RePluginInternal.getAppContext();
         File dir;
-        if (isPnPlugin()) {
-            dir = context.getDir(Constant.LOCAL_PLUGIN_DATA_LIB_DIR, 0);
-        } else if (getIsPendingCover()) {
+        if (getIsPendingCover()) {
             dir = context.getDir(Constant.LOCAL_PLUGIN_APK_COVER_DIR, 0);
         } else {
             dir = context.getDir(Constant.LOCAL_PLUGIN_APK_LIB_DIR, 0);
@@ -724,18 +719,14 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @return 文件名（不含扩展名）
      */
     public String makeInstalledFileName() {
-        if (isPnPlugin() || getType() == TYPE_BUILTIN) {
-            return formatName();
-        } else {
-            // 混淆插件名字，做法：
-            // 1. 生成最初的名字：[插件包名（小写）][协议最低版本][协议最高版本][插件版本][ak]
-            //    必须用小写和数字、无特殊字符，否则hashCode后会有一定的重复率
-            // 2. 将其生成出hashCode
-            // 3. 将整体数字 - 88
-            String n = getPackageName().toLowerCase() + getLowInterfaceApi() + getHighInterfaceApi() + getVersion() + "ak";
-            int h = n.hashCode() - 88;
-            return Integer.toString(h);
-        }
+        // 混淆插件名字，做法：
+        // 1. 生成最初的名字：[插件包名（小写）][协议最低版本][协议最高版本][插件版本][ak]
+        //    必须用小写和数字、无特殊字符，否则hashCode后会有一定的重复率
+        // 2. 将其生成出hashCode
+        // 3. 将整体数字 - 88
+        String n = getPackageName().toLowerCase() + getLowInterfaceApi() + getHighInterfaceApi() + getVersion() + "ak";
+        int h = n.hashCode() - 88;
+        return Integer.toString(h);
     }
 
     /**
@@ -751,6 +742,19 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
         setType(info.getType());
         setPackageName(info.getPackageName());
         setAlias(info.getAlias());
+    }
+
+    /**
+     * 更新插件的所有信息
+     * @param info
+     */
+    public void updateAll(PluginInfo info) {
+        synchronized (mJson) {
+            mJson.clear();
+            for (String key : info.mJson.keySet()) {
+                mJson.put(key, info.mJson.get(key));
+            }
+        }
     }
 
     /**
@@ -874,8 +878,6 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
         {
             if (getType() == TYPE_BUILTIN) {
                 b.append("[BUILTIN] ");
-            } else if (isPnPlugin()) {
-                b.append("[P-N] ");
             } else {
                 b.append("[APK] ");
             }
@@ -1110,8 +1112,8 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @deprecated 只用于旧的P-n插件，可能会废弃
      */
     public final boolean canReplaceForPn(PluginInfo info) {
-        if (getType() != TYPE_PN_INSTALLED
-                && info.getType() == TYPE_PN_INSTALLED
+        if (getType() != TYPE_EXTRACTED
+                && info.getType() == TYPE_EXTRACTED
                 && getName().equals(info.getName())
                 && getLowInterfaceApi() == info.getLowInterfaceApi()
                 && getHighInterfaceApi() == info.getHighInterfaceApi()
@@ -1202,9 +1204,11 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
 
     ////
 
-    private <T> T get(String name, @NonNull T def) {
-        final Object obj = mJson.get(name);
-        return (def.getClass().isInstance(obj)) ? (T) obj : def;
+    private <T> T get(String name, T def) {
+        synchronized (mJson) {
+            final Object obj = mJson.get(name);
+            return (def.getClass().isInstance(obj)) ? (T) obj : def;
+        }
     }
 
     public <T> void put(String key, T value) {

@@ -63,6 +63,7 @@ import java.util.Set;
 import static com.qihoo360.replugin.helper.LogDebug.LOADER_TAG;
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
+import static com.qihoo360.replugin.helper.LogDebug.TAG_NO_PN;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
 
 /**
@@ -452,6 +453,7 @@ class Loader {
     }
 
     final boolean loadEntryMethod2() {
+        long start = System.currentTimeMillis();
         //
         try {
             String className = Factory.PLUGIN_ENTRY_PACKAGE_PREFIX + "." + mPluginName + "." + Factory.PLUGIN_ENTRY_CLASS_NAME;
@@ -465,6 +467,9 @@ class Loader {
 //            if (LOGR) {
 //                LogRelease.e(PLUGIN_TAG, e.getMessage(), e);
 //            }
+        }
+        if (LOG) {
+            Log.d(TAG_NO_PN, "load loadEntryMethod2 for  " + mPluginName + " time=" + (System.currentTimeMillis() - start));
         }
         return mCreateMethod2 != null;
     }
@@ -488,6 +493,8 @@ class Loader {
 
     final boolean invoke2(PluginCommImpl x) {
         try {
+
+            long start = System.currentTimeMillis();
             IBinder manager = null; // TODO
             IBinder b = (IBinder) mCreateMethod2.invoke(null, mPkgContext, getClass().getClassLoader(), manager);
             if (b == null) {

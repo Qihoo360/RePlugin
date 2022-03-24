@@ -25,8 +25,9 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+
+import com.qihoo360.loader.utils.LocalBroadcastManager;
 
 import com.qihoo360.mobilesafe.api.Tasks;
 import com.qihoo360.replugin.RePlugin;
@@ -335,6 +336,9 @@ class PmHostSvc extends IPluginHost.Stub {
 
         if (pi != null) {
             // 通常到这里，表示“安装已成功”，这时不管处于什么状态，都应该通知外界更新插件内存表
+            if (LOG) {
+                LogDebug.d(PLUGIN_TAG, "plugin install success,pi=" + pi);
+            }
             syncInstalledPluginInfo2All(pi);
 
         }
@@ -357,6 +361,9 @@ class PmHostSvc extends IPluginHost.Stub {
     }
 
     private void syncInstalledPluginInfo2All(PluginInfo pi) {
+        if (LOG) {
+            LogDebug.d(PLUGIN_TAG, "syncInstalledPluginInfo2All： pn=" + pi);
+        }
         // PS：若更新了“正在运行”的插件（属于“下次重启进程后更新”），则由于install返回的是“新的PluginInfo”，为防止出现“错误更新”，需要使用原来的
         //
         // 举例，有一个正在运行的插件A（其Info为PluginInfoOld）升级到新版（其Info为PluginInfoNew），则：
@@ -375,14 +382,19 @@ class PmHostSvc extends IPluginHost.Stub {
         }
 
         // 在常驻进程内更新插件内存表
+        if (LOG) {
+            LogDebug.d(PLUGIN_TAG, "syncInstalledPluginInfo2All,newPluginFound=" + needToSyncPi);
+        }
         mPluginMgr.newPluginFound(needToSyncPi, false);
 
         // 通知其它进程去更新
         Intent intent = new Intent(PmBase.ACTION_NEW_PLUGIN);
         intent.putExtra(RePluginConstants.KEY_PERSIST_NEED_RESTART, mNeedRestart);
         intent.putExtra("obj", (Parcelable) needToSyncPi);
+        if (LOG) {
+            LogDebug.d(PLUGIN_TAG, "ACTION_NEW_PLUGIN broadcast start");
+        }
         IPC.sendLocalBroadcast2AllSync(mContext, intent);
-
         if (LOG) {
             LogDebug.d(TAG, "syncInstalledPluginInfo2All: Sync complete! syncPi=" + needToSyncPi);
         }

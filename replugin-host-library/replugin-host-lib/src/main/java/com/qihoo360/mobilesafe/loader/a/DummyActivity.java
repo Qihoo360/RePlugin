@@ -17,6 +17,7 @@
 package com.qihoo360.mobilesafe.loader.a;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.qihoo360.replugin.helper.LogRelease;
@@ -40,7 +41,11 @@ public class DummyActivity extends Activity {
         // 这时如果常驻进程已被杀，这时立即恢复后，由于插件还没有准备好，故会出现崩溃情况
         // 详细见：Crash Hash = 5C863A3E0CACDAEA9DBD05B9A7D353FE
         super.onCreate(null);
+        setIntent(new Intent());
+        try {
+            finish();
+        } catch (Exception e) {
 
-        finish();
+        }
     }
 }

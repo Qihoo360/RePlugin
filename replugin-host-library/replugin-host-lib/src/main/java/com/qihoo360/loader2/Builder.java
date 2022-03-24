@@ -196,29 +196,6 @@ public class Builder {
     static final void builder(Context context, PxAll all) {
         // 搜索所有本地插件和V5插件
         Finder.search(context, all);
-
-        // 删除不适配的PLUGINs
-        for (PluginInfo p : all.getOthers()) {
-            // TODO 如果已存在built-in和V5则不删除
-            if (LOG) {
-                LogDebug.d(PLUGIN_TAG, "delete obsolote plugin=" + p);
-            }
-            boolean rc = p.deleteObsolote(context);
-            if (!rc) {
-                if (LOG) {
-                    LogDebug.d(PLUGIN_TAG, "can't delete obsolote plugin=" + p);
-                }
-            }
-        }
-
-        // 删除所有和PLUGINs不一致的DEX文件
-        deleteUnknownDexs(context, all);
-
-        // 删除所有和PLUGINs不一致的SO库目录
-        // Added by Jiongxuan Zhang
-        deleteUnknownLibs(context, all);
-
-        // 构建数据
     }
 
     private static File getDexDir(Context context) {
@@ -286,7 +263,7 @@ public class Builder {
     private static void deleteUnknownLibs(Context context, PxAll all) {
         HashSet<String> names = new HashSet<>();
         for (PluginInfo p : all.getPlugins()) {
-            names.add(p.getNativeLibsDir().getName());
+            names.add(p.getOldNativeLibsDir().getName());
         }
 
         File dir = context.getDir(Constant.LOCAL_PLUGIN_DATA_LIB_DIR, 0);

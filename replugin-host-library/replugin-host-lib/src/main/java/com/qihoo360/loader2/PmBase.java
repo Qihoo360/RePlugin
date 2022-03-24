@@ -27,8 +27,9 @@ import android.content.pm.ServiceInfo;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
+import com.qihoo360.loader.utils.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.IModule;
@@ -54,6 +55,7 @@ import com.qihoo360.replugin.utils.ReflectUtils;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,6 +64,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
+import static com.qihoo360.replugin.helper.LogDebug.TAG_NO_PN;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
 import static com.qihoo360.replugin.packages.PluginInfoUpdater.ACTION_UNINSTALL_PLUGIN;
 
@@ -313,12 +316,26 @@ class PmBase {
         // 兼容即将废弃的p-n方案 by Jiongxuan Zhang
         mAll = new Builder.PxAll();
         Builder.builder(mContext, mAll);
-        refreshPluginMap(mAll.getPlugins());
 
         // [Newest!] 使用全新的RePlugin APK方案
         // Added by Jiongxuan Zhang
         try {
             List<PluginInfo> l = PluginManagerProxy.load();
+            if (l == null || l.isEmpty()) {
+                //说明是第一次启动，内置信息还没有添加进去，需要添加内置信息,自己单纯的更新到p.l文件，没有执行文件的拷贝和安装，路径还是plugins/xxx.jar
+                //主要是为了让内置插件被Replugin认识，加载的时候，我们做真正的安装（拷贝文件到app_p_a）
+                l = PluginManagerProxy.preInstallBuiltins(mAll.getPlugins());
+                if (LOG && l != null) {
+                    Log.d(TAG_NO_PN, "installBuiltins, plugin size=" + l.size());
+                }
+            } else {
+                //需要找到内置有更新的插件，然后重新写入p.l文件中
+                List<PluginInfo> newestBuiltin = findNewestBuiltin(mAll.getPlugins(), l);
+                if (!newestBuiltin.isEmpty()) {
+                    newestBuiltin = PluginManagerProxy.preInstallBuiltins(newestBuiltin);
+                    refreshPluginMap(newestBuiltin);
+                }
+            }
             if (l != null) {
                 // 将"纯APK"插件信息并入总的插件信息表中，方便查询
                 // 这里有可能会覆盖之前在p-n中加入的信息。本来我们就想这么干，以"纯APK"插件为准
@@ -332,6 +349,38 @@ class PmBase {
     }
 
     /**
+     * 找到内置插件列表中，有更新的插件
+     * @param builtin 内置插件列表
+     * @param plList p.l插件列表
+     */
+    private List<PluginInfo> findNewestBuiltin(List<PluginInfo> builtin, List<PluginInfo> plList) {
+        List<PluginInfo> newest = new ArrayList<>();
+        if (builtin != null) {
+            for (PluginInfo builtinItem : builtin) {
+                boolean found = false;
+                for (PluginInfo plItem : plList) {
+                    if (TextUtils.equals(plItem.getName(), builtinItem.getName())) {
+                        found = true;
+                        if (builtinItem.getVersion() > plItem.getVersion()) {
+                            //找到最新版
+                            if (LOGR) {
+                                LogRelease.d(TAG_NO_PN, "发现新版内置插件:" + builtinItem);
+                            }
+                            newest.add(builtinItem);
+                            break;
+                        }
+                    }
+                }
+                //新增的内置插件，也需要写入p.l
+                if (!found) {
+                    newest.add(builtinItem);
+                }
+            }
+        }
+        return newest;
+    }
+
+    /**
      * Client(UI进程)的初始化
      *
      */
@@ -340,8 +389,18 @@ class PmBase {
             LogDebug.d(PLUGIN_TAG, "list plugins from persistent process");
         }
 
-        // 1. 先尝试连接
-        PluginProcessMain.connectToHostSvc();
+        // 1. 先尝试连接，需要注册binder连接断开监听，以便于能重新建立连接
+        PluginProcessMain.connectToHostSvc(new PluginProcessMain.DiedAction() {
+            @Override
+            public void onDied() {
+                //重新建立连接，然后刷新插件列表
+                initForClient();
+                // 最新快照
+                PluginTable.initPlugins(mPlugins);
+                //重新加载后，需要为当前进程的所有Plugin对象attach上context等属性，避免出现后续插件加载失败
+                callAttach();
+            }
+        });
 
         // 2. 然后从常驻进程获取插件列表
         refreshPluginsFromHostSvc();
@@ -450,6 +509,9 @@ class PmBase {
                 }
             }
         } else {
+            if (LOG) {
+                LogRelease.i(PLUGIN_TAG, "更新插件,plugin=" + info);
+            }
             // 同时加入PackageName和Alias（如有）
             mPlugins.put(info.getPackageName(), plugin);
             if (!TextUtils.isEmpty(info.getAlias())) {
@@ -1163,6 +1225,9 @@ class PmBase {
     }
 
     final void newPluginFound(PluginInfo info, boolean persistNeedRestart) {
+        if (LOGR) {
+            LogRelease.i(PLUGIN_TAG, "newPluginFound=" + info + ",execute update plugintable");
+        }
         // 更新最新插件表
         PluginTable.updatePlugin(info);
 

@@ -266,4 +266,9 @@ public class LogDebug {
     public static final String MISC_TAG = "ws002";
 
     public static final String LOADER_TAG = "createClassLoader";
+
+    /**
+     * 去掉pn逻辑的tag
+     */
+    public static final String TAG_NO_PN = "nopn";
 }

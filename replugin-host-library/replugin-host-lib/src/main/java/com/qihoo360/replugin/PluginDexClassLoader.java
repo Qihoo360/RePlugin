@@ -18,6 +18,7 @@ package com.qihoo360.replugin;
 
 import android.os.Build;
 
+import com.qihoo360.loader2.PluginManager;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.utils.CloseableUtils;
@@ -76,7 +77,13 @@ public class PluginDexClassLoader extends DexClassLoader {
 
         installMultiDexesBeforeLollipop(pi, dexPath, parent);
 
-        mHostClassLoader = RePluginInternal.getAppClassLoader();
+       ClassLoader host = RePluginInternal.getAppClassLoader();
+       //防止再loader进程加载类出现死循环的问题
+        if (PluginManager.isPluginProcess() && host instanceof RePluginClassLoader) {
+            mHostClassLoader = ((RePluginClassLoader) host).getOrig();
+        } else {
+            mHostClassLoader = host;
+        }
 
         initMethods(mHostClassLoader);
     }

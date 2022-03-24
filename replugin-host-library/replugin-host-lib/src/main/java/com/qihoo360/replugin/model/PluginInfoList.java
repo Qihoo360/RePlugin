@@ -17,10 +17,11 @@
 package com.qihoo360.replugin.model;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.qihoo360.loader2.Constant;
+import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.utils.Charsets;
 import com.qihoo360.replugin.utils.FileUtils;
@@ -50,6 +51,16 @@ public class PluginInfoList implements Iterable<PluginInfo> {
 
     public void add(PluginInfo pi) {
         addToMap(pi);
+    }
+
+    /**
+     * 强制更新内存列表，比如安装后需要立即更新p.l的情况
+     * @param pi
+     */
+    public void addForce(PluginInfo pi) {
+        if (pi == null) return;
+        if (!TextUtils.isEmpty(pi.getName())) mMap.put(pi.getName(), pi);
+        if (!TextUtils.isEmpty(pi.getAlias())) mMap.put(pi.getAlias(), pi);
     }
 
     public void remove(String pn) {
@@ -87,6 +98,12 @@ public class PluginInfoList implements Iterable<PluginInfo> {
                     }
                     continue;
                 }
+
+                //block状态的插件丢弃
+                if (RePlugin.getConfig().getCallbacks().isPluginBlocked(pi)) {
+                    continue;
+                }
+
                 addToMap(pi);
             }
             return true;
@@ -107,6 +124,9 @@ public class PluginInfoList implements Iterable<PluginInfo> {
             final File f = getFile(context);
             final JSONArray jsonArr = new JSONArray();
             for (PluginInfo i : getCopyValues()) jsonArr.put(i.getJSON());
+            if (LogDebug.LOG) {
+                Log.d(LogDebug.TAG_NO_PN, "save json into p.l=" + jsonArr.toString());
+            }
             FileUtils.writeStringToFile(f, jsonArr.toString(), Charsets.UTF_8);
             return true;
         } catch (IOException e) {
@@ -124,18 +144,37 @@ public class PluginInfoList implements Iterable<PluginInfo> {
 
     ///
 
-    @NonNull
     private Collection<PluginInfo> getCopyValues() {
         return new HashSet(mMap.values()); //是否有必要去重???
     }
 
     private void addToMap(PluginInfo pi) {
         if (pi == null) return;
-        if (!TextUtils.isEmpty(pi.getName())) mMap.put(pi.getName(), pi);
-        if (!TextUtils.isEmpty(pi.getAlias())) mMap.put(pi.getAlias(), pi);
+        if (!TextUtils.isEmpty(pi.getName())) updateMap(pi.getName(), pi);
+        if (!TextUtils.isEmpty(pi.getAlias())) updateMap(pi.getAlias(), pi);
     }
 
-    @NonNull
+    private void updateMap(String name, PluginInfo info) {
+        if (mMap.contains(info)) {
+            return;
+        }
+        if (LogDebug.LOG) {
+            Log.d(TAG, "updateMap=" + info + ",address=" + System.identityHashCode(info));
+        }
+        //解决其他进程重启后，重新加载，导致内存中的PluginInfo对象被替换的问题
+        if (mMap.containsKey(name)) {
+            PluginInfo oriInfo = mMap.get(name);
+            if (oriInfo != null) {
+                oriInfo.updateAll(info);
+                mMap.put(name, oriInfo);
+            } else {
+                mMap.put(name, info);
+            }
+        } else {
+            mMap.put(name, info);
+        }
+    }
+
     private File getFile(Context context) {
         final File d = context.getDir(Constant.LOCAL_PLUGIN_APK_SUB_DIR, 0);
         return new File(d, "p.l");

@@ -390,12 +390,34 @@ public class PluginLocalBroadcastManager {
 
         public static void initLocked(final ClassLoader classLoader) {
             // 填充LocalBroadcastManager各方法
-            final String localBroadcastManager = "android.support.v4.content.LocalBroadcastManager";
-            getInstance = new MethodInvoker(classLoader, localBroadcastManager, "getInstance", new Class<?>[]{Context.class});
-            registerReceiver = new MethodInvoker(classLoader, localBroadcastManager, "registerReceiver", new Class<?>[]{BroadcastReceiver.class, IntentFilter.class});
-            unregisterReceiver = new MethodInvoker(classLoader, localBroadcastManager, "unregisterReceiver", new Class<?>[]{BroadcastReceiver.class});
-            sendBroadcast = new MethodInvoker(classLoader, localBroadcastManager, "sendBroadcast", new Class<?>[]{Intent.class});
-            sendBroadcastSync = new MethodInvoker(classLoader, localBroadcastManager, "sendBroadcastSync", new Class<?>[]{Intent.class});
+            final String localBroadcastManagerX = "androidx.localbroadcastmanager.content.LocalBroadcastManager";
+            //在android x 编译环境下，如果开启了android.enableJetifier,编译时会把support 相关的常量字符串替换为android x的路径，所以这个地方用运行时赋值
+             String localBroadcastManagerV4 = "";
+            if (classLoader != null) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("android");
+                stringBuilder.append(".");
+                stringBuilder.append("support");
+                stringBuilder.append(".");
+                stringBuilder.append("v4");
+                stringBuilder.append(".");
+                stringBuilder.append("content");
+                stringBuilder.append(".");
+                stringBuilder.append("LocalBroadcastManager");
+                localBroadcastManagerV4 = stringBuilder.toString();
+            }
+
+            String target = localBroadcastManagerX;
+            try {
+                classLoader.loadClass(target);
+            } catch (Exception e){
+                target = localBroadcastManagerV4;
+            }
+            getInstance = new MethodInvoker(classLoader, target, "getInstance", new Class<?>[]{Context.class});
+            registerReceiver = new MethodInvoker(classLoader, target, "registerReceiver", new Class<?>[]{BroadcastReceiver.class, IntentFilter.class});
+            unregisterReceiver = new MethodInvoker(classLoader, target, "unregisterReceiver", new Class<?>[]{BroadcastReceiver.class});
+            sendBroadcast = new MethodInvoker(classLoader, target, "sendBroadcast", new Class<?>[]{Intent.class});
+            sendBroadcastSync = new MethodInvoker(classLoader, target, "sendBroadcastSync", new Class<?>[]{Intent.class});
         }
     }
 }
