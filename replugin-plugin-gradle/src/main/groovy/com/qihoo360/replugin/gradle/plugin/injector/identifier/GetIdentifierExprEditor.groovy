@@ -36,9 +36,12 @@ public class GetIdentifierExprEditor extends ExprEditor {
 
         if (clsName.equalsIgnoreCase('android.content.res.Resources')) {
             if (methodName == 'getIdentifier') {
-                m.replace('{ $3 = \"' + CommonData.appPackage + '\"; ' +
+                m.replace('{ $3 = "android".equalsIgnoreCase($3)? $3 : \"' + CommonData.appPackage + '\"; ' +
                         '$_ = $proceed($$);' +
                         ' }')
+//                m.replace('{ $3 = \"' + CommonData.appPackage + '\"; ' +
+//                        '$_ = $proceed($$);' +
+//                        ' }')
                 println " GetIdentifierCall => ${filePath} ${methodName}():${m.lineNumber}"
             }
         }
