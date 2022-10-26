@@ -17,10 +17,9 @@ buildscript {
     { p, cfg = "rp-config.gradle" -> if (new File(p, cfg).exists()) apply from: "${p}/${cfg}" else if (p.exists()) call(p.parentFile) }(buildscript.sourceFile.parentFile)
     ext.kotlin_version = '1.3.72'
     repositories {
-        mavenLocal()
-        jcenter()
         mavenCentral()
-        google()
+        maven { url "https://maven.google.com" }
+        maven {url "http://maven.geelib.360.cn/nexus/repository/replugin/"}
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.4'
@@ -31,10 +30,9 @@ buildscript {
 
 allprojects {
     repositories {
-        mavenLocal()
-        jcenter()
         mavenCentral()
-        google()
+        maven { url "https://maven.google.com" }
+        maven {url "http://maven.geelib.360.cn/nexus/repository/replugin/"}
     }
 }
 
