@@ -14,7 +14,7 @@
 
 如果需要继续接入RePlugin，需要在项目的build.gradle内增加新的仓库地址:
 
-maven {url "http://maven.geelib.360.cn/nexus/service/rest/repository/browse/replugin/"}
+maven {url "http://maven.geelib.360.cn/nexus/repository/replugin/"}
 
 
 ## 通知
