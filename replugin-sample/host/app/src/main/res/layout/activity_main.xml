@@ -36,6 +36,13 @@
         android:text="@string/startDemo1ForResult" />
 
     <Button
+        android:id="@+id/btn_start_plugin_from_action"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:text="@string/startDemo1FromAction" />
+
+    <Button
         android:id="@+id/btn_load_fragment_from_demo1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -62,4 +69,5 @@
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:text="@string/installPluginFromAssets" />
+
 </LinearLayout>

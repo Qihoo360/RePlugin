@@ -37,6 +37,8 @@ import com.qihoo360.replugin.component.utils.PluginClientHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 
+import java.util.List;
+
 import static com.qihoo360.replugin.helper.LogDebug.LOG;
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
@@ -335,12 +337,20 @@ public class PluginServiceClient {
         } else {
             /* Intent 中已指定 Action，根据 action 解析出 ServiceInfo */
             if (!TextUtils.isEmpty(intent.getAction())) {
-                ComponentList componentList = Factory.queryPluginComponentList(plugin);
-                if (componentList != null) {
-                    // 返回 ServiceInfo 和 Service 所在的插件
-                    Pair<ServiceInfo, String> pair = componentList.getServiceAndPluginByIntent(context, intent);
-                    if (pair != null) {
-                        return new ComponentName(pair.second, pair.first.name);
+                ComponentList currentComponentList;
+                Pair<ServiceInfo, String> pair;
+                // 返回 全部插件的ComponentList
+                List<ComponentList> componentListAll = Factory.queryPluginComponentListAll();
+                if (componentListAll != null && !componentListAll.isEmpty()) {
+                    for (int index = 0; index < componentListAll.size(); index++) {
+                        currentComponentList = componentListAll.get(index);
+                        if (currentComponentList != null) {
+                            pair = currentComponentList.getServiceAndPluginByIntent(context, intent);
+                            if (pair != null) {
+                                // 返回 ServiceInfo 和 Service 所在的插件
+                                return new ComponentName(pair.second, pair.first.name);
+                            }
+                        }
                     }
                 }
             } else {
@@ -352,4 +362,3 @@ public class PluginServiceClient {
         return null;
     }
 }
-

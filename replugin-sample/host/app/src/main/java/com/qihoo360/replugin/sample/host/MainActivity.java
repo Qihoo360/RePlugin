@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.qihoo360.replugin.RePlugin;
+import com.qihoo360.replugin.component.service.PluginServiceClient;
 import com.qihoo360.replugin.model.PluginInfo;
 import com.qihoo360.replugin.utils.FileUtils;
 
@@ -59,6 +60,16 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName("demo1", "com.qihoo360.replugin.sample.demo1.activity.for_result.ForResultActivity"));
                 RePlugin.startActivityForResult(MainActivity.this, intent, REQUEST_CODE_DEMO1, null);
+            }
+        });
+
+        findViewById(R.id.btn_start_plugin_from_action).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setPackage("com.qihoo360.replugin.sample.demo1");
+                intent.setAction("com.qihoo360.replugin.sample.demo1.action.XXXX");
+                PluginServiceClient.startService(MainActivity.this, intent);
             }
         });
 

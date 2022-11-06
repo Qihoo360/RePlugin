@@ -228,6 +228,15 @@ public final class Factory {
 
     /**
      * 警告：低层接口
+     * 调用此接口会在当前进程加载全部插件（不加载代码和资源，只获取ComponentList）
+     * @return 插件的全部插件的ComponentList
+     */
+    public static final List<ComponentList> queryPluginComponentListAll() {
+        return sPluginManager.queryPluginComponentListAll();
+    }
+
+    /**
+     * 警告：低层接口
      * 调用此接口会在当前进程加载插件（不启动App）
      * @param name 插件名
      * @return 插件的ComponentList
