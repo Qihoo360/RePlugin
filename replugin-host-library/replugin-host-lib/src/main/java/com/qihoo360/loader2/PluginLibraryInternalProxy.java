@@ -352,7 +352,7 @@ public class PluginLibraryInternalProxy {
             plugin = intent.getComponent().getPackageName();
         }
         // 如果 plugin 是包名，则说明启动的是本插件。
-        if (TextUtils.isEmpty(plugin) || plugin.contains(".")) {
+        if (TextUtils.isEmpty(plugin)) {
             plugin = RePlugin.fetchPluginNameByClassLoader(activity.getClassLoader());
         }
         // 否则是其它插件
