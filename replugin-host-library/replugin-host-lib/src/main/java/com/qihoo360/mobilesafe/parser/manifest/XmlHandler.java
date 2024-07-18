@@ -159,6 +159,8 @@ class XmlHandler extends DefaultHandler {
 
                         if (!TextUtils.isEmpty(bean.host) && !TextUtils.isEmpty(bean.port)) {
                             curFilter.addDataAuthority(bean.host, bean.port);
+                        }else if(!TextUtils.isEmpty(bean.host)){
+                            curFilter.addDataAuthority(bean.host, null);
                         }
 
                         if (!TextUtils.isEmpty(bean.path)) {
