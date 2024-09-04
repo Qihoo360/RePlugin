@@ -40,6 +40,8 @@ class ComponentsGenerator {
 
     def static final ori = 'android:screenOrientation'
     def static final oriV = 'portrait'
+    def static final oriL = 'landscape'
+    def static final LAND = 'LAND'
 
     def static final theme = 'android:theme'
     def static final themeTS = '@android:style/Theme.Translucent.NoTitleBar'
@@ -134,6 +136,42 @@ class ComponentsGenerator {
                         "${theme}": "${themeTS}",
                         "${launchMode}": "singleInstance")
             }
+            /* 透明坑 横屏*/
+            config.countTranslucentStandardLand().times {
+                activity(
+                        "${name}": "${applicationID}.${infix}N1${LAND}NRTS${it}",
+                        "${cfg}": "${cfgV}",
+                        "${exp}": "${expV}",
+                        "${ori}": "${oriL}",
+                        "${theme}": "${themeTS}")
+            }
+            config.countTranslucentSingleTopLand().times {
+                activity(
+                        "${name}": "${applicationID}.${infix}N1${LAND}STPTS${it}",
+                        "${cfg}": "${cfgV}",
+                        "${exp}": "${expV}",
+                        "${ori}": "${oriL}",
+                        "${theme}": "${themeTS}",
+                        "${launchMode}": "singleTop")
+            }
+            config.countTranslucentSingleTaskLand().times {
+                activity(
+                        "${name}": "${applicationID}.${infix}N1${LAND}STTS${it}",
+                        "${cfg}": "${cfgV}",
+                        "${exp}": "${expV}",
+                        "${ori}": "${oriL}",
+                        "${theme}": "${themeTS}",
+                        "${launchMode}": "singleTask")
+            }
+            config.countTranslucentSingleInstanceLand().times {
+                activity(
+                        "${name}": "${applicationID}.${infix}N1${LAND}SITS${it}",
+                        "${cfg}": "${cfgV}",
+                        "${exp}": "${expV}",
+                        "${ori}": "${oriL}",
+                        "${theme}": "${themeTS}",
+                        "${launchMode}": "singleInstance")
+            }
 
             /* 不透明坑 */
             config.countNotTranslucentStandard.times {
@@ -168,6 +206,43 @@ class ComponentsGenerator {
                         "${cfg}": "${cfgV}",
                         "${exp}": "${expV}",
                         "${ori}": "${oriV}",
+                        "${theme}": "${themeNTS}",
+                        "${launchMode}": "singleInstance")
+            }
+
+            /* 不透明坑 */
+            config.countNotTranslucentStandardLand().times {
+                activity(
+                        "${name}": "${applicationID}.${infix}N1${LAND}NRNTS${it}",
+                        "${cfg}": "${cfgV}",
+                        "${exp}": "${expV}",
+                        "${ori}": "${oriL}",
+                        "${theme}": "${themeNTS}")
+            }
+            config.countNotTranslucentSingleTopLand().times {
+                activity(
+                        "${name}": "${applicationID}.${infix}N1${LAND}STPNTS${it}",
+                        "${cfg}": "${cfgV}",
+                        "${exp}": "${expV}",
+                        "${ori}": "${oriL}",
+                        "${theme}": "${themeNTS}",
+                        "${launchMode}": "singleTop")
+            }
+            config.countNotTranslucentSingleTaskLand().times {
+                activity(
+                        "${name}": "${applicationID}.${infix}N1${LAND}STNTS${it}",
+                        "${cfg}": "${cfgV}",
+                        "${exp}": "${expV}",
+                        "${ori}": "${oriL}",
+                        "${theme}": "${themeNTS}",
+                        "${launchMode}": "singleTask",)
+            }
+            config.countNotTranslucentSingleInstanceLand().times {
+                activity(
+                        "${name}": "${applicationID}.${infix}N1${LAND}SINTS${it}",
+                        "${cfg}": "${cfgV}",
+                        "${exp}": "${expV}",
+                        "${ori}": "${oriL}",
                         "${theme}": "${themeNTS}",
                         "${launchMode}": "singleInstance")
             }
@@ -230,6 +305,66 @@ class ComponentsGenerator {
                             "${cfg}": "${cfgV}",
                             "${exp}": "${expV}",
                             "${ori}": "${oriV}",
+                            "${theme}": "${themeNTS}",
+                            "${task}": ":t${i}",
+                            "${launchMode}": "singleTask")
+                }
+                // 横屏
+                config.countTranslucentStandardLand().times { j ->
+                    activity(
+                            "${name}": "${applicationID}.${infix}N1TA${i}${LAND}NRTS${j}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeTS}",
+                            "${task}": ":t${i}")
+                }
+                config.countTranslucentSingleTopLand().times { j ->
+                    activity(
+                            "${name}": "${applicationID}.${infix}N1TA${i}${LAND}STPTS${j}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeTS}",
+                            "${task}": ":t${i}",
+                            "${launchMode}": "singleTop")
+                }
+                config.countTranslucentSingleTaskLand().times { j ->
+                    activity(
+                            "${name}": "${applicationID}.${infix}N1TA${i}${LAND}STTS${j}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeTS}",
+                            "${task}": ":t${i}",
+                            "${launchMode}": "singleTask")
+                }
+
+                config.countNotTranslucentStandardLand().times { j ->
+                    activity(
+                            "${name}": "${applicationID}.${infix}N1TA${i}${LAND}NRNTS${j}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeNTS}",
+                            "${task}": ":t${i}")
+                }
+                config.countNotTranslucentSingleTopLand().times { j ->
+                    activity(
+                            "${name}": "${applicationID}.${infix}N1TA${i}${LAND}STPNTS${j}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeNTS}",
+                            "${task}": ":t${i}",
+                            "${launchMode}": "singleTop")
+                }
+                config.countNotTranslucentSingleTaskLand().times { j ->
+                    activity(
+                            "${name}": "${applicationID}.${infix}N1TA${i}${LAND}STNTS${j}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
                             "${theme}": "${themeNTS}",
                             "${task}": ":t${i}",
                             "${launchMode}": "singleTask")
@@ -336,6 +471,85 @@ class ComponentsGenerator {
                             "${launchMode}": "singleInstance")
                 }
 
+                config.countTranslucentStandardLand().times {
+                    activity(
+                            "${name}": "${applicationID}.${infix}P${p}${LAND}NRTS${it}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeTS}",
+                            "${process}": ":p${p}")
+                }
+                config.countTranslucentSingleTopLand().times {
+                    activity(
+                            "${name}": "${applicationID}.${infix}P${p}${LAND}STPTS${it}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeTS}",
+                            "${process}": ":p${p}",
+                            "${launchMode}": "singleTop")
+                }
+                config.countTranslucentSingleTaskLand().times {
+                    activity(
+                            "${name}": "${applicationID}.${infix}P${p}${LAND}STTS${it}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeTS}",
+                            "${process}": ":p${p}",
+                            "${launchMode}": "singleTask")
+                }
+                config.countTranslucentSingleInstanceLand().times {
+                    activity(
+                            "${name}": "${applicationID}.${infix}P${p}${LAND}SITS${it}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeTS}",
+                            "${process}": ":p${p}",
+                            "${launchMode}": "singleInstance")
+                }
+                config.countNotTranslucentStandardLand().times {
+                    activity(
+                            "${name}": "${applicationID}.${infix}P${p}${LAND}NRNTS${it}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeNTS}",
+                            "${process}": ":p${p}")
+                }
+                config.countNotTranslucentSingleTopLand().times {
+                    activity(
+                            "${name}": "${applicationID}.${infix}P${p}${LAND}STPNTS${it}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeNTS}",
+                            "${process}": ":p${p}",
+                            "${launchMode}": "singleTop")
+                }
+                config.countNotTranslucentSingleTaskLand().times {
+                    activity(
+                            "${name}": "${applicationID}.${infix}P${p}${LAND}STNTS${it}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeNTS}",
+                            "${process}": ":p${p}",
+                            "${launchMode}": "singleTask")
+                }
+                config.countNotTranslucentSingleInstanceLand().times {
+                    activity(
+                            "${name}": "${applicationID}.${infix}P${p}${LAND}SINTS${it}",
+                            "${cfg}": "${cfgV}",
+                            "${exp}": "${expV}",
+                            "${ori}": "${oriL}",
+                            "${theme}": "${themeNTS}",
+                            "${process}": ":p${p}",
+                            "${launchMode}": "singleInstance")
+                }
+
                 /* TaskAffinity */
                 config.countTask.times { i ->
                     config.countTranslucentStandard.times { j ->
@@ -397,6 +611,72 @@ class ComponentsGenerator {
                                 "${cfg}": "${cfgV}",
                                 "${exp}": "${expV}",
                                 "${ori}": "${oriV}",
+                                "${theme}": "${themeNTS}",
+                                "${launchMode}": "singleTask",
+                                "${process}": ":p${p}",
+                                "${task}": ":t${i}")
+                    }
+
+                    // 横屏
+                    config.countTranslucentStandardLand().times { j ->
+                        activity(
+                                "${name}": "${applicationID}.${infix}P${p}${LAND}TA${i}NRTS${j}",
+                                "${cfg}": "${cfgV}",
+                                "${exp}": "${expV}",
+                                "${ori}": "${oriL}",
+                                "${theme}": "${themeTS}",
+                                "${process}": ":p${p}",
+                                "${task}": ":t${i}")
+                    }
+                    config.countTranslucentSingleTopLand().times { j ->
+                        activity(
+                                "${name}": "${applicationID}.${infix}P${p}${LAND}TA${i}STPTS${j}",
+                                "${cfg}": "${cfgV}",
+                                "${exp}": "${expV}",
+                                "${ori}": "${oriL}",
+                                "${theme}": "${themeTS}",
+                                "${launchMode}": "singleTop",
+                                "${process}": ":p${p}",
+                                "${task}": ":t${i}")
+                    }
+                    config.countTranslucentSingleTaskLand().times { j ->
+                        activity(
+                                "${name}": "${applicationID}.${infix}P${p}${LAND}TA${i}STTS${j}",
+                                "${cfg}": "${cfgV}",
+                                "${exp}": "${expV}",
+                                "${ori}": "${oriL}",
+                                "${theme}": "${themeTS}",
+                                "${launchMode}": "singleTask",
+                                "${process}": ":p${p}",
+                                "${task}": ":t${i}")
+                    }
+                    config.countNotTranslucentStandardLand().times { j ->
+                        activity(
+                                "${name}": "${applicationID}.${infix}P${p}TA${i}NRNTS${LAND}${j}",
+                                "${cfg}": "${cfgV}",
+                                "${exp}": "${expV}",
+                                "${ori}": "${oriL}",
+                                "${theme}": "${themeNTS}",
+                                "${process}": ":p${p}",
+                                "${task}": ":t${i}")
+                    }
+                    config.countNotTranslucentSingleTopLand().times { j ->
+                        activity(
+                                "${name}": "${applicationID}.${infix}P${p}${LAND}TA${i}STPNTS${j}",
+                                "${cfg}": "${cfgV}",
+                                "${exp}": "${expV}",
+                                "${ori}": "${oriL}",
+                                "${theme}": "${themeNTS}",
+                                "${launchMode}": "singleTop",
+                                "${process}": ":p${p}",
+                                "${task}": ":t${i}")
+                    }
+                    config.countNotTranslucentSingleTaskLand().times { j ->
+                        activity(
+                                "${name}": "${applicationID}.${infix}P${p}${LAND}TA${i}STNTS${j}",
+                                "${cfg}": "${cfgV}",
+                                "${exp}": "${expV}",
+                                "${ori}": "${oriL}",
                                 "${theme}": "${themeNTS}",
                                 "${launchMode}": "singleTask",
                                 "${process}": ":p${p}",

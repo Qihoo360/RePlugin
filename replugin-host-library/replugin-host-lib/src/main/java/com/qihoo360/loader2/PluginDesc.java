@@ -24,7 +24,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.qihoo360.loader.utils.LocalBroadcastManager;
-import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.utils.Charsets;
 import com.qihoo360.replugin.utils.CloseableUtils;
 import com.qihoo360.mobilesafe.core.BuildConfig;

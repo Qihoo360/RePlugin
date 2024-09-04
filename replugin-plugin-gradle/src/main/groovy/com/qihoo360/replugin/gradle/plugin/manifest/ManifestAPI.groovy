@@ -61,27 +61,9 @@ public class ManifestAPI {
             //instant run的manifest
             File instantRunManifestOutputFile = null
             try {
-                manifestOutputFile = processManifestTask.getManifestOutputFile()
-                instantRunManifestOutputFile = processManifestTask.getInstantRunManifestOutputFile()
+                def dir = processManifestTask.multiApkManifestOutputDirectory.get().asFile
+                manifestOutputFile = new File(dir, "AndroidManifest.xml")
             } catch (Exception e) {
-//                manifestOutputFile = new File(processManifestTask.getManifestOutputDirectory(), "AndroidManifest.xml")
-//                instantRunManifestOutputFile = new File(processManifestTask.getInstantRunManifestOutputDirectory(), "AndroidManifest.xml")
-                def dir = processManifestTask.getManifestOutputDirectory()
-                if (dir instanceof File || dir instanceof String) {
-                    manifestOutputFile = new File(dir, "AndroidManifest.xml")
-                } else {
-                    manifestOutputFile = new File(dir.getAsFile().get(), "AndroidManifest.xml")
-                }
-                try {
-                    dir = processManifestTask.getInstantRunManifestOutputDirectory()
-                }catch(Exception e1){
-                    dir = processManifestTask.getInstantAppManifestOutputDirectory()
-                }
-                if (dir instanceof File || dir instanceof String) {
-                    instantRunManifestOutputFile = new File(dir, "AndroidManifest.xml")
-                } else {
-                    instantRunManifestOutputFile = new File(dir.getAsFile().get(), "AndroidManifest.xml")
-                }
             }
 
             if (manifestOutputFile == null && instantRunManifestOutputFile == null) {
@@ -90,27 +72,9 @@ public class ManifestAPI {
 
             //打印
             println " manifestOutputFile:${manifestOutputFile} ${manifestOutputFile.exists()}"
-            println " instantRunManifestOutputFile:${instantRunManifestOutputFile} ${instantRunManifestOutputFile.exists()}"
 
             //先设置为正常的manifest
             result = manifestOutputFile
-
-            try {
-                //获取instant run 的Task
-                def instantRunTask = project.tasks.getByName("transformClassesWithInstantRunFor${variantName}")
-                //查找instant run是否存在且文件存在
-                if (instantRunTask && instantRunManifestOutputFile.exists()) {
-                    println ' Instant run is enabled and the manifest is exist.'
-                    if (!manifestOutputFile.exists()) {
-                        //因为这里只是为了读取activity，所以无论用哪个manifest差别不大
-                        //正常情况下不建议用instant run的manifest，除非正常的manifest不存在
-                        //只有当正常的manifest不存在时，才会去使用instant run产生的manifest
-                        result = instantRunManifestOutputFile
-                    }
-                }
-            } catch (ignored) {
-                // transformClassesWithInstantRunForXXX may not exists
-            }
 
             //最后检测文件是否存在，打印
             if (!result.exists()) {

@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.qihoo360.replugin.helper.LogRelease;
+import com.qihoo360.replugin.utils.FixOTranslucentOrientation;
 
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
@@ -36,6 +37,8 @@ public class DummyActivity extends Activity {
         if (LOGR) {
             LogRelease.i(PLUGIN_TAG, "d a o c f m");
         }
+
+        FixOTranslucentOrientation.fix(this);
 
         // 之所以传Null，是因为系统会直接解析savedInstanceState
         // 这时如果常驻进程已被杀，这时立即恢复后，由于插件还没有准备好，故会出现崩溃情况

@@ -329,8 +329,18 @@ class Loader {
                     }
                 }
 
+
+                File dexFile = new File(mPath);
+                if (dexFile.exists()){ // Android 14 安全的动态代码加载
+                    dexFile.setWritable(false);
+                }
+
                 mClassLoader = RePlugin.getConfig().getCallbacks().createPluginClassLoader(mPluginObj.mInfo, mPath, out, soDir, parent);
                 Log.i("dex", "load " + mPath + " = " + mClassLoader);
+
+                if (dexFile.exists()){ // Android 14 安全的动态代码加载
+                    dexFile.setWritable(true);
+                }
 
                 if (mClassLoader == null) {
                     if (LOG) {

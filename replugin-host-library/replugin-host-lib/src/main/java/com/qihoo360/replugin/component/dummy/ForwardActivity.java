@@ -22,6 +22,7 @@ import android.os.Bundle;
 
 import com.qihoo360.loader2.PMF;
 import com.qihoo360.replugin.helper.LogRelease;
+import com.qihoo360.replugin.utils.FixOTranslucentOrientation;
 
 import static com.qihoo360.replugin.helper.LogDebug.PLUGIN_TAG;
 import static com.qihoo360.replugin.helper.LogRelease.LOGR;
@@ -41,6 +42,8 @@ public class ForwardActivity extends Activity {
         if (LOGR) {
             LogRelease.i(PLUGIN_TAG, "f.a: o.c");
         }
+
+        FixOTranslucentOrientation.fix(this);
 
         Intent intent = getIntent();
         if (intent == null) {

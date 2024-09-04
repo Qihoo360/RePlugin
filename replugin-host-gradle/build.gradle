@@ -14,41 +14,28 @@
  * the License.
  */
 
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
-
-repositories {
-    jcenter()
-    mavenCentral()
-    google()
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'maven-publish'
 }
 
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        google()
-    }
-
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
-        classpath 'com.github.dcendents:android-maven-plugin:1.2'
-    }
+repositories {
+    google()
+    mavenCentral()
 }
 
 dependencies {
-    compile 'com.android.tools.build:gradle:3.5.4'
-    compile 'org.json:json:20160212'
-    compile 'org.codehaus.groovy:groovy:2.4.7'
-    compile 'com.squareup:javapoet:1.5.1'
+    implementation 'com.android.tools.build:gradle:7.4.2'
+    implementation 'org.json:json:20160212'
+    implementation 'org.codehaus.groovy:groovy:2.4.7'
+    implementation 'com.squareup:javapoet:1.5.1'
 
-    compile gradleApi()
-    compile localGroovy()
+    implementation gradleApi()
+    implementation localGroovy()
 
-    compile 'com.google.gradle:osdetector-gradle-plugin:1.2.1'
-    compile 'net.dongliu:apk-parser:2.2.0'
+    implementation 'com.google.gradle:osdetector-gradle-plugin:1.2.1'
+    implementation 'net.dongliu:apk-parser:2.2.0'
 }
 
 project.ext.RP_ARTIFACT_ID = 'replugin-host-gradle'

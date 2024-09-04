@@ -36,7 +36,6 @@ import java.util.regex.Pattern
 public class ReClassTransform extends Transform {
 
     private Project project
-    private def globalScope
 
     /* 需要处理的 jar 包 */
     def includeJars = [] as Set
@@ -44,11 +43,6 @@ public class ReClassTransform extends Transform {
 
     public ReClassTransform(Project p) {
         this.project = p
-        def appPlugin = project.plugins.getPlugin(AppPlugin)
-        // taskManager 在 2.1.3 中为 protected 访问类型的，在之后的版本为 private 访问类型的，
-        // 使用反射访问
-        def taskManager = BasePlugin.metaClass.getProperty(appPlugin, "taskManager")
-        this.globalScope = taskManager.globalScope;
     }
 
     @Override
@@ -211,7 +205,7 @@ public class ReClassTransform extends Transform {
         Util.newSection()
         def pool = new ClassPool(true)
         // 添加编译时需要引用的到类到 ClassPool, 同时记录要修改的 jar 到 includeJars
-        Util.getClassPaths(project, globalScope, inputs, includeJars, map).each {
+        Util.getClassPaths(project, inputs, includeJars, map).each {
             println "    $it"
             pool.insertClassPath(it)
         }

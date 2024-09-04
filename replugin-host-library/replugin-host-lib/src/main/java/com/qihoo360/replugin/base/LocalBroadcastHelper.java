@@ -19,8 +19,6 @@ package com.qihoo360.replugin.base;
 import android.content.Context;
 import android.content.Intent;
 
-import com.qihoo360.replugin.helper.HostConfigHelper;
-
 import com.qihoo360.loader.utils.LocalBroadcastManager;
 
 import java.util.concurrent.Callable;

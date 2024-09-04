@@ -28,16 +28,15 @@ public class RePluginHostConfigCreator implements IFileCreator {
 
     def config
     def project
-    def variant
+    def generateBuildConfigTask
     def fileDir
     def fileName
-
-    def RePluginHostConfigCreator(def project, def variant, def cfg) {
+    def RePluginHostConfigCreator(def project, def generateBuildConfigTask, def cfg) {
         this.project = project
-        this.variant = variant;
+        this.generateBuildConfigTask = generateBuildConfigTask
         this.config = cfg
         //make it generated in buildConfig output dir so that we don't need to hook anything
-        File buildConfigGeneratedDir = this.variant.getVariantData().getScope().getBuildConfigSourceOutputDir()
+        File buildConfigGeneratedDir = this.generateBuildConfigTask.sourceOutputDir.asFile.get()
         fileName = HOST_CONFIG_NAME;
         fileDir = new File(buildConfigGeneratedDir, HOST_CONFIG_PATH)
     }
@@ -76,12 +75,28 @@ public class RePluginHostConfig {
             config.countTranslucentSingleInstance
         };
 
+    // 背景透明的坑的数量（每种 launchMode 不同）横屏
+    public static int ACTIVITY_PIT_COUNT_TS_STANDARD_LAND = ${config.countTranslucentStandardLand()};
+    public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TOP_LAND = ${config.countTranslucentSingleTopLand()};
+    public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TASK_LAND = ${config.countTranslucentSingleTaskLand()};
+    public static int ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE_LAND = ${
+            config.countTranslucentSingleInstanceLand()
+        };
+
     // 背景不透明的坑的数量（每种 launchMode 不同）
     public static int ACTIVITY_PIT_COUNT_NTS_STANDARD = ${config.countNotTranslucentStandard};
     public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP = ${config.countNotTranslucentSingleTop};
     public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK = ${config.countNotTranslucentSingleTask};
     public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE = ${
             config.countNotTranslucentSingleInstance
+        };
+
+    // 背景不透明的坑的数量（每种 launchMode 不同）横屏
+    public static int ACTIVITY_PIT_COUNT_NTS_STANDARD_LAND = ${config.countNotTranslucentStandardLand()};
+    public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP_LAND = ${config.countNotTranslucentSingleTopLand()};
+    public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK_LAND = ${config.countNotTranslucentSingleTaskLand()};
+    public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE_LAND = ${
+            config.countNotTranslucentSingleInstanceLand()
         };
 
     // TaskAffinity 组数
@@ -93,6 +108,9 @@ public class RePluginHostConfig {
    // HOST 是否使用 androidx 库
     public static boolean HOST_USE_ANDROIDX = ${config.useAndroidX};
 
+   // 是否使用 横屏坑位
+    public static boolean HOST_USE_OCCUPYLAND = ${config.useOccupyLand};
+   
     //------------------------------------------------------------
     // 主程序支持的插件版本范围
     //------------------------------------------------------------

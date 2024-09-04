@@ -77,6 +77,10 @@ def pbGitUrl = getPropertyExt('RP_GIT_URL', pbSiteUrl)
 
 def pbIssueUrl = getPropertyExt('RP_ISSUE_URL', pbSiteUrl)
 
+def mUser = getPropertyExt('RP_MAVEN_USER')
+
+def mPwd = getPropertyExt('RP_MAVEN_PWD')
+
 println(
 	">>>「publish.gradle」 CONFIGURATIONS:"
     + "\n ${group}:${pbArtifactId}:${version}"
@@ -87,114 +91,76 @@ println(
 	+ "\n pbGitUrl = ${pbGitUrl}"
 	+ "\n pbIssueUrl = ${pbIssueUrl}"
     + "\n License = ${pbLicense}(${pbLicenseUrl})"
+    + "\n pbArtifactId = ${pbArtifactId}"
+    + "\n mUser = ${mUser}"
+    + "\n mPwd = ${mPwd}"
 	+ "\n pbBintayKey = ${pbBintayKey}"
 )
 
 //// task
 
 if (isAndroid()) { // Android libraries
-    task sourcesJar(overwrite: true, type: Jar) {
-        classifier = 'sources'
+    task androidSourcesJar(type: Jar) {
+        archiveClassifier.set('sources')
         from android.sourceSets.main.java.srcDirs
     }
-    task javadoc(overwrite: true, type: Javadoc) {
+    task androidJavadocs(type: Javadoc) {
+        failOnError = false
         source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        classpath += files(ext.androidJar)
     }
+    task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+        archiveClassifier.set('javadoc')
+        from androidJavadocs.destinationDir
+   }
 } else { // Java libraries
-    task sourcesJar(overwrite: true, type: Jar, dependsOn: classes) {
+    task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allSource
     }
-}
-
-task javadocJar(overwrite: true, type: Jar, dependsOn: javadoc) {
+    task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
+    }
+    artifacts {
+    archives sourcesJar, javadocJar
 }
-
-artifacts {
-    // archives javadocJar
-    archives sourcesJar
 }
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
-
-// TODO: mavenLocal & jcenter conflicts
-
-if ( pbBintayKey == null ){
-
-	System.err.println("\n>>>「publish.gradle」bintray access key is EMPTY, UPLOAD LOCAL ONLY!\n")
-
-    ///// publish to LOCAL
-
-    apply plugin: 'maven'
-    final def theGroup = group // group will be reset to 'upload'
-    uploadArchives {
-       repositories.mavenDeployer {
-           repository(url: "file://${System.getenv('HOME')}/.m2/repository")
-           pom.groupId = theGroup
-           pom.version = version
-           pom.artifactId = pbArtifactId
-       }
-    }
-
-    return
-}
-
-/////// publish to BINTRAY
-
-apply plugin: 'com.jfrog.bintray'
-if (isAndroid()) {
-    apply plugin: 'com.github.dcendents.android-maven'
-}
-
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                name pbArtifactId
-                url pbSiteUrl
-                licenses {
-                    license {
-                        name pbLicense
-                        url pbLicenseUrl
-                    }
-                }
-                developers {
-                    developer {
-                        id pbUser
-                        name pbUserId
-                        email pbEmail
-                    }
-                }
-                scm {
-                    connection pbGitUrl
-                    developerConnection pbGitUrl
-                    url pbSiteUrl
+apply plugin: 'maven-publish'
+final def theGroup = group // group will be reset to 'upload'
+publishing {
+    repositories {
+        maven {
+            url = uri('file://${System.getenv('HOME')}/.m2/repository')
+            if (mUser && mPwd) {
+                credentials {
+                    username = mUser
+                    password = mPwd
                 }
             }
         }
     }
-}
-
-bintray {
-    user = pbUser
-    key = pbBintayKey
-    configurations = ['archives']
-    pkg {
-        desc = pbDesc
-        repo = pbRepo
-        name = pbArtifactId
-        vcsUrl = pbGitUrl
-        userOrg = pbUserOrg
-        websiteUrl = pbSiteUrl
-        issueTrackerUrl = pbIssueUrl
-        licenses = [pbLicense]
-        publish = true
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = theGroup
+            version = version
+            artifactId = pbArtifactId
+            if (pbArtifactId.endsWith('gradle')) {
+                from components.java
+            } else {
+                // 必须有这个 否则不会上传AAR包
+                afterEvaluate {
+                    artifact(androidSourcesJar)
+                    artifact(androidJavadocsJar)
+                    artifact(tasks.getByName("bundleReleaseAar"))
+                }
+            }
+        }
     }
 }

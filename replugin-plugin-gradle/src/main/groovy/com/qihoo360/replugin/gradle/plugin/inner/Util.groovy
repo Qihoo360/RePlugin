@@ -20,6 +20,7 @@ package com.qihoo360.replugin.gradle.plugin.inner
 import com.android.build.api.transform.DirectoryInput
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInput
+import com.android.build.gradle.internal.dependency.VariantDependencies
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import com.qihoo360.replugin.gradle.compat.ScopeCompat
@@ -30,20 +31,22 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipFile
 
-import static com.android.builder.model.AndroidProject.FD_INTERMEDIATES;
-
 /**
  * @author RePlugin Team
  */
 public class Util {
 
-    /** 生成 ClassPool 使用的 ClassPath 集合，同时将要处理的 jar 写入 includeJars */
-    def
-    static getClassPaths(Project project, def globalScope, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
-        def classpathList = []
+    private static final String INTERMEDIATES_DIR = "intermediates";
 
+    /** 生成 ClassPool 使用的 ClassPath 集合，同时将要处理的 jar 写入 includeJars */
+    def static getClassPaths(Project project, Collection<TransformInput> inputs, Set<String> includeJars, Map<String, String> map) {
+        def classpathList = []
         // android.jar
-        classpathList.add(getAndroidJarPath(globalScope))
+        def androidJarConfig = project.configurations
+                .maybeCreate(VariantDependencies.CONFIG_NAME_ANDROID_APIS)
+        androidJarConfig.description = "Configuration providing various types of Android JAR file"
+        def androidJarPath = androidJarConfig.asPath
+        classpathList.add(androidJarPath)
 
         // 原始项目中引用的 classpathList
         getProjectClassPath(project, inputs, includeJars, map).each {
@@ -82,8 +85,8 @@ public class Util {
                 if (!jarPath.contains(projectDir)) {
 
                     String jarZipDir = project.getBuildDir().path +
-                            File.separator + FD_INTERMEDIATES + File.separator + "exploded-aar" +
-                            File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class";
+                            File.separator + INTERMEDIATES_DIR + File.separator + "exploded-aar" +
+                            File.separator + Hashing.sha1().hashString(jarPath, Charsets.UTF_16LE).toString() + File.separator + "class"
                     if (unzip(jarPath, jarZipDir)) {
                         def jarZip = jarZipDir + ".jar"
                         includeJars << jarPath
@@ -108,8 +111,12 @@ public class Util {
                         Files.walkFileTree(Paths.get(jarZipDir), visitor)
                     }
 
-                    // 删除 jar
-                    FileUtils.forceDelete(jar)
+                    try{
+                        // 删除 jar
+                        FileUtils.forceDelete(jar)
+                    } catch (Exception e){
+                        e.printStackTrace()
+                    }
                 }
             }
         }

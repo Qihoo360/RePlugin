@@ -18,6 +18,8 @@ package com.qihoo360.replugin.sample.demo1.support;
 
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -27,7 +29,10 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
+
+import java.util.List;
 
 /**
  * @author RePlugin Team
@@ -56,6 +61,11 @@ public class NotifyUtils {
                     .setContentText(contentText)
                     .setLargeIcon(getAppIcon(ctx));
 
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                String channelId = getSilenceChannelId(ctx);
+                builder.setChannelId(channelId);
+            }
+
             Notification notification;
             if (Build.VERSION.SDK_INT <= 15) {
                 notification = builder.getNotification();
@@ -68,7 +78,7 @@ public class NotifyUtils {
                 return;
             }
 
-            notification.icon = 0x7f030002; // 注意此处是Host宿主的通知栏图标ID，需要宿主keep该资源ID
+            notification.icon = 0x7f0c0002; // 注意此处是Host宿主的通知栏图标ID，需要宿主keep该资源ID
             notification.tickerText = notiTitle;
             notification.when = System.currentTimeMillis();
             notification.flags = Notification.FLAG_AUTO_CANCEL;
@@ -78,6 +88,70 @@ public class NotifyUtils {
         } catch (Throwable e) {
             Log.e(TAG, e.toString());
         }
+    }
+
+    public static String getSilenceChannelId(Context context) {
+        if (context == null) return null;
+
+        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        String id = context.getPackageName() + "_" + "silence_channel";
+        NotificationChannel channel = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            channel = nm.getNotificationChannel(id);
+            if (channel == null) {
+                CharSequence name = "channel_silent_notification";
+                channel = new NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH);
+
+                channel.enableVibration(false);
+                channel.setVibrationPattern(new long[]{0});
+                channel.setSound(null, null);
+
+                String groupId = getChannelGroupId(context);
+                if (!TextUtils.isEmpty(groupId)) {
+                    channel.setGroup(groupId);
+                }
+
+                nm.createNotificationChannel(channel);
+            }
+        }
+
+        return id;
+    }
+
+    private static String getChannelGroupId(Context context) {
+        if (context == null) return null;
+
+        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        String groupId = context.getPackageName() + "_" + "default_channel_group";
+        NotificationChannelGroup group = null;
+
+        List<NotificationChannelGroup> channelGroupsList = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            channelGroupsList = nm.getNotificationChannelGroups();
+
+            if (channelGroupsList != null) {
+                for (int i = channelGroupsList.size() - 1; i >= 0; i--) {
+                    NotificationChannelGroup channelGroup = channelGroupsList.get(i);
+                    if (channelGroup != null) {
+                        String id = channelGroup.getId();
+                        if (groupId.equals(id)) {
+                            group = channelGroup;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (group == null) {
+                CharSequence name = "Replugin";
+
+                group = new NotificationChannelGroup(groupId, name);
+                nm.createNotificationChannelGroup(group);
+            }
+        }
+
+        return groupId;
     }
 
     private static Bitmap getAppIcon(Context ctx) {
@@ -94,6 +168,14 @@ public class NotifyUtils {
     private static PendingIntent getNotificationIntent(Context context) {
         Intent i = new Intent(ACTION_START_NOTIFY_UI);
         i.putExtra(NOTIFY_KEY, "来自Demo1插件的通知栏点击");
-        return PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent mPendingPollIntent;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            mPendingPollIntent = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            mPendingPollIntent = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+        return mPendingPollIntent;
     }
 }

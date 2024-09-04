@@ -1,27 +1,58 @@
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 def siteUrl = ''
 def gitUrl = ''
 
+group = 'com.qihoo360.replugin'
+version = '3.1.0'
 
-install {
-    repositories.mavenInstaller {
-        // This generates POM.xml with proper parameters
-        pom {
-            artifactId = ""
+//生成文档注释
+task androidJavadocs(type: Javadoc) {
+    failOnError = false
+    source = android.sourceSets.main.java.srcDirs
+    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+    classpath += files(ext.androidJar)
+}
+//将文档打包成jar
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    archiveClassifier.set('javadoc')
+    from androidJavadocs.destinationDir
+}
+//将源码打包，这一点对kotlin来说很重要，否则业务侧无法看到源码
+task androidSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+}
 
-            project {
-
-                packaging 'aar'
-                // Add your description here
-                name 'RePlugin - A flexible, stable, easy-to-use Android Plug-in Framework' //项目描述
-                url siteUrl
-                // Set your license
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = group
+            artifactId = 'replugin-host-lib'
+            version = version
+            artifact(androidSourcesJar)//将源码打包进aar，如果不需要可以去掉
+            artifact(androidJavadocsJar)//将注释打包进aar，如果不需要可以去掉
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'My Library'
+                description = 'RePlugin - A flexible, stable, easy-to-use Android Plug-in Framework'
+                url = siteUrl
+                properties = [
+                         myProp: "value",
+                        "prop.with.dots": "anotherValue"
+                ]
                 licenses {
                     license {
-                        name 'Apache License 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0'
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
                 developers {
@@ -39,41 +70,12 @@ install {
             }
         }
     }
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-artifacts {
-    //archives javadocJar
-    archives sourcesJar
-}
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-bintray {
-    user = ""
-    key = ""
-    configurations = ['archives']
-    pkg {
-
-        repo = '' // 上传到中央仓库的名称
-        name = '' // 上传到jcenter 的项目名称
-        userOrg = ''
-        desc = 'RePlugin - A flexible, stable, easy-to-use Android Plug-in Framework' // 项目描述
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
-    }
-
+//    repositories {
+//        maven {
+//            // change URLs to point to your repos, e.g. http://my.org/repo
+//            def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
+//            def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
+//            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+//        }
+//    }
 }

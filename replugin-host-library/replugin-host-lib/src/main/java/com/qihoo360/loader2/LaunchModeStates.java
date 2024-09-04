@@ -17,16 +17,16 @@
 package com.qihoo360.loader2;
 
 import android.content.pm.ActivityInfo;
+import android.util.Log;
 
 import com.qihoo360.loader2.PluginContainers.ActivityState;
 import com.qihoo360.replugin.RePlugin;
+import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
-import static com.qihoo360.replugin.helper.LogDebug.LOG;
 
 /**
  * 存储 LaunchMode + Theme -> 此种组合下的 ActivityState 状态集合
@@ -76,6 +76,42 @@ class LaunchModeStates {
 
             // 只有开启“详细日志”时才输出每一个坑位的信息，防止刷屏
             if (RePlugin.getConfig().isPrintDetailLog()) {
+                Log.d(TAG, "LaunchModeStates.add(" + key + ")");
+            }
+
+            ActivityState state = new ActivityState(key);
+            states.put(key, state);
+            allStates.put(key, state);
+            containers.add(key);
+        }
+    }
+
+    /**
+     * 初始化 LaunchMode 和 Theme 对应的坑位
+     *
+     * @param containers  保存所有 activity 坑位的引用
+     * @param prefix      坑位前缀
+     * @param launchMode  launchMode
+     * @param translucent 是否是透明的坑
+     * @param count       坑位数
+     */
+    void addLandStates(Map<String, ActivityState> allStates, HashSet<String> containers, String prefix, int launchMode, boolean translucent, int count) {
+        if (!HostConfigHelper.HOST_USE_OCCUPYLAND || count <= 0){
+            return;
+        }
+        String infix = getInfix(launchMode, translucent);
+        infix = "LAND" + infix;
+        HashMap<String, ActivityState> states = mStates.get(infix);
+        if (states == null) {
+            states = new HashMap<>();
+            mStates.put(infix, states);
+        }
+
+        for (int i = 0; i < count; i++) {
+            String key = prefix + infix + i;
+
+            // 只有开启“详细日志”时才输出每一个坑位的信息，防止刷屏
+            if (RePlugin.getConfig().isPrintDetailLog()) {
                 LogDebug.d(TAG, "LaunchModeStates.add(" + key + ")");
             }
 
@@ -89,9 +125,16 @@ class LaunchModeStates {
     /**
      * 根据 launchMode 和 theme 获取对应的坑位集合
      */
-    HashMap<String, ActivityState> getStates(int launchMode, int theme) {
-        String infix = getInfix(launchMode, isTranslucentTheme(theme));
-        return mStates.get(infix);
+    HashMap<String, ActivityState> getStates(int screenOrientation, int launchMode, int theme) {
+        try {
+            String infix = getInfix(launchMode, isTranslucentTheme(theme));
+            if (HostConfigHelper.HOST_USE_OCCUPYLAND && screenOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                infix = "LAND" + infix;
+            }
+            return mStates.get(infix);
+        }catch (Exception e){
+            return null;
+        }
     }
 
     /**

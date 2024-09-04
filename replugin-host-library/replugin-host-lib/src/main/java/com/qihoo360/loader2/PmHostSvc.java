@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.os.RemoteException;
@@ -282,7 +283,11 @@ class PmHostSvc extends IPluginHost.Stub {
                     }
 
                     // 注册 Receiver
-                    mContext.registerReceiver(mReceiverProxy, filter);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        mContext.registerReceiver(mReceiverProxy, filter, Context.RECEIVER_EXPORTED);
+                    } else {
+                        mContext.registerReceiver(mReceiverProxy, filter);
+                    }
                 }
             }
         }

@@ -28,6 +28,7 @@ import android.text.TextUtils;
 import com.qihoo360.i.Factory;
 import com.qihoo360.i.Factory2;
 import com.qihoo360.i.IPluginManager;
+import com.qihoo360.replugin.utils.FixOTranslucentOrientation;
 import com.qihoo360.replugin.utils.ReflectUtils;
 import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.base.IPC;
@@ -450,6 +451,8 @@ public class PluginLibraryInternalProxy {
             intent.setExtrasClassLoader(activity.getClassLoader());
             activity.setTheme(getThemeId(activity, intent));
         }
+
+        FixOTranslucentOrientation.fix(activity);
     }
 
     /**

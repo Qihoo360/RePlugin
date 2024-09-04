@@ -13,5 +13,39 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        mavenLocal()
+        maven {
+            allowInsecureProtocol = true
+            url "http://maven.geelib.360.cn/nexus/repository/replugin/"}
+    }
+    resolutionStrategy {
+        def modules = [
+                'replugin.plugin.gradle': 'com.qihoo360.replugin:replugin-plugin-gradle',
+        ]
+        eachPlugin {
+            def module = modules.get(requested.id.id)
+            if (module != null) {
+                useModule(module + ":" + requested.version)
+            }
+        }
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
+        maven {
+            allowInsecureProtocol = true
+            url "http://maven.geelib.360.cn/nexus/repository/replugin/"}
+    }
+}
 
-include ':app'
+rootProject.name = "plugin-demo1"
+include ':app', ':library'

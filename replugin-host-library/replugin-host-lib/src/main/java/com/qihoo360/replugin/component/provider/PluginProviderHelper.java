@@ -28,7 +28,7 @@ import com.qihoo360.replugin.RePlugin;
 import com.qihoo360.replugin.component.ComponentList;
 import com.qihoo360.replugin.helper.LogDebug;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public class PluginProviderHelper {
         mAuthority = authority;
     }
 
-    Map<String, ContentProvider> mProviderAuthorityMap = new HashMap<>();
+    Map<String, ContentProvider> mProviderAuthorityMap = new ConcurrentHashMap<>();
 
     // 将从系统传过来的URI转化成插件里的URI。例如：
     // Before: content://com.qihoo360.mobilesafe.PluginTransferP/contacts/com.qihoo360.contacts.abc/people

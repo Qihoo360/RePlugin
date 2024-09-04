@@ -37,16 +37,13 @@ class PluginDebugger {
         this.project = project
         this.config = config
         this.variant = variant
-        def variantData = this.variant.variantData
-        def scope = variantData.scope
-        def globalScope = scope.globalScope
-        def variantConfiguration = variantData.variantConfiguration
-        String archivesBaseName = globalScope.getArchivesBaseName();
-        String apkBaseName = archivesBaseName + "-" + variantConfiguration.getBaseName()
+        def confBaseName = this.variant.outputs[0].variantOutput.baseName
+        String archivesBaseName = project.archivesBaseName
+        String apkBaseName = archivesBaseName + "-" + confBaseName
 
-        File apkDir = new File(globalScope.getBuildDir(), "outputs" + File.separator + "apk")
+        File apkDir = new File(project.getBuildDir(), "outputs" + File.separator + "apk")
 
-        String unsigned = (variantConfiguration.getSigningConfig() == null
+        String unsigned = (variant.signingConfig == null
                 ? "-unsigned.apk"
                 : ".apk");
         String apkName = apkBaseName + unsigned
@@ -54,10 +51,10 @@ class PluginDebugger {
         apkFile = new File(apkDir, apkName)
 
         if (!apkFile.exists() || apkFile.length() == 0) {
-            apkFile = new File(apkDir, variantConfiguration.getBaseName() + File.separator + apkName)
+            apkFile = new File(apkDir, confBaseName + File.separator + apkName)
         }
 
-        adbFile = ScopeCompat.getAdbExecutable(globalScope)
+        adbFile = project.plugins.getPlugin('android').extension.adbExecutable
 
     }
 
@@ -84,6 +81,24 @@ class PluginDebugger {
             apkPath += "/"
         }
         apkPath += "${apkFile.name}"
+
+        //获取写存储权限
+        String grantWriteStorageCmd = "${adbFile.absolutePath} shell pm grant ${config.hostApplicationId} android.permission.WRITE_EXTERNAL_STORAGE "
+        if (0 != CmdUtil.syncExecute(grantWriteStorageCmd)) {
+            return false
+        }
+
+        //获取读存储权限
+        String grantReadStorageCmd = "${adbFile.absolutePath} shell pm grant ${config.hostApplicationId} android.permission.READ_EXTERNAL_STORAGE "
+        if (0 != CmdUtil.syncExecute(grantReadStorageCmd)) {
+            return false
+        }
+
+        //延迟两秒
+        String sleepCmd = "${adbFile.absolutePath} shell sleep 2 "
+        if (0 != CmdUtil.syncExecute(sleepCmd)) {
+            return false
+        }
 
         //发送安装广播
         String installBrCmd = "${adbFile.absolutePath} shell am broadcast -a ${config.hostApplicationId}.replugin.install -e path ${apkPath} -e immediately true "

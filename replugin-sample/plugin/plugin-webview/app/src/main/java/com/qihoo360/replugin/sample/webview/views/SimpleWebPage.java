@@ -87,7 +87,6 @@ public class SimpleWebPage extends RelativeLayout {
         // 开启DomStorage缓存
         ws.setDomStorageEnabled(true);
         ws.setJavaScriptCanOpenWindowsAutomatically(true);
-        ws.setAppCacheEnabled(false);
         // 防止WebView跨源攻击
         // 设置是否允许WebView使用File协议，默认值是允许
         // 注意：不允许使用File协议，则不会存在通过file协议的跨源安全威胁，但同时也限制了WebView的功能，使其不能加载本地的HTML文件

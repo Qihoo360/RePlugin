@@ -24,6 +24,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- ======================== -->
 
     <application
@@ -34,7 +35,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,7 +45,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PluginFragmentActivity" />
+        <activity android:name=".PluginFragmentActivity"/>
 
         <provider
             android:name=".FileProvider"

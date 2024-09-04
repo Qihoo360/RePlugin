@@ -17,20 +17,25 @@
 /**
  * @author RePlugin Team
  */
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    namespace 'com.qihoo360.mobilesafe.core'
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 25
+        targetSdkVersion 34
 
         versionCode 2
         versionName version
         consumerProguardFiles 'replugin-rules.pro'
 
+        buildConfigField "int", 'VERSION_CODE', String.valueOf(2)
+        buildConfigField 'String', 'VERSION_NAME', "\"" + version + "\""
     }
 
     lintOptions {
@@ -39,10 +44,11 @@ android {
 
     // 务必要加上此段话，这样默认会出Debug版AAR，会带上日志方便定位
     defaultPublishConfig "debug"
-}
 
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 project.ext.RP_ARTIFACT_ID = 'replugin-host-lib'

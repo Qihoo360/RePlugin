@@ -15,28 +15,12 @@
  */
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        google()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.4'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
-    }
+plugins {
+    id 'com.android.application' version '7.4.2' apply false
+    id 'maven-publish'
 }
 
-allprojects {
-    repositories {
-        jcenter()
-        mavenCentral()
-        google()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+configure(allprojects - project(':replugin-host-lib')) {
+    println "applying java plugin to $project"
+    apply plugin: 'java-library'
 }
