@@ -1,7 +1,5 @@
 package com.qihoo360.replugin.gradle.compat
 
-import com.android.sdklib.IAndroidTarget
-
 /**
  * @author hyongbai
  */
@@ -27,14 +25,14 @@ class ScopeCompat {
 //        return globalScope.getAndroidBuilder().getTarget().getPath(IAndroidTarget.ANDROID_JAR)
 //    }
 
-    static def getAndroidJar(def scope){
-        final MetaClass scopeClz = scope.metaClass
-
-        if (scopeClz.hasProperty(scope, "androidBuilder")) {
-            return scope.getAndroidBuilder().getTarget().getPath(IAndroidTarget.ANDROID_JAR)
-        }
-        if (scopeClz.hasProperty(scope, "sdkComponents")) {
-            return scope.sdkComponents.androidJarProvider.get().getAbsolutePath()
-        }
-    }
+//    static def getAndroidJar(def scope){
+//        final MetaClass scopeClz = scope.metaClass
+//
+//        if (scopeClz.hasProperty(scope, "androidBuilder")) {
+//            return scope.getAndroidBuilder().getTarget().getPath(IAndroidTarget.ANDROID_JAR)
+//        }
+//        if (scopeClz.hasProperty(scope, "sdkComponents")) {
+//            return scope.sdkComponents.androidJarProvider.get().getAbsolutePath()
+//        }
+//    }
 }

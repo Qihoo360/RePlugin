@@ -74,6 +74,15 @@ public class PluginServiceServer {
      * Service onStartCommand
      */
     private static final int WHAT_ON_START_COMMAND = 1;
+    /**
+     * Service onCreate
+     */
+    private static final int WHAT_ON_CREATE = 2;
+
+    /**
+     * Service onCreate onBind
+     */
+    private static final int WHAT_ON_CREATE_AND_BIND = 3;
 
     private final Context mContext;
 
@@ -99,25 +108,72 @@ public class PluginServiceServer {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-
-            switch (msg.what) {
-                case WHAT_ON_START_COMMAND:
-                    Bundle data = msg.getData();
-                    Intent intent = data.getParcelable("intent");
-
-                    ServiceRecord sr = (ServiceRecord)msg.obj;
-
-                    if (intent != null && sr != null) {
-                        sr.service.onStartCommand(intent, 0, 0);
-                    }else{
+            int what =  msg.what;
+            try {
+                if (what == WHAT_ON_CREATE_AND_BIND){
+                    if (msg.obj == null || !(msg.obj instanceof OnCreateAndBindMsg)){
                         if (LOG) {
-                            LogDebug.e(PLUGIN_TAG, "pss.onStartCommand fail.");
+                            LogDebug.e(PLUGIN_TAG, handlerErrorMsg(what));
                         }
+                        return;
                     }
-                    break;
+                    handleOnCreateAndBind((OnCreateAndBindMsg) msg.obj);
+                    return;
+                }
+
+                if (what != WHAT_ON_CREATE && what != WHAT_ON_START_COMMAND){
+                    return;
+                }
+                Bundle data = msg.getData();
+                if (data == null){
+                    if (LOG) {
+                        LogDebug.e(PLUGIN_TAG, handlerErrorMsg(what));
+                    }
+                    return;
+                }
+                Intent intent = data.getParcelable("intent");
+                if (intent == null){
+                    if (LOG) {
+                        LogDebug.e(PLUGIN_TAG, handlerErrorMsg(what));
+                    }
+                    return;
+                }
+                ServiceRecord sr = (ServiceRecord)msg.obj;
+                if (sr == null){
+                    if (LOG) {
+                        LogDebug.e(PLUGIN_TAG, handlerErrorMsg(what));
+                    }
+                    return;
+                }
+                switch (msg.what) {
+                    case WHAT_ON_CREATE:
+                        handleOnCreate(intent, sr);
+                        break;
+                    case WHAT_ON_START_COMMAND:
+                        intent.setExtrasClassLoader(sr.service.getClassLoader());
+                        sr.service.onStartCommand(intent, 0, 0);
+                        break;
+                }
+            }catch (Exception e){
+                if (LOG) {
+                    LogDebug.e(PLUGIN_TAG, handlerErrorMsg(what), e);
+                }
             }
+
         }
     };
+
+    private String handlerErrorMsg(int what){
+        switch (what){
+            case WHAT_ON_CREATE:
+                return "pss.onStartCommand fail.";
+            case WHAT_ON_START_COMMAND:
+                return "pss.onCreate fail.";
+            case WHAT_ON_CREATE_AND_BIND:
+                return "pss.onCreate pss.onBind fail";
+        }
+        return "";
+    }
 
     public PluginServiceServer(Context context) {
         mContext = context;
@@ -133,10 +189,32 @@ public class PluginServiceServer {
         if (sr == null) {
             return null;
         }
-        if (!installServiceIfNeededLocked(sr)) {
+        if (!handleOnCreate(intent, sr)){
             return null;
         }
+        return cn;
+    }
 
+    private boolean handleOnCreate(Intent intent, ServiceRecord sr){
+        if (Looper.myLooper() != Looper.getMainLooper()){
+            if (sr.service == null){
+                sendStartServiceMsg(intent, sr, WHAT_ON_CREATE);
+                return true;
+            }
+            handleOnStartCommand(intent, sr);
+            return true;
+        }
+
+        if (!installServiceIfNeededLocked(sr)) {
+            return false;
+        }
+
+        handleOnStartCommand(intent, sr);
+        return true;
+    }
+
+    private void handleOnStartCommand(Intent intent, ServiceRecord sr){
+        ComponentName cn = intent.getComponent();
         sr.startRequested = true;
 
         // 加入到列表中，统一管理
@@ -146,15 +224,18 @@ public class PluginServiceServer {
             LogDebug.i(PLUGIN_TAG, "PSM.startService(): Start! in=" + intent + "; sr=" + sr);
         }
 
-        // 从binder线程post到ui线程，去执行Service的onStartCommand操作
-        Message message = mHandler.obtainMessage(WHAT_ON_START_COMMAND);
+        sendStartServiceMsg(intent, sr, WHAT_ON_START_COMMAND);
+    }
+
+    private void sendStartServiceMsg(Intent intent, ServiceRecord sr, int what){
+        // 从binder线程post到ui线程，去执行Service的onCreate, onStartCommand操作
+        Message message = mHandler.obtainMessage(what);
         Bundle data = new Bundle();
         data.putParcelable("intent", intent);
         message.setData(data);
         message.obj = sr;
-        mHandler.sendMessage(message);
 
-        return cn;
+        mHandler.sendMessage(message);
     }
 
     // 停止插件的Service。说明见PluginServiceClient的定义
@@ -175,42 +256,71 @@ public class PluginServiceServer {
 
     // 绑定插件Service。说明见PluginServiceClient的定义
     int bindServiceLocked(Intent intent, IServiceConnection connection, int flags, Messenger client) {
-        intent = cloneIntentLocked(intent);
-        ComponentName cn = intent.getComponent();
-        ProcessRecord callerPr = retrieveProcessRecordLocked(client);
-        ServiceRecord sr = retrieveServiceLocked(intent);
-        if (sr == null) {
-            return 0;
-        }
-        if (!installServiceIfNeededLocked(sr)) {
+        OnCreateAndBindMsg msg = new OnCreateAndBindMsg();
+        msg.intent = cloneIntentLocked(intent);
+        msg.cn = intent.getComponent();
+        msg.callerPr = retrieveProcessRecordLocked(client);
+        msg.sr = retrieveServiceLocked(intent);
+        msg.connection = connection;
+        msg.flags = flags;
+        if (msg.sr == null) {
             return 0;
         }
 
+        if (!handleOnCreateAndBind(msg)) {
+            return 0;
+        }
+        return 1;
+    }
+
+    private boolean handleOnCreateAndBind(OnCreateAndBindMsg msg){
+        if (msg == null){
+            return false;
+        }
+        if (Looper.myLooper() != Looper.getMainLooper()){
+            if (msg.sr.service == null){
+                Message message = mHandler.obtainMessage(WHAT_ON_CREATE_AND_BIND);
+                message.obj = msg;
+                mHandler.sendMessage(message);
+                return true;
+            }
+            handleOnBind(msg);
+            return true;
+        }
+
+        if (!installServiceIfNeededLocked(msg.sr)) {
+            return false;
+        }
+
+        handleOnBind(msg);
+        return true;
+    }
+
+    private void handleOnBind(OnCreateAndBindMsg msg){
         // 将ServiceConnection连接加入各种表中
-        ProcessBindRecord b = sr.retrieveAppBindingLocked(intent, callerPr);
-        insertConnectionToRecords(sr, b, connection, flags);
+        ProcessBindRecord b = msg.sr.retrieveAppBindingLocked(msg.intent, msg.callerPr);
+        insertConnectionToRecords(msg.sr, b, msg.connection, msg.flags);
 
         // 判断是否已经绑定过
         if (b.intent.hasBound) {
             // 之前此Intent已绑定过，则直接返回。像系统那样
             // 注意：不管哪个进程，只要第一次绑定过了，其后直接返回。像系统那样
-            callConnectedMethodLocked(connection, cn, b.intent.binder);
+            callConnectedMethodLocked(msg.connection, msg.cn, b.intent.binder);
         } else {
             // 没有绑定，则直接调用onBind，且记录绑定状态
             if (b.intent.apps.size() > 0) {
-                IBinder bd = sr.service.onBind(intent);
+                IBinder bd = msg.sr.service.onBind(msg.intent);
                 b.intent.hasBound = true;
                 b.intent.binder = bd;
                 if (bd != null) {
                     // 为空就不会回调，但仍算绑定成功。像系统那样
-                    callConnectedMethodLocked(connection, cn, bd);
+                    callConnectedMethodLocked(msg.connection, msg.cn, bd);
                 }
             }
         }
         if (LOG) {
-            LogDebug.i(PLUGIN_TAG, "PSM.bindService(): Bind! inb=" + b + "; fl=" + flags + "; sr=" + sr);
+            LogDebug.i(PLUGIN_TAG, "PSM.bindService(): Bind! inb=" + b + "; fl=" + msg.flags + "; sr=" + msg.sr);
         }
-        return 1;
     }
 
     private void insertConnectionToRecords(ServiceRecord sr, ProcessBindRecord b, IServiceConnection connection, int flags) {
@@ -664,5 +774,14 @@ public class PluginServiceServer {
         }
 
         return jsonArray.toString();
+    }
+
+    private static class OnCreateAndBindMsg{
+        private Intent intent;
+        private IServiceConnection connection;
+        private int flags;
+        private ServiceRecord sr;
+        private ComponentName cn;
+        private ProcessRecord callerPr;
     }
 }

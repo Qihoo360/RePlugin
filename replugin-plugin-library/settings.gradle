@@ -13,4 +13,28 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        mavenLocal()
+        maven {
+            allowInsecureProtocol = true
+            url "http://maven.geelib.360.cn/nexus/repository/replugin/"}
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
+        maven {
+            allowInsecureProtocol = true
+            url "http://maven.geelib.360.cn/nexus/repository/replugin/"}
+    }
+}
+
+rootProject.name = "replugin-plugin-library"
 include ':replugin-plugin-lib'

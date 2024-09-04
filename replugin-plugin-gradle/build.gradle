@@ -15,29 +15,15 @@
  *
  */
 
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
-
-repositories {
-    jcenter()
-    mavenCentral()
-    google()
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'maven-publish'
 }
 
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        google()
-    }
-    dependencies {
-//        classpath 'com.android.tools.build:gradle:2.1.0'
-        // 将项目发布到JCenter 所需要的jar   添加依赖
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
-        classpath 'com.github.dcendents:android-maven-plugin:1.2'
-    }
+repositories {
+    google()
+    mavenCentral()
 }
 
 group = 'com.qihoo360.replugin'  // 组名
@@ -58,67 +44,20 @@ sourceSets {
 }
 
 dependencies {
-    compile 'com.android.tools.build:gradle:3.5.4'
-    compile 'org.json:json:20160212'
-    compile 'org.codehaus.groovy:groovy:2.4.7'
-    compile 'com.squareup:javapoet:1.5.1'
-    compile 'com.android.tools.build:transform-api:1.5.0'
-    compile 'org.javassist:javassist:3.18.2-GA'
-    compile 'commons-io:commons-io:2.5'
+    implementation 'com.android.tools.build:gradle:7.4.2'
+    implementation 'org.json:json:20160212'
+    implementation 'org.codehaus.groovy:groovy:2.4.7'
+    implementation 'com.squareup:javapoet:1.5.1'
+    implementation 'com.android.tools.build:transform-api:1.5.0'
+    implementation 'org.javassist:javassist:3.18.2-GA'
+    implementation 'commons-io:commons-io:2.5'
 
-    compile gradleApi()
-    compile localGroovy()
+    // gradle:7.4.2 也会依赖guava，codec
+    implementation 'com.google.guava:guava:30.1-jre'
+    implementation 'commons-codec:commons-codec:1.11'
 
-    compile 'com.google.gradle:osdetector-gradle-plugin:1.2.1'
-}
-
-if (project.hasProperty("android")) { // Android libraries
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from android.sourceSets.main.java.srcDirs
-    }
-
-    task javadoc(type: Javadoc) {
-        source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    }
-} else { // Java libraries
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-}
-
-// 强制 Java/JavaDoc 等的编码为 UTF-8
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-
-
-// add javadoc/source jar tasks as artifacts
-artifacts {
-    archives sourcesJar, javadocJar
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            if (plugins.hasPlugin('war')) {
-                from components.web
-            } else {
-                from components.java
-            }
-
-            artifact sourcesJar
-            artifact javadocJar
-        }
-    }
+    implementation gradleApi()
+    implementation localGroovy()
 }
 
 project.ext.RP_ARTIFACT_ID = 'replugin-plugin-gradle'

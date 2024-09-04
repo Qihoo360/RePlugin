@@ -16,6 +16,7 @@
 
 package com.qihoo360.replugin.sample.demo1;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -24,7 +25,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -39,6 +42,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.qihoo360.replugin.RePlugin;
+import com.qihoo360.replugin.common.utils.TimeUtils;
 import com.qihoo360.replugin.sample.demo1.activity.file_provider.FileProviderActivity;
 import com.qihoo360.replugin.sample.demo1.activity.notify_test.NotifyActivity;
 import com.qihoo360.replugin.sample.demo1.activity.preference.PrefActivity2;
@@ -53,6 +57,7 @@ import com.qihoo360.replugin.sample.demo1.activity.webview.WebViewActivity;
 import com.qihoo360.replugin.sample.demo1.service.PluginDemoService1;
 import com.qihoo360.replugin.sample.demo1.support.NotifyUtils;
 import com.qihoo360.replugin.sample.demo2.IDemo2;
+import com.qihoo360.replugin.sample.library.LibMainActivity;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -61,6 +66,8 @@ import java.util.List;
 import static com.qihoo360.replugin.sample.demo1.support.NotifyUtils.ACTION_START_NOTIFY_UI;
 import static com.qihoo360.replugin.sample.demo1.support.NotifyUtils.NOTIFY_KEY;
 import static com.qihoo360.replugin.sample.demo1.support.NotifyUtils.TAG;
+
+import androidx.core.content.ContextCompat;
 
 /**
  * @author RePlugin Team
@@ -76,7 +83,12 @@ public class MainActivity extends Activity {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_START_NOTIFY_UI);
-        registerReceiver(mIntentReceiver, filter);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(mIntentReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(mIntentReceiver, filter);
+        }
 
         initData();
 
@@ -401,18 +413,38 @@ public class MainActivity extends Activity {
         mItems.add(new TestItem("Send Notification", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NotifyUtils.sendNotification(v.getContext().getApplicationContext());
+                Context applicationContext = v.getContext().getApplicationContext();
+                if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
+                    NotifyUtils.sendNotification(applicationContext);
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    MainActivity.this.requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_DEMO3);
+                }
             }
         }));
     }
 
     private static final int REQUEST_CODE_DEMO2 = 0x021;
     private static final int RESULT_CODE_DEMO2 = 0x022;
+    private static final int REQUEST_CODE_DEMO3 = 0x023;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_DEMO2 && resultCode == RESULT_CODE_DEMO2) {
             Toast.makeText(this, data.getStringExtra("data"), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_DEMO3: {
+                if (grantResults != null && grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    NotifyUtils.sendNotification(getApplicationContext());
+                } else {
+                  Toast.makeText(this, "Please open the app notification permission", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 

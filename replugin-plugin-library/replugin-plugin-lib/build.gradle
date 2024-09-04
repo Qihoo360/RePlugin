@@ -14,17 +14,25 @@
  * the License.
  */
 
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    namespace 'com.qihoo360.replugin.library'
+    compileSdk 28
 
     defaultConfig {
-        minSdkVersion 1
+        minSdkVersion 9
+        targetSdkVersion 28
+
         versionCode 1
         versionName "1.0"
         consumerProguardFiles 'replugin-library-rules.pro'
+
+        buildConfigField "int", 'VERSION_CODE', String.valueOf(1)
+        buildConfigField 'String', 'VERSION_NAME', "\"" + "1.0" + "\""
     }
 
     buildTypes {
@@ -40,7 +48,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly 'com.android.support:appcompat-v7:28.+'
     compileOnly 'androidx.appcompat:appcompat:1.1.0'
 }

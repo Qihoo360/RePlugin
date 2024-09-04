@@ -79,6 +79,18 @@ class TaskAffinityStates {
             /* SingleInstance */
             states.addStates(allStates, containers, prefix + suffix + "TA" + i, LAUNCH_SINGLE_INSTANCE, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE);
             states.addStates(allStates, containers, prefix + suffix + "TA" + i, LAUNCH_SINGLE_INSTANCE, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE);
+
+            /* Standard 横屏*/
+            states.addLandStates(allStates, containers, prefix + suffix + "TA" + i, LAUNCH_MULTIPLE, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_STANDARD_LAND);
+            states.addLandStates(allStates, containers, prefix + suffix + "TA" + i, LAUNCH_MULTIPLE, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_STANDARD_LAND);
+
+            /* SingleTop 横屏*/
+            states.addLandStates(allStates, containers, prefix + suffix + "TA" + i, LAUNCH_SINGLE_TOP, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_TOP_LAND);
+            states.addLandStates(allStates, containers, prefix + suffix + "TA" + i, LAUNCH_SINGLE_TOP, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP_LAND);
+
+            /* SingleTask 横屏*/
+            states.addLandStates(allStates, containers, prefix + suffix + "TA" + i, LAUNCH_SINGLE_TASK, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_TASK_LAND);
+            states.addLandStates(allStates, containers, prefix + suffix + "TA" + i, LAUNCH_SINGLE_TASK, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK_LAND);
         }
     }
 
@@ -98,7 +110,7 @@ class TaskAffinityStates {
 
             LaunchModeStates states = mLaunchModeStates[index];
             if (states != null) {
-                return states.getStates(ai.launchMode, ai.theme);
+                return states.getStates(ai.screenOrientation, ai.launchMode, ai.theme);
             }
         }
 

@@ -53,14 +53,15 @@ public class ReClassPlugin implements Plugin<Project> {
             android.applicationVariants.all { variant ->
                 PluginDebugger pluginDebugger = new PluginDebugger(project, config, variant)
 
-                def variantData = variant.variantData
-                def scope = variantData.scope
-
                 def assembleTask = VariantCompat.getAssembleTask(variant)
 
-                def installPluginTaskName = scope.getTaskName(AppConstant.TASK_INSTALL_PLUGIN, "")
-                def installPluginTask = project.task(installPluginTaskName)
+                def variantName = captureName(variant.name)
 
+                def tasks =  project.tasks
+                def installPluginTask = tasks.asMap.get(AppConstant.TASK_INSTALL_PLUGIN + variantName)
+                if (installPluginTask == null) {
+                    installPluginTask = tasks.create(AppConstant.TASK_INSTALL_PLUGIN + variantName)
+                }
                 installPluginTask.doLast {
                     pluginDebugger.startHostApp()
                     pluginDebugger.uninstall()
@@ -70,19 +71,19 @@ public class ReClassPlugin implements Plugin<Project> {
                 }
                 installPluginTask.group = AppConstant.TASKS_GROUP
 
-
-                def uninstallPluginTaskName = scope.getTaskName(AppConstant.TASK_UNINSTALL_PLUGIN, "")
-                def uninstallPluginTask = project.task(uninstallPluginTaskName)
-
+                def uninstallPluginTask = tasks.asMap.get(AppConstant.TASK_UNINSTALL_PLUGIN)
+                if (uninstallPluginTask == null){
+                    uninstallPluginTask = tasks.create(AppConstant.TASK_UNINSTALL_PLUGIN)
+                }
                 uninstallPluginTask.doLast {
                     //generate json
                     pluginDebugger.uninstall()
                 }
                 uninstallPluginTask.group = AppConstant.TASKS_GROUP
 
-
-                if (null == forceStopHostAppTask) {
-                    forceStopHostAppTask = project.task(AppConstant.TASK_FORCE_STOP_HOST_APP)
+                forceStopHostAppTask = tasks.asMap.get(AppConstant.TASK_FORCE_STOP_HOST_APP)
+                if (forceStopHostAppTask == null) {
+                    forceStopHostAppTask = tasks.create(AppConstant.TASK_FORCE_STOP_HOST_APP)
                     forceStopHostAppTask.doLast {
                         //generate json
                         pluginDebugger.forceStopHostApp()
@@ -90,8 +91,9 @@ public class ReClassPlugin implements Plugin<Project> {
                     forceStopHostAppTask.group = AppConstant.TASKS_GROUP
                 }
 
-                if (null == startHostAppTask) {
-                    startHostAppTask = project.task(AppConstant.TASK_START_HOST_APP)
+                startHostAppTask = tasks.asMap.get(AppConstant.TASK_START_HOST_APP)
+                if (startHostAppTask == null) {
+                    startHostAppTask = tasks.create(AppConstant.TASK_START_HOST_APP)
                     startHostAppTask.doLast {
                         //generate json
                         pluginDebugger.startHostApp()
@@ -99,8 +101,9 @@ public class ReClassPlugin implements Plugin<Project> {
                     startHostAppTask.group = AppConstant.TASKS_GROUP
                 }
 
-                if (null == restartHostAppTask) {
-                    restartHostAppTask = project.task(AppConstant.TASK_RESTART_HOST_APP)
+                restartHostAppTask = tasks.asMap.get(AppConstant.TASK_RESTART_HOST_APP)
+                if (restartHostAppTask == null) {
+                    restartHostAppTask = tasks.create(AppConstant.TASK_RESTART_HOST_APP)
                     restartHostAppTask.doLast {
                         //generate json
                         pluginDebugger.startHostApp()
@@ -109,20 +112,23 @@ public class ReClassPlugin implements Plugin<Project> {
                     restartHostAppTask.dependsOn(forceStopHostAppTask)
                 }
 
-
                 if (assembleTask) {
                     installPluginTask.dependsOn assembleTask
                 }
 
-                def runPluginTaskName = scope.getTaskName(AppConstant.TASK_RUN_PLUGIN, "")
-                def runPluginTask = project.task(runPluginTaskName)
+                def runPluginTask = tasks.asMap.get(AppConstant.TASK_RUN_PLUGIN + variantName)
+                if (runPluginTask == null) {
+                    runPluginTask = tasks.create(AppConstant.TASK_RUN_PLUGIN + variantName)
+                }
                 runPluginTask.doLast {
                     pluginDebugger.run()
                 }
                 runPluginTask.group = AppConstant.TASKS_GROUP
 
-                def installAndRunPluginTaskName = scope.getTaskName(AppConstant.TASK_INSTALL_AND_RUN_PLUGIN, "")
-                def installAndRunPluginTask = project.task(installAndRunPluginTaskName)
+                def installAndRunPluginTask = tasks.asMap.get(AppConstant.TASK_INSTALL_AND_RUN_PLUGIN + variantName)
+                if (installAndRunPluginTask == null) {
+                    installAndRunPluginTask = tasks.create(AppConstant.TASK_INSTALL_AND_RUN_PLUGIN + variantName)
+                }
                 installAndRunPluginTask.doLast {
                     pluginDebugger.run()
                 }
@@ -138,6 +144,12 @@ public class ReClassPlugin implements Plugin<Project> {
             // 将 transform 注册到 android
             android.registerTransform(transform)
         }
+    }
+
+    private String captureName(String name) {
+        char[] cs = name.toCharArray();
+        cs[0] -= 32;
+        return String.valueOf(cs);
     }
 }
 

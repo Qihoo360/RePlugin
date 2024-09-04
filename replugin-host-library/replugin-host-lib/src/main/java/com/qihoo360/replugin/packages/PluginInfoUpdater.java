@@ -26,7 +26,6 @@ import com.qihoo360.loader.utils.LocalBroadcastManager;
 
 import com.qihoo360.loader2.MP;
 import com.qihoo360.replugin.base.IPC;
-import com.qihoo360.replugin.helper.HostConfigHelper;
 import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.model.PluginInfo;
 

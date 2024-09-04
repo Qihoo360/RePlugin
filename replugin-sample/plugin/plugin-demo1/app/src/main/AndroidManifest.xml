@@ -17,6 +17,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.qihoo360.replugin.sample.demo1">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <application
         android:name=".MainApp"
         android:allowBackup="false"
@@ -64,6 +66,7 @@
         <!-- NoTitleBarFullScreen -->
         <activity
             android:name=".activity.theme.ThemeBlackNoTitleBarFullscreenActivity"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <intent-filter>
@@ -74,7 +77,9 @@
         </activity>
 
         <!-- receivers -->
-        <receiver android:name=".receivers.PluginDemo1Receiver">
+        <receiver
+            android:name=".receivers.PluginDemo1Receiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.qihoo360.repluginapp.replugin.receiver.ACTION1" />
             </intent-filter>
@@ -82,12 +87,15 @@
 
         <!-- service -->
         <service
-            android:name=".service.PluginDemoAppService" />
+            android:name=".service.PluginDemoAppService"
+            android:exported="false"/>
         <service
             android:name=".service.PluginDemoService1"
+            android:exported="false"
             android:process=":bg" />
         <service
-            android:name=".service.PluginDemoService2">
+            android:name=".service.PluginDemoService2"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.qihoo360.replugin.sample.demo1.action.XXXX" />
             </intent-filter>
@@ -97,21 +105,25 @@
         <activity
             android:name=".activity.task_affinity.TAActivity1"
             android:launchMode="singleTask"
+            android:exported="false"
             android:taskAffinity=":ta_1"
             android:theme="@android:style/Theme.Black.NoTitleBar" />
         <activity
             android:name=".activity.task_affinity.TAActivity2"
             android:launchMode="singleTask"
+            android:exported="false"
             android:taskAffinity=":ta_1"
             android:theme="@android:style/Theme.Black.NoTitleBar" />
         <activity
             android:name=".activity.task_affinity.TAActivity3"
             android:launchMode="singleTask"
+            android:exported="false"
             android:taskAffinity=":ta_1"
             android:theme="@android:style/Theme.Black.NoTitleBar" />
         <activity
             android:name=".activity.task_affinity.TAActivity4"
             android:launchMode="singleTask"
+            android:exported="false"
             android:taskAffinity=":ta_1"
             android:theme="@android:style/Theme.Black.NoTitleBar" />
 
@@ -120,18 +132,21 @@
         <activity
             android:name=".activity.single_instance.TIActivity1"
             android:launchMode="singleInstance"
+            android:exported="false"
             android:theme="@android:style/Theme.Black.NoTitleBar" />
 
         <!-- SingleTop -->
         <activity
             android:name=".activity.single_top.SingleTopActivity1"
             android:launchMode="singleTop"
+            android:exported="false"
             android:theme="@android:style/Theme.Black.NoTitleBar" />
 
         <!-- IntentFilter -->
 
         <activity
             android:name=".activity.intent_filter.IntentFilterDemoActivity1"
+            android:exported="false"
             android:theme="@android:style/Theme.Black.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.demo1" />
@@ -143,26 +158,36 @@
         <activity
             android:name=".activity.preference.PrefActivity1"
             android:configChanges="keyboard|keyboardHidden|orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:exported="false"/>
 
         <activity
             android:name=".activity.preference.PrefActivity2"
             android:configChanges="keyboard|keyboardHidden|orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:exported="false"/>
 
         <activity android:name=".activity.webview.WebViewActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:exported="false"/>
 
         <provider
             android:name=".provider.Provider2"
-            android:authorities="com.qihoo360.replugin.sample.demo1.provider2" />
+            android:authorities="com.qihoo360.replugin.sample.demo1.provider2"
+            android:exported="false"/>
 
-        <activity android:name=".activity.for_result.ForResultActivity"/>
+        <activity
+            android:name=".activity.for_result.ForResultActivity"
+            android:exported="false"/>
 
-        <activity android:name=".activity.file_provider.FileProviderActivity"/>
+        <activity
+            android:name=".activity.file_provider.FileProviderActivity"
+            android:exported="false"/>
 
-        <activity android:name=".activity.notify_test.NotifyActivity"/>
+        <activity
+            android:name=".activity.notify_test.NotifyActivity"
+            android:exported="false"/>
 
         <!-- 以下provider，作为插件时，可注释掉；作为单独APK时需要声明-->
         <provider
@@ -174,10 +199,5 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/fileprovider_path" />
         </provider>
-
-        <activity
-            android:name=".LibMainActivity"
-            android:label="@string/app_name">
-        </activity>
     </application>
 </manifest>

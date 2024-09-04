@@ -19,22 +19,29 @@
  *
  * @author RePlugin Team
  */
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'replugin-plugin-gradle'
+}
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    namespace 'com.qihoo360.replugin.sample.webview'
+    compileSdk 33
 
     defaultConfig {
         versionName "1.1"
         versionCode 100
-        targetSdkVersion 28
+        targetSdkVersion 33
         applicationId "com.qihoo360.replugin.sample.webview"
         minSdkVersion 15
         multiDexEnabled false
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -46,13 +53,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 // 这个plugin需要放在android配置之后，因为需要读取android中的配置项
-apply plugin: 'replugin-plugin-gradle'
 repluginPluginConfig {
     pluginName = "webview"
     hostApplicationId = "com.qihoo360.replugin.sample.host"

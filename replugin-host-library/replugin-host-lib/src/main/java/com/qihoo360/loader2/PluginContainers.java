@@ -369,6 +369,22 @@ a 流程完成
             mLaunchModeStates.addStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_INSTANCE, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE);
             mLaunchModeStates.addStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_INSTANCE, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE);
 
+            // Standard 横屏
+            mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_MULTIPLE, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_STANDARD_LAND);
+            mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_MULTIPLE, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_STANDARD_LAND);
+
+            // SingleTop 横屏
+            mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_TOP, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_TOP_LAND);
+            mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_TOP, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP_LAND);
+
+            // SingleTask 横屏
+            mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_TASK, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_TASK_LAND);
+            mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_TASK, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK_LAND);
+
+            // SingleInstance 横屏
+            mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_INSTANCE, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE_LAND);
+            mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_INSTANCE, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE_LAND);
+
             // taskAffinity
             mTaskAffinityStates.init(prefix, suffix, mStates, containers);
 
@@ -383,8 +399,6 @@ a 流程完成
             // 从内存中加载
             loadFromPref();
         }
-
-        // TODO more
     }
 
     /**
@@ -413,6 +427,22 @@ a 流程完成
         // SingleInstance
         states.mLaunchModeStates.addStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_INSTANCE, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE);
         states.mLaunchModeStates.addStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_INSTANCE, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE);
+
+        // Standard 横屏
+        states.mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_MULTIPLE, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_STANDARD_LAND);
+        states.mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_MULTIPLE, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_STANDARD_LAND);
+
+        // SingleTop 横屏
+        states.mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_TOP, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_TOP_LAND);
+        states.mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_TOP, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP_LAND);
+
+        // SingleTask 横屏
+        states.mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_TASK, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_TASK_LAND);
+        states.mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_TASK, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK_LAND);
+
+        // SingleInstance 横屏
+        states.mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_INSTANCE, true, HostConfigHelper.ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE_LAND);
+        states.mLaunchModeStates.addLandStates(mStates, containers, prefix + suffix, LAUNCH_SINGLE_INSTANCE, false, HostConfigHelper.ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE_LAND);
 
         // taskAffinity
         states.mTaskAffinityStates.init(prefix, suffix, mStates, containers);
@@ -561,7 +591,7 @@ a 流程完成
         /* SingleInstance 优先级最高 */
         if (ai.launchMode == LAUNCH_SINGLE_INSTANCE) {
             synchronized (mLock) {
-                state = allocLocked(ai, mLaunchModeStates.getStates(ai.launchMode, ai.theme), plugin, activity, intent);
+                state = allocLocked(ai, mLaunchModeStates.getStates(ai.screenOrientation, ai.launchMode, ai.theme), plugin, activity, intent);
             }
 
         /* TaskAffinity */
@@ -573,7 +603,7 @@ a 流程完成
         /* SingleTask, SingleTop, Standard */
         } else {
             synchronized (mLock) {
-                state = allocLocked(ai, mLaunchModeStates.getStates(ai.launchMode, ai.theme), plugin, activity, intent);
+                state = allocLocked(ai, mLaunchModeStates.getStates(ai.screenOrientation, ai.launchMode, ai.theme), plugin, activity, intent);
             }
         }
 
@@ -685,7 +715,7 @@ a 流程完成
         /* SingleInstance */
         if (ai.launchMode == LAUNCH_SINGLE_INSTANCE) {
             synchronized (mLock) {
-                state = allocLocked(ai, states.mLaunchModeStates.getStates(ai.launchMode, ai.theme), plugin, activity, intent);
+                state = allocLocked(ai, states.mLaunchModeStates.getStates(ai.screenOrientation, ai.launchMode, ai.theme), plugin, activity, intent);
             }
 
         /* TaskAffinity */
@@ -697,7 +727,7 @@ a 流程完成
         /* other mode */
         } else {
             synchronized (mLock) {
-                state = allocLocked(ai, states.mLaunchModeStates.getStates(ai.launchMode, ai.theme), plugin, activity, intent);
+                state = allocLocked(ai, states.mLaunchModeStates.getStates(ai.screenOrientation, ai.launchMode, ai.theme), plugin, activity, intent);
             }
         }
 

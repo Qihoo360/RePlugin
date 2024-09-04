@@ -20,7 +20,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.qihoo360.replugin.RePlugin;
@@ -369,7 +368,6 @@ public class PluginInfo implements Serializable, Parcelable, Cloneable {
      * @param dirSuffix 目录后缀
      * @return 插件的Dex所在目录的File对象
      */
-    @NonNull
     private File getDexDir(File dexDir, String dirSuffix) {
 
         File dir = new File(dexDir, makeInstalledFileName() + dirSuffix);

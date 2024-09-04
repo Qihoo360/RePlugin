@@ -44,56 +44,38 @@ public class Replugin implements Plugin<Project> {
 
         /* Extensions */
         project.extensions.create(AppConstant.USER_CONFIG, RepluginConfig)
-
         if (project.plugins.hasPlugin(AppPlugin)) {
-
             def android = project.extensions.getByType(AppExtension)
             android.applicationVariants.all { variant ->
-
                 addShowPluginTask(variant)
-
                 if (config == null) {
                     config = project.extensions.getByName(AppConstant.USER_CONFIG)
                     checkUserConfig(config)
                 }
-
                 def generateBuildConfigTask = VariantCompat.getGenerateBuildConfigTask(variant)
-                def appID = generateBuildConfigTask.appPackageName
+                def appID = [variant.getApplicationId(), variant.buildType.applicationIdSuffix].findAll().join()
+
                 def newManifest = ComponentsGenerator.generateComponent(appID, config)
                 println "${TAG} countTask=${config.countTask}"
-
-                def variantData = variant.variantData
-                def scope = variantData.scope
-
                 //host generate task
-                def generateHostConfigTaskName = scope.getTaskName(AppConstant.TASK_GENERATE, "HostConfig")
-                def generateHostConfigTask = project.task(generateHostConfigTaskName)
 
+                def generateHostConfigTaskName = getTaskName(variant, AppConstant.TASK_GENERATE, "HostConfig")
+                def generateHostConfigTask = project.task(generateHostConfigTaskName)
                 generateHostConfigTask.doLast {
-                    FileCreators.createHostConfig(project, variant, config)
+                    FileCreators.createHostConfig(project, generateBuildConfigTask, config)
                 }
                 generateHostConfigTask.group = AppConstant.TASKS_GROUP
-
                 //depends on build config task
                 if (generateBuildConfigTask) {
                     generateHostConfigTask.dependsOn generateBuildConfigTask
                     generateBuildConfigTask.finalizedBy generateHostConfigTask
                 }
-
-                //json generate task
-                def generateBuiltinJsonTaskName = scope.getTaskName(AppConstant.TASK_GENERATE, "BuiltinJson")
-                def generateBuiltinJsonTask = project.task(generateBuiltinJsonTaskName)
-
-                generateBuiltinJsonTask.doLast {
-                    FileCreators.createBuiltinJson(project, variant, config)
-                }
-                generateBuiltinJsonTask.group = AppConstant.TASKS_GROUP
-
                 //depends on mergeAssets Task
                 def mergeAssetsTask = VariantCompat.getMergeAssetsTask(variant)
                 if (mergeAssetsTask) {
-                    generateBuiltinJsonTask.dependsOn mergeAssetsTask
-                    mergeAssetsTask.finalizedBy generateBuiltinJsonTask
+                    mergeAssetsTask.doLast{
+                        FileCreators.createBuiltinJson(project, variant, config)
+                    }
                 }
 
                 variant.outputs.each { output ->
@@ -130,57 +112,44 @@ public class Replugin implements Plugin<Project> {
             appendManifest(file, newManifest)
         }
     }
-
     def appendManifest(def file, def content) {
         if (file == null || !file.exists()) return
         println "${AppConstant.TAG} appendManifest: ${file}"
         def updatedContent = file.getText("UTF-8").replaceAll("</application>", content + "</application>")
         file.write(updatedContent, 'UTF-8')
     }
-
     // 添加 【查看所有插件信息】 任务
     def addShowPluginTask(def variant) {
-        def variantData = variant.variantData
-        def scope = variantData.scope
-        def showPluginsTaskName = scope.getTaskName(AppConstant.TASK_SHOW_PLUGIN, "")
+        def showPluginsTaskName = getTaskName(variant, AppConstant.TASK_SHOW_PLUGIN, "")
         def showPluginsTask = project.task(showPluginsTaskName)
-
         showPluginsTask.doLast {
             IFileCreator creator = new PluginBuiltinJsonCreator(project, variant, config)
             def dir = creator.getFileDir()
-
             if (!dir.exists()) {
                 println "${AppConstant.TAG} The ${dir.absolutePath} does not exist "
                 println "${AppConstant.TAG} pluginsInfo=null"
                 return
             }
-
             String fileContent = creator.getFileContent()
             if (null == fileContent) {
                 return
             }
-
             new File(dir, creator.getFileName()).write(fileContent, 'UTF-8')
         }
         showPluginsTask.group = AppConstant.TASKS_GROUP
-
         //get mergeAssetsTask name, get real gradle task
         def mergeAssetsTask = VariantCompat.getMergeAssetsTask(variant)
-
         //depend on mergeAssetsTask so that assets have been merged
         if (mergeAssetsTask) {
             showPluginsTask.dependsOn mergeAssetsTask
         }
-
     }
-
     /**
      * 检查用户配置项
      */
     def checkUserConfig(config) {
 /*
         def persistentName = config.persistentName
-
         if (persistentName == null || persistentName.trim().equals("")) {
             project.logger.log(LogLevel.ERROR, "\n---------------------------------------------------------------------------------")
             project.logger.log(LogLevel.ERROR, " ERROR: persistentName can'te be empty, please set persistentName in replugin. ")
@@ -198,14 +167,26 @@ public class Replugin implements Plugin<Project> {
         doCheckConfig("countNotTranslucentSingleTop", config.countNotTranslucentSingleTop)
         doCheckConfig("countNotTranslucentSingleTask", config.countNotTranslucentSingleTask)
         doCheckConfig("countNotTranslucentSingleInstance", config.countNotTranslucentSingleInstance)
+
+        // 横屏
+        doCheckConfig("countTranslucentStandardLand", config.countTranslucentStandardLand)
+        doCheckConfig("countTranslucentSingleTopLand", config.countTranslucentSingleTopLand)
+        doCheckConfig("countTranslucentSingleTaskLand", config.countTranslucentSingleTaskLand)
+        doCheckConfig("countTranslucentSingleInstanceLand", config.countTranslucentSingleInstanceLand)
+        doCheckConfig("countNotTranslucentStandardLand", config.countNotTranslucentStandardLand)
+        doCheckConfig("countNotTranslucentSingleTopLand", config.countNotTranslucentSingleTopLand)
+        doCheckConfig("countNotTranslucentSingleTaskLand", config.countNotTranslucentSingleTaskLand)
+        doCheckConfig("countNotTranslucentSingleInstanceLand", config.countNotTranslucentSingleInstanceLand)
+
         doCheckConfig("countTask", config.countTask)
 
         println '--------------------------------------------------------------------------'
 //        println "${TAG} appID=${appID}"
         println "${TAG} useAppCompat=${config.useAppCompat}"
-
+        println "${TAG} useOccupyLand=${config.useOccupyLand}"
         println "${TAG} useAndroidX=${config.useAndroidX}"
         // println "${TAG} persistentName=${config.persistentName}"
+
         println "${TAG} countProcess=${config.countProcess}"
 
         println "${TAG} countTranslucentStandard=${config.countTranslucentStandard}"
@@ -216,6 +197,16 @@ public class Replugin implements Plugin<Project> {
         println "${TAG} countNotTranslucentSingleTop=${config.countNotTranslucentSingleTop}"
         println "${TAG} countNotTranslucentSingleTask=${config.countNotTranslucentSingleTask}"
         println "${TAG} countNotTranslucentSingleInstance=${config.countNotTranslucentSingleInstance}"
+
+        // 横屏
+        println "${TAG} countTranslucentStandardLand=${config.countTranslucentStandardLand()}"
+        println "${TAG} countTranslucentSingleTopLand=${config.countTranslucentSingleTopLand()}"
+        println "${TAG} countTranslucentSingleTaskLand=${config.countTranslucentSingleTaskLand()}"
+        println "${TAG} countTranslucentSingleInstanceLand=${config.countTranslucentSingleInstanceLand()}"
+        println "${TAG} countNotTranslucentStandardLand=${config.countNotTranslucentStandardLand()}"
+        println "${TAG} countNotTranslucentSingleTopLand=${config.countNotTranslucentSingleTopLand()}"
+        println "${TAG} countNotTranslucentSingleTaskLand=${config.countNotTranslucentSingleTaskLand()}"
+        println "${TAG} countNotTranslucentSingleInstanceLand=${config.countNotTranslucentSingleInstanceLand()}"
 
         println "${TAG} countTask=${config.countTask}"
         println '--------------------------------------------------------------------------'
@@ -234,6 +225,9 @@ public class Replugin implements Plugin<Project> {
             System.exit(0)
         }
     }
+    String getTaskName(def variant, def prefix, def suffix){
+        return prefix + variant.name + suffix
+    }
 }
 
 class RepluginConfig {
@@ -247,6 +241,11 @@ class RepluginConfig {
     /** 常驻进程名称（也就是上面说的 Persistent 进程，开发者可自定义）*/
     def persistentName = ':GuardService'
 
+    /**
+     * 是否使用 横屏坑位
+     */
+    def useOccupyLand = false
+
     /** 背景不透明的坑的数量 */
     def countNotTranslucentStandard = 6
     def countNotTranslucentSingleTop = 2
@@ -258,6 +257,26 @@ class RepluginConfig {
     def countTranslucentSingleTop = 2
     def countTranslucentSingleTask = 2
     def countTranslucentSingleInstance = 3
+
+    /** 背景不透明的坑的数量 横屏 */
+    def countNotTranslucentStandardLand = 1
+    def countNotTranslucentSingleTopLand = 1
+    def countNotTranslucentSingleTaskLand = 1
+    def countNotTranslucentSingleInstanceLand = 1
+    def countNotTranslucentStandardLand(){useOccupyLand ? countNotTranslucentStandardLand : 0}
+    def countNotTranslucentSingleTopLand(){useOccupyLand ? countNotTranslucentSingleTopLand : 0}
+    def countNotTranslucentSingleTaskLand(){useOccupyLand ? countNotTranslucentSingleTaskLand : 0}
+    def countNotTranslucentSingleInstanceLand(){useOccupyLand ? countNotTranslucentSingleInstanceLand : 0}
+
+    /** 背景透明的坑的数量 横屏*/
+    def countTranslucentStandardLand = 1
+    def countTranslucentSingleTopLand = 1
+    def countTranslucentSingleTaskLand = 1
+    def countTranslucentSingleInstanceLand = 1
+    def countTranslucentStandardLand(){useOccupyLand ? countTranslucentStandardLand : 0}
+    def countTranslucentSingleTopLand(){useOccupyLand ? countTranslucentSingleTopLand : 0}
+    def countTranslucentSingleTaskLand(){useOccupyLand ? countTranslucentSingleTaskLand : 0}
+    def countTranslucentSingleInstanceLand(){useOccupyLand ? countTranslucentSingleInstanceLand : 0}
 
     /** 宿主中声明的 TaskAffinity 的组数 */
     def countTask = 2

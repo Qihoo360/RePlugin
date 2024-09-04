@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.qihoo360.replugin.RePlugin;
@@ -106,7 +107,11 @@ public class DebuggerReceivers {
         itf.addAction(actionUninstall);
         itf.addAction(actionInstallWithPN);
         itf.addAction(actionStartActivity);
-        context.registerReceiver(sDebugerReceiver, itf);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.registerReceiver(sDebugerReceiver, itf, Context.RECEIVER_EXPORTED);
+        } else {
+            context.registerReceiver(sDebugerReceiver, itf);
+        }
 
         return true;
     }

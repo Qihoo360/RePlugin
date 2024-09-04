@@ -47,8 +47,8 @@ public class FileCreators {
         println "${AppConstant.TAG} rewrite ${targetFile.getAbsoluteFile()}"
     }
 
-    static def createHostConfig(project, variant, config) {
-        def creator = new RePluginHostConfigCreator(project, variant, config)
+    static def createHostConfig(project, generateBuildConfigTask, config) {
+        def creator = new RePluginHostConfigCreator(project, generateBuildConfigTask, config)
         create(creator)
     }
 

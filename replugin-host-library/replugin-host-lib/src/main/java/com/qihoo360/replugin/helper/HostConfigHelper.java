@@ -49,11 +49,23 @@ public class HostConfigHelper {
     public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TASK = 2;
     public static int ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE = 3;
 
+    // 背景透明的坑的数量（每种 launchMode 不同）横屏
+    public static int ACTIVITY_PIT_COUNT_TS_STANDARD_LAND = 1;
+    public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TOP_LAND = 1;
+    public static int ACTIVITY_PIT_COUNT_TS_SINGLE_TASK_LAND = 1;
+    public static int ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE_LAND = 1;
+
     // 背景不透明的坑的数量（每种 launchMode 不同）
     public static int ACTIVITY_PIT_COUNT_NTS_STANDARD = 6;
     public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP = 2;
     public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK = 3;
     public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE = 2;
+
+    // 背景不透明的坑的数量（每种 launchMode 不同）横屏
+    public static int ACTIVITY_PIT_COUNT_NTS_STANDARD_LAND = 1;
+    public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP_LAND = 1;
+    public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK_LAND = 1;
+    public static int ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE_LAND = 1;
 
     // TaskAffinity 组数
     public static int ACTIVITY_PIT_COUNT_TASK = 2;
@@ -61,8 +73,11 @@ public class HostConfigHelper {
     // 是否使用 AppCompat 库
     public static boolean ACTIVITY_PIT_USE_APPCOMPAT = false;
 
-    //host 是否支持了androidx库
+    // host 是否支持了androidx库
     public static boolean HOST_USE_ANDROIDX = false;
+
+    // 是否使用 横屏坑位
+    public static boolean HOST_USE_OCCUPYLAND = false;
 
     //------------------------------------------------------------
     // 主程序支持的插件版本范围
@@ -107,7 +122,19 @@ public class HostConfigHelper {
         }
 
         try {
+            HOST_USE_OCCUPYLAND = readField("HOST_USE_OCCUPYLAND");
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
             ACTIVITY_PIT_COUNT_TS_STANDARD = readField("ACTIVITY_PIT_COUNT_TS_STANDARD");
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
+            ACTIVITY_PIT_COUNT_TS_STANDARD_LAND = readField("ACTIVITY_PIT_COUNT_TS_STANDARD_LAND");
         } catch (NoSuchFieldException e) {
             // Ignore, Just use default value
         }
@@ -119,7 +146,19 @@ public class HostConfigHelper {
         }
 
         try {
+            ACTIVITY_PIT_COUNT_TS_SINGLE_TOP_LAND = readField("ACTIVITY_PIT_COUNT_TS_SINGLE_TOP_LAND");
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
             ACTIVITY_PIT_COUNT_TS_SINGLE_TASK = readField("ACTIVITY_PIT_COUNT_TS_SINGLE_TASK");
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
+            ACTIVITY_PIT_COUNT_TS_SINGLE_TASK_LAND = readField("ACTIVITY_PIT_COUNT_TS_SINGLE_TASK_LAND");
         } catch (NoSuchFieldException e) {
             // Ignore, Just use default value
         }
@@ -131,7 +170,19 @@ public class HostConfigHelper {
         }
 
         try {
+            ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE_LAND = readField("ACTIVITY_PIT_COUNT_TS_SINGLE_INSTANCE_LAND");
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
             ACTIVITY_PIT_COUNT_NTS_STANDARD = readField("ACTIVITY_PIT_COUNT_NTS_STANDARD");
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
+            ACTIVITY_PIT_COUNT_NTS_STANDARD_LAND = readField("ACTIVITY_PIT_COUNT_NTS_STANDARD_LAND");
         } catch (NoSuchFieldException e) {
             // Ignore, Just use default value
         }
@@ -143,13 +194,31 @@ public class HostConfigHelper {
         }
 
         try {
+            ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP_LAND = readField("ACTIVITY_PIT_COUNT_NTS_SINGLE_TOP_LAND");
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
             ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK = readField("ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK");
         } catch (NoSuchFieldException e) {
             // Ignore, Just use default value
         }
 
         try {
+            ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK_LAND = readField("ACTIVITY_PIT_COUNT_NTS_SINGLE_TASK_LAND");
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
             ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE = readField("ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE");
+        } catch (NoSuchFieldException e) {
+            // Ignore, Just use default value
+        }
+
+        try {
+            ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE_LAND = readField("ACTIVITY_PIT_COUNT_NTS_SINGLE_INSTANCE_LAND");
         } catch (NoSuchFieldException e) {
             // Ignore, Just use default value
         }

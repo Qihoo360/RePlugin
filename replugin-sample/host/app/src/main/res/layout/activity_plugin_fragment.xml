@@ -5,7 +5,7 @@
     android:layout_weight="2"
     android:orientation="vertical">
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment"
         class="com.qihoo360.replugin.sample.demo1.fragment.DemoFragment"
         android:layout_width="match_parent"

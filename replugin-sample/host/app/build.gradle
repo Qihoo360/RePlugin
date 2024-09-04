@@ -14,15 +14,18 @@
  * the License.
  */
 
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'replugin-host-gradle'
+}
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    namespace 'com.qihoo360.replugin.sample.host'
+    compileSdk 34
     defaultConfig {
         applicationId "com.qihoo360.replugin.sample.host"
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdkVersion 21
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
     }
@@ -32,9 +35,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
-apply plugin: 'replugin-host-gradle'
 repluginHostConfig {
     useAppCompat = true
     useAndroidX = true

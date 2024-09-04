@@ -15,25 +15,8 @@
  */
 buildscript {
     { p, cfg = "rp-config.gradle" -> if (new File(p, cfg).exists()) apply from: "${p}/${cfg}" else if (p.exists()) call(p.parentFile) }(buildscript.sourceFile.parentFile)
-    repositories {
-        mavenCentral()
-        maven { url "https://maven.google.com" }
-        maven {url "http://maven.geelib.360.cn/nexus/repository/replugin/"}
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.4'
-        classpath "com.qihoo360.replugin:replugin-plugin-gradle:${RP_VERSION}"
-    }
 }
-
-allprojects {
-    repositories {
-        mavenCentral()
-        maven { url "https://maven.google.com" }
-        maven {url "http://maven.geelib.360.cn/nexus/repository/replugin/"}
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+plugins {
+    id 'com.android.application' version '7.4.2' apply false
+    id 'replugin.plugin.gradle' version "${RP_VERSION}" apply false
 }
