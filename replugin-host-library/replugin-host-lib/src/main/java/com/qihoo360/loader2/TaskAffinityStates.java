@@ -108,6 +108,10 @@ class TaskAffinityStates {
                 e.printStackTrace();
             }
 
+            // index在坑位查找失败时会返回-1，导致这里越界
+            // 此处增加修越界检查
+            index = Math.max(0, Math.min(mLaunchModeStates.length - 1, index));
+
             LaunchModeStates states = mLaunchModeStates[index];
             if (states != null) {
                 return states.getStates(ai.screenOrientation, ai.launchMode, ai.theme);
