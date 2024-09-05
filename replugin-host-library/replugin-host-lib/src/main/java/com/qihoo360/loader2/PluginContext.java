@@ -401,6 +401,7 @@ public class PluginContext extends ContextThemeWrapper {
             // 找构造器
             try {
                 construct = c.getConstructor(Context.class, AttributeSet.class);
+                construct.setAccessible(true);
                 if (LOG) {
                     LogDebug.d(PLUGIN_TAG, "layout.cache: new constructor. plugin=" + mPlugin + " name=" + name);
                 }

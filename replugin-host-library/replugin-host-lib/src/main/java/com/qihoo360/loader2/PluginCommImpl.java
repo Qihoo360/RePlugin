@@ -42,6 +42,7 @@ import com.qihoo360.replugin.helper.LogDebug;
 import com.qihoo360.replugin.helper.LogRelease;
 import com.qihoo360.replugin.model.PluginInfo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -292,6 +293,34 @@ public class PluginCommImpl {
 
         if (LOG) {
             LogDebug.d(PLUGIN_TAG, "not found plugin=" + name);
+        }
+
+        return null;
+    }
+
+    /**
+     * 获取全部插件的ComponentList，并在其中查找Intent Action
+     * @return 全部插件的ComponentList
+     */
+    public List<ComponentList> queryPluginComponentListAll() {
+        List<ComponentList> result;
+        // 先从缓存获取全部插件
+        result = Plugin.queryCachedComponentListAll();
+        if (result != null && !result.isEmpty()) {
+            return result;
+        }
+
+        result = new ArrayList<>();
+        List<Plugin> list = mPluginMgr.loadPackageInfoPluginList(this);
+        if (list != null && !list.isEmpty()) {
+            for (Plugin p : list) {
+                result.add(p.mLoader.mComponents);
+            }
+            return result;
+        }
+
+        if (LOG) {
+            LogDebug.d(PLUGIN_TAG, "not found plugin");
         }
 
         return null;
