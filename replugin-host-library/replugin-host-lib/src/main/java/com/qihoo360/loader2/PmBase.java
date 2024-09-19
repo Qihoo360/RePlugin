@@ -1263,6 +1263,11 @@ class PmBase {
         if (mPlugins.containsKey(info.getName())) {
             mPlugins.remove(info.getName());
         }
+        //移除卸载插件的HashMap中已包名为key的缓存
+        String packageName = info.getPackageName();
+        if (mPlugins.containsKey(packageName)) {
+            mPlugins.remove(packageName);
+        }
 
         // 移除卸载插件表快照
         PluginTable.removeInfo(info);
