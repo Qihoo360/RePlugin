@@ -33,7 +33,7 @@ class ComponentsGenerator {
     def static final multiprocess = 'android:multiprocess'
 
     def static final cfg = 'android:configChanges'
-    def static final cfgV = 'keyboard|keyboardHidden|orientation|screenSize'
+    def static final cfgV = 'keyboard|keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout'
 
     def static final exp = 'android:exported'
     def static final expV = 'false'
