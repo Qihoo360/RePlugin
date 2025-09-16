@@ -77,15 +77,19 @@ public class MatrixPlugin implements Plugin<Project> {
             description = 'Initialize Matrix APM configuration for RePlugin'
             
             doLast {
+                def currentConfig = project.extensions.getByName(AppConstant.USER_CONFIG)
+                def apmConfig = currentConfig.apm
+                def traceConfig = currentConfig.trace
+                
                 println "${TAG} Matrix APM initialization completed"
                 println "${TAG} Configuration:"
-                println "${TAG}   - Matrix enabled: ${config.enable}"
-                println "${TAG}   - APM enabled: ${config.apm.enable}"
-                println "${TAG}   - Trace enabled: ${config.trace.enable}"
-                println "${TAG}   - IO Canary: ${config.apm.ioCanary}"
-                println "${TAG}   - Battery Canary: ${config.apm.batteryCanary}"
-                println "${TAG}   - SQLite Canary: ${config.apm.sqliteCanary}"
-                println "${TAG}   - Memory Canary: ${config.apm.memoryCanary}"
+                println "${TAG}   - Matrix enabled: ${currentConfig.enable}"
+                println "${TAG}   - APM enabled: ${apmConfig.enable}"
+                println "${TAG}   - Trace enabled: ${traceConfig.enable}"
+                println "${TAG}   - IO Canary: ${apmConfig.ioCanary}"
+                println "${TAG}   - Battery Canary: ${apmConfig.batteryCanary}"
+                println "${TAG}   - SQLite Canary: ${apmConfig.sqliteCanary}"
+                println "${TAG}   - Memory Canary: ${apmConfig.memoryCanary}"
             }
         }
 
@@ -95,7 +99,8 @@ public class MatrixPlugin implements Plugin<Project> {
             description = 'Generate Matrix configuration file'
             
             doLast {
-                generateMatrixConfigFile()
+                def currentConfig = project.extensions.getByName(AppConstant.USER_CONFIG)
+                generateMatrixConfigFile(currentConfig)
             }
         }
 
@@ -106,23 +111,28 @@ public class MatrixPlugin implements Plugin<Project> {
     /**
      * Generate Matrix configuration file
      */
-    def generateMatrixConfigFile() {
+    def generateMatrixConfigFile(currentConfig) {
         def configFile = new File(project.projectDir, "matrix_config.json")
+        
+        // Access nested properties properly
+        def apmConfig = currentConfig.apm
+        def traceConfig = currentConfig.trace
+        
         def configContent = """
 {
   "matrix": {
-    "enable": ${config.enable},
+    "enable": ${currentConfig.enable},
     "apm": {
-      "enable": ${config.apm.enable},
-      "ioCanary": ${config.apm.ioCanary},
-      "batteryCanary": ${config.apm.batteryCanary},
-      "sqliteCanary": ${config.apm.sqliteCanary},
-      "memoryCanary": ${config.apm.memoryCanary}
+      "enable": ${apmConfig.enable},
+      "ioCanary": ${apmConfig.ioCanary},
+      "batteryCanary": ${apmConfig.batteryCanary},
+      "sqliteCanary": ${apmConfig.sqliteCanary},
+      "memoryCanary": ${apmConfig.memoryCanary}
     },
     "trace": {
-      "enable": ${config.trace.enable},
-      "baseMethodMapFile": "${config.trace.baseMethodMapFile ?: ''}",
-      "blackListFile": "${config.trace.blackListFile ?: ''}"
+      "enable": ${traceConfig.enable},
+      "baseMethodMapFile": "${traceConfig.baseMethodMapFile ?: ''}",
+      "blackListFile": "${traceConfig.blackListFile ?: ''}"
     }
   }
 }
